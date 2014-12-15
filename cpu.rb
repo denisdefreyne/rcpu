@@ -11,7 +11,7 @@ end
 
 class Register < Struct.new(:name)
   def inspect
-    "reg(#{name})"
+    "R#{name}"
   end
 end
 
@@ -33,11 +33,11 @@ def val(value)
   Value.new(value)
 end
 
-A = reg(:a)
-B = reg(:b)
-C = reg(:c)
-R = reg(:r)
-PC = reg(:pc)
+PC = reg(:PC)
+R = reg(:R)
+A = reg(:A)
+B = reg(:B)
+C = reg(:C)
 
 class Context
   attr_reader :instrs
@@ -48,8 +48,18 @@ class Context
   def initialize(instrs, mem)
     @instrs = instrs
     @mem = mem
-    @registers = { PC => val(0) }
+    @registers = {
+      PC => val(0),
+      R => val(0),
+      A => val(0),
+      B => val(0),
+      C => val(0),
+    }
     @stack = []
+  end
+
+  def inspect
+    "Context(stack = #{stack.inspect}, registers = #{registers.map { |k,v| k.name.to_s + '=' + v.value.to_s }.join(' ')})"
   end
 
   def get_reg(reg)
@@ -92,8 +102,7 @@ class Interpreter
       raise "No instruction at #{ctx.get_reg(PC)}"
     end
 
-    puts "--- Stack:     #{ctx.stack.inspect}"
-    puts "--- Registers: #{ctx.registers.inspect}"
+    puts "--- Context:   #{ctx.inspect}"
     puts "=== Evaluating #{instr.inspect}"
     case instr[0]
     when :dis
