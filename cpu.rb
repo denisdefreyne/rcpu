@@ -169,8 +169,8 @@ program = {
     [:mod, :a, 20, :b],
     [:ifz, :b],
     [:set, 0, :pc],
-    [:set, 42, :a],
-    [:set, 14, :b],
+    [:push, 42],
+    [:push, 14],
     [:add, :pc, 2, :d], # return address
     [:push, :d], # return address
     [:set, label(:gcd), :pc], # jump
@@ -179,12 +179,17 @@ program = {
     [:halt],
   ],
   gcd: [
+    [:pop, :d], # return address
+    [:pop, :a],
+    [:pop, :b],
+  ],
+  gcd_loop: [
     [:mod, :a, :b, :c],
     [:set, :b, :a],
     [:set, :c, :b],
     [:ifnz, :c],
-    [:set, label(:gcd), :pc], # jump
-    [:pop, :pc],
+    [:set, label(:gcd_loop), :pc], # jump
+    [:set, :d, :pc],
   ]
 }
 
