@@ -236,7 +236,86 @@ end
 
 ###############################################################################
 
-program = {
+class DSL
+  attr_reader :instrs
+
+  def self.define(&block)
+    dsl = self.new
+    dsl.instance_eval(&block)
+    dsl.instrs
+  end
+
+  def initialize
+    @instrs = {} # ordered!
+  end
+
+  def label(name, &block)
+    @instrs[name] = []
+    BlockDSL.define(@instrs[name], &block)
+  end
+end
+
+class BlockDSL
+  def self.define(instrs, &block)
+    self.new(instrs).instance_eval(&block)
+  end
+
+  def initialize(instrs)
+    @instrs = instrs
+  end
+
+  def fmt(x)
+    @instrs << [:fmt, x]
+  end
+
+  def set(src, dst)
+    @instrs << [:set, src, dst]
+  end
+
+  def dis(x)
+    @instrs << [:dis, x]
+  end
+
+  def add(a, b, r)
+    @instrs << [:add, a, b, r]
+  end
+
+  def mod(a, b, r)
+    @instrs << [:mod, a, b, r]
+  end
+
+  def ifz(x)
+    @instrs << [:ifz, x]
+  end
+
+  def halt
+    @instrs << [:halt]
+  end
+end
+
+###############################################################################
+
+program = DSL.define do
+  label(:main) do
+    fmt label(:hello)
+  end
+
+  label(:count) do
+    set val(100), A
+    dis A
+    add A, val(1), A
+    mod A, val(20), B
+    ifz B
+    set label(:count), PC
+    halt
+  end
+end
+
+p program
+
+###############################################################################
+
+program2 = {
   main: [
     # greet
     [:fmt, label(:hello)],
