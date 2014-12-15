@@ -10,8 +10,10 @@
 #   * direct jump: jmp
 #   * conditional jump: if-zero, if-negative
 
-def label(name)
-  [:label, name]
+class Label < Struct.new(:name)
+  def inspect
+    "label(#{name})"
+  end
 end
 
 class Register < Struct.new(:name)
@@ -24,6 +26,10 @@ class Value < Struct.new(:value)
   def inspect
     "val(#{value})"
   end
+end
+
+def label(name)
+  Label.new(name)
 end
 
 def reg(name)
@@ -261,8 +267,8 @@ def translate(procedures)
   # Translate labels
   instrs.each do |instr|
     instr.each_with_index do |arg, idx|
-      if arg.is_a?(Array) && arg[0] == :label
-        instr[idx] = val(labels[arg[1]])
+      if arg.is_a?(Label)
+        instr[idx] = val(labels[arg.name])
       end
     end
   end
