@@ -119,7 +119,7 @@ def eval(instrs, ctx)
     raise "No instruction at #{ctx.registers[:pc]}"
   end
 
-  p instr
+  # p instr
   case instr[0]
   when :dis
     dis(instr[1], ctx)
@@ -157,13 +157,11 @@ program = {
     [:mod, :a, 20, :b],
     [:ifz, :b],
     [:set, 0, :pc],
-    [:dis, 666],
     [:set, 42, :a],
     [:set, 14, :b],
     [:add, :pc, 1, :d], # return address
     [:set, label(:gcd), :pc], # jump
     [:dis, :a],
-    [:dis, 777],
     [:halt],
   ],
   gcd: [
