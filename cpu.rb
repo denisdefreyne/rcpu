@@ -69,6 +69,13 @@ def sub(a, b, dst, ctx)
   ctx.registers[dst] = a - b
 end
 
+def mod(a, b, dst, ctx)
+  a = value_or_register(a, ctx)
+  b = value_or_register(b, ctx)
+
+  ctx.registers[dst] = a % b
+end
+
 def halt(ctx)
   ctx.registers[:pc] -= 1
 end
@@ -88,7 +95,13 @@ def eql(a, b, dst, ctx)
 end
 
 def ifnz(r, ctx)
-  if ctx.registers[r] == 1
+  if ctx.registers[r] != 0
+    ctx.registers[:pc] += 1
+  end
+end
+
+def ifz(r, ctx)
+  if ctx.registers[r] == 0
     ctx.registers[:pc] += 1
   end
 end
@@ -100,7 +113,6 @@ def eval(instrs, ctx)
     raise "No instruction at #{ctx.registers[:pc]}"
   end
 
-  puts "- #{instr[0].to_s.upcase}"
   case instr[0]
   when :dis
     dis(instr[1], ctx)
@@ -112,8 +124,12 @@ def eval(instrs, ctx)
     eql(instr[1], instr[2], instr[3], ctx)
   when :ifnz
     ifnz(instr[1], ctx)
+  when :ifz
+    ifz(instr[1], ctx)
   when :halt
     halt(ctx)
+  when :mod
+    mod(instr[1], instr[2], instr[3], ctx)
   end
 
   ctx.registers[:pc] += 1
@@ -124,8 +140,8 @@ instrs = {
   0 => [:set, 100, :a],
   1 => [:dis, :a],
   2 => [:sub, :a, -1, :a],
-  3 => [:eql, :a, 110, :b],
-  4 => [:ifnz, :b],
+  3 => [:mod, :a, 20, :b],
+  4 => [:ifz, :b],
   5 => [:set, 0, :pc],
   6 => [:dis, 666],
   7 => [:halt],
