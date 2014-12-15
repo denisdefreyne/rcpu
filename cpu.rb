@@ -87,32 +87,14 @@ def resolve(r, ctx)
   end
 end
 
-# MOV <mem-loc> <register>
-# MOV <register> <mem-loc>
+###############################################################################
 
-# ADD <value-or-register> <value-or-register> <register>
-# SUB <value-or-register> <value-or-register> <register>
-# MUL <value-or-register> <value-or-register> <register>
-# DIV <value-or-register> <value-or-register> <register>
-# MOD <value-or-register> <value-or-register> <register>
-
-# SHL <value-or-register> <value-or-register> <register>
-# SHR <value-or-register> <value-or-register> <register>
-
-# XOR <value-or-register> <value-or-register> <register>
-# AND <value-or-register> <value-or-register> <register>
-# NOT <value-or-register> <value-or-register> <register>
-# OR  <value-or-register> <value-or-register> <register>
-
-# IZ  <value-or-register>
-# INZ <value-or-register>
-
-# DIS <value>
-# DIS <register>
+# DIS <value-or-register>
 def dis(arg, ctx)
   puts resolve(arg, ctx)
 end
 
+# ADD <value-or-register> <value-or-register> <register>
 def add(a, b, dst, ctx)
   p [a,b]
   a = resolve(a, ctx)
@@ -122,6 +104,7 @@ def add(a, b, dst, ctx)
   ctx.set_reg(dst, a + b)
 end
 
+# SUB <value-or-register> <value-or-register> <register>
 def sub(a, b, dst, ctx)
   a = resolve(a, ctx)
   b = resolve(b, ctx)
@@ -129,6 +112,10 @@ def sub(a, b, dst, ctx)
   ctx.set_reg(dst, a - b)
 end
 
+# MUL <value-or-register> <value-or-register> <register>
+# DIV <value-or-register> <value-or-register> <register>
+
+# MOD <value-or-register> <value-or-register> <register>
 def mod(a, b, dst, ctx)
   a = resolve(a, ctx)
   b = resolve(b, ctx)
@@ -136,17 +123,32 @@ def mod(a, b, dst, ctx)
   ctx.set_reg(dst, a % b)
 end
 
+# SHL <value-or-register> <value-or-register> <register>
+# SHR <value-or-register> <value-or-register> <register>
+
+# XOR <value-or-register> <value-or-register> <register>
+# AND <value-or-register> <value-or-register> <register>
+# NOT <value-or-register> <value-or-register> <register>
+# OR  <value-or-register> <value-or-register> <register>
+
+# HALT
 def halt(ctx)
   ctx.update_reg(PC) { |v| v - 1 }
 end
 
-# SET <value> <register>
-# SET <register> <register>
+# SET <value-or-register> <register>
 def set(src, dst, ctx)
   p [:SET, src, dst, resolve(src, ctx), ctx.registers]
   ctx.set_reg(dst, resolve(src, ctx))
 end
 
+# MOV <mem-loc> <register>
+# …
+
+# MOV <register> <mem-loc>
+# …
+
+# EQL <value-or-register> <value-or-register> <register>
 def eql(a, b, dst, ctx)
   a = resolve(a, ctx)
   b = resolve(b, ctx)
@@ -154,25 +156,31 @@ def eql(a, b, dst, ctx)
   ctx.set_reg(dst, (a == b ? 1 : 0))
 end
 
+# IFNZ <value-or-register>
 def ifnz(r, ctx)
   if ctx.get_reg(r) != 0
     ctx.update_reg(PC) { |v| v + 1 }
   end
 end
 
+# IFZ <value-or-register>
 def ifz(r, ctx)
   if ctx.get_reg(r) == 0
     ctx.update_reg(PC) { |v| v + 1 }
   end
 end
 
+# PUSH <value-or-register>
 def push(a, ctx)
   ctx.stack.push(resolve(a, ctx))
 end
 
+# POP <register>
 def pop(a, ctx)
   ctx.set_reg(a, ctx.stack.pop)
 end
+
+###############################################################################
 
 def eval(instrs, ctx)
   instr = ctx.instrs[ctx.get_reg(PC)]
