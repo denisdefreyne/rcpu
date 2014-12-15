@@ -163,18 +163,23 @@ end
 
 program = {
   main: [
+    # count
     [:set, 100, :a],
     [:dis, :a],
     [:add, :a, 1, :a],
     [:mod, :a, 20, :b],
     [:ifz, :b],
     [:set, 0, :pc],
+
+    # calc gcd
     [:push, 42],
     [:push, 14],
     [:add, :pc, 2, :d], # return address
     [:push, :d], # return address
     [:set, label(:gcd), :pc], # jump
     [:dis, :a],
+
+    # done
     [:dis, 666],
     [:halt],
   ],
