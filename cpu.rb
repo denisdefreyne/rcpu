@@ -90,8 +90,7 @@ end
 # SET <value> <register>
 # SET <register> <register>
 def set(src, dst, ctx)
-  # TODO: allow register src
-  ctx.registers[dst] = src
+  ctx.registers[dst] = value_or_register(src, ctx)
 end
 
 def eql(a, b, dst, ctx)
@@ -120,6 +119,7 @@ def eval(instrs, ctx)
     raise "No instruction at #{ctx.registers[:pc]}"
   end
 
+  p instr
   case instr[0]
   when :dis
     dis(instr[1], ctx)
@@ -153,7 +153,21 @@ instrs = {
   4 => [:ifz, :b],
   5 => [:set, 0, :pc],
   6 => [:dis, 666],
-  7 => [:halt],
+  7 => [:set, 42, :a],
+  8 => [:set, 14, :b],
+  9 => [:set, 10, :d], # return address
+  10 => [:set, 1_000, :pc], # jmp
+  11 => [:dis, :a],
+  12 => [:dis, 777],
+  13 => [:halt],
+
+  # gcd (d contains return address)
+  1_000 => [:mod, :a, :b, :c],
+  1_001 => [:set, :b, :a],
+  1_002 => [:set, :c, :b],
+  1_003 => [:ifnz, :c],
+  1_004 => [:set, 1_000, :pc],
+  1_005 => [:set, :d, :pc],
 }
 
 ctx = Context.new(instrs)
