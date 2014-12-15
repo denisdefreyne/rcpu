@@ -62,6 +62,13 @@ def dis(arg, ctx)
   end
 end
 
+def add(a, b, dst, ctx)
+  a = value_or_register(a, ctx)
+  b = value_or_register(b, ctx)
+
+  ctx.registers[dst] = a + b
+end
+
 def sub(a, b, dst, ctx)
   a = value_or_register(a, ctx)
   b = value_or_register(b, ctx)
@@ -120,6 +127,8 @@ def eval(instrs, ctx)
     set(instr[1], instr[2], ctx)
   when :sub
     sub(instr[1], instr[2], instr[3], ctx)
+  when :add
+    add(instr[1], instr[2], instr[3], ctx)
   when :eql
     eql(instr[1], instr[2], instr[3], ctx)
   when :ifnz
@@ -139,7 +148,7 @@ end
 instrs = {
   0 => [:set, 100, :a],
   1 => [:dis, :a],
-  2 => [:sub, :a, -1, :a],
+  2 => [:add, :a, 1, :a],
   3 => [:mod, :a, 20, :b],
   4 => [:ifz, :b],
   5 => [:set, 0, :pc],
