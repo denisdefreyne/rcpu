@@ -41,11 +41,13 @@ PC = reg(:pc)
 
 class Context
   attr_reader :instrs
+  attr_reader :mem
   attr_reader :registers
   attr_reader :stack
 
-  def initialize(instrs)
+  def initialize(instrs, mem)
     @instrs = instrs
+    @mem = mem
     @registers = { PC => val(0) }
     @stack = []
   end
@@ -85,6 +87,11 @@ end
 # DIS <value-or-register>
 def dis(arg, ctx)
   puts resolve(arg, ctx)
+end
+
+# FMT <value-or-register>
+def fmt(arg, ctx)
+  puts ctx.mem[resolve(arg, ctx)]
 end
 
 # ADD <value-or-register> <value-or-register> <register>
@@ -185,6 +192,8 @@ def eval(instrs, ctx)
   case instr[0]
   when :dis
     dis(instr[1], ctx)
+  when :fmt
+    fmt(instr[1], ctx)
   when :set
     set(instr[1], instr[2], ctx)
   when :sub
@@ -214,6 +223,9 @@ end
 
 program = {
   main: [
+    # greet
+    [:fmt, label(:hello)],
+
     # count
     [:set, val(100), A],
     [:dis, A],
@@ -250,11 +262,17 @@ program = {
   ]
 }
 
-def translate(procedures)
-  # Build instrs
-  instrs = []
-  i = 0
+data = {
+  hello: "Hello, world!"
+}
+
+def translate(procedures, data)
   labels = {}
+  i = 0
+  instrs = {}
+  mem = {}
+
+  # Build instrs and remember labels
   procedures.each do |name, sub_instrs|
     labels[name] = i
     sub_instrs.each do |sub_instr|
@@ -263,8 +281,15 @@ def translate(procedures)
     end
   end
 
+  # Get data labels
+  data.each do |name, value|
+    labels[name] = i
+    mem[i] = value
+    i += 1
+  end
+
   # Translate labels
-  instrs.each do |instr|
+  instrs.each do |_, instr|
     instr.each_with_index do |arg, idx|
       if arg.is_a?(Label)
         instr[idx] = val(labels[arg.name])
@@ -272,11 +297,12 @@ def translate(procedures)
     end
   end
 
-  instrs
+  [instrs, mem]
 end
 
-instrs = translate(program)
-ctx = Context.new(instrs)
+instrs, mem = *translate(program, data)
+
+ctx = Context.new(instrs, mem)
 loop do
   eval(instrs, ctx)
 end
