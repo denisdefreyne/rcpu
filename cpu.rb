@@ -14,9 +14,24 @@ def label(name)
   [:label, name]
 end
 
+class Register < Struct.new(:name)
+  def inspect
+    "reg(#{name})"
+  end
+end
+
+class Value < Struct.new(:value)
+  def inspect
+    "val(#{value})"
+  end
+end
+
 def reg(name)
-  # TODO: make this more obvious
-  name
+  Register.new(name)
+end
+
+def val(value)
+  Value.new(value)
 end
 
 A = reg(:a)
@@ -32,17 +47,37 @@ class Context
 
   def initialize(instrs)
     @instrs = instrs
-    @registers = { pc: 0 }
+    @registers = { PC => val(0) }
     @stack = []
+  end
+
+  def get_reg(reg)
+    v = @registers[reg]
+    v && v.value
+  end
+
+  def set_reg(reg, val)
+    case val
+    when Value
+      @registers[reg] = val
+    else
+      @registers[reg] = Value.new(val)
+    end
+  end
+
+  def update_reg(reg, &block)
+    set_reg(reg, yield(get_reg(reg)))
   end
 end
 
-def value_or_register(r, ctx)
+def resolve(r, ctx)
   case r
-  when Numeric
-    r
-  when Symbol
-    ctx.registers[r]
+  when Register
+    ctx.get_reg(r)
+  when Value
+    r.value
+  else
+    raise "do not know how to resolve #{r.inspect}"
   end
 end
 
@@ -69,80 +104,78 @@ end
 # DIS <value>
 # DIS <register>
 def dis(arg, ctx)
-  case arg
-  when Numeric
-    puts arg
-  when Symbol
-    puts ctx.registers[arg]
-  end
+  puts resolve(arg, ctx)
 end
 
 def add(a, b, dst, ctx)
-  a = value_or_register(a, ctx)
-  b = value_or_register(b, ctx)
+  p [a,b]
+  a = resolve(a, ctx)
+  b = resolve(b, ctx)
+  p [a,b]
 
-  ctx.registers[dst] = a + b
+  ctx.set_reg(dst, a + b)
 end
 
 def sub(a, b, dst, ctx)
-  a = value_or_register(a, ctx)
-  b = value_or_register(b, ctx)
+  a = resolve(a, ctx)
+  b = resolve(b, ctx)
 
-  ctx.registers[dst] = a - b
+  ctx.set_reg(dst, a - b)
 end
 
 def mod(a, b, dst, ctx)
-  a = value_or_register(a, ctx)
-  b = value_or_register(b, ctx)
+  a = resolve(a, ctx)
+  b = resolve(b, ctx)
 
-  ctx.registers[dst] = a % b
+  ctx.set_reg(dst, a % b)
 end
 
 def halt(ctx)
-  ctx.registers[PC] -= 1
+  ctx.update_reg(PC) { |v| v - 1 }
 end
 
 # SET <value> <register>
 # SET <register> <register>
 def set(src, dst, ctx)
-  ctx.registers[dst] = value_or_register(src, ctx)
+  p [:SET, src, dst, resolve(src, ctx), ctx.registers]
+  ctx.set_reg(dst, resolve(src, ctx))
 end
 
 def eql(a, b, dst, ctx)
-  a = value_or_register(a, ctx)
-  b = value_or_register(b, ctx)
+  a = resolve(a, ctx)
+  b = resolve(b, ctx)
 
-  ctx.registers[dst] = (a == b ? 1 : 0)
+  ctx.set_reg(dst, (a == b ? 1 : 0))
 end
 
 def ifnz(r, ctx)
-  if ctx.registers[r] != 0
-    ctx.registers[PC] += 1
+  if ctx.get_reg(r) != 0
+    ctx.update_reg(PC) { |v| v + 1 }
   end
 end
 
 def ifz(r, ctx)
-  if ctx.registers[r] == 0
-    ctx.registers[PC] += 1
+  if ctx.get_reg(r) == 0
+    ctx.update_reg(PC) { |v| v + 1 }
   end
 end
 
 def push(a, ctx)
-  ctx.stack.push(value_or_register(a, ctx))
+  ctx.stack.push(resolve(a, ctx))
 end
 
 def pop(a, ctx)
-  ctx.registers[a] = ctx.stack.pop
+  ctx.set_reg(a, ctx.stack.pop)
 end
 
 def eval(instrs, ctx)
-  instr = ctx.instrs[ctx.registers[PC]]
+  instr = ctx.instrs[ctx.get_reg(PC)]
 
   if instr.nil?
-    raise "No instruction at #{ctx.registers[PC]}"
+    raise "No instruction at #{ctx.get_reg(PC)}"
   end
 
-  # p instr
+  p instr
   case instr[0]
   when :dis
     dis(instr[1], ctx)
@@ -168,32 +201,32 @@ def eval(instrs, ctx)
     pop(instr[1], ctx)
   when :noop
   end
-  # p [ctx.stack, ctx.registers]
+  p [ctx.stack, ctx.registers]
 
-  ctx.registers[PC] += 1
+  ctx.update_reg(PC) { |v| v + 1 }
   sleep 0.01
 end
 
 program = {
   main: [
     # count
-    [:set, 100, A],
+    [:set, val(100), A],
     [:dis, A],
-    [:add, A, 1, A],
-    [:mod, A, 20, B],
+    [:add, A, val(1), A],
+    [:mod, A, val(20), B],
     [:ifz, B],
-    [:set, 0, PC],
+    [:set, val(0), PC],
 
     # calc gcd
-    [:push, 42],
-    [:push, 14],
-    [:add, PC, 2, A], # return address
+    [:push, val(42)],
+    [:push, val(14)],
+    [:add, PC, val(2), A], # return address
     [:push, A], # return address
     [:set, label(:gcd), PC], # jump
     [:dis, A],
 
     # done
-    [:dis, 666],
+    [:dis, val(666)],
     [:halt],
   ],
   gcd: [
@@ -229,7 +262,7 @@ def translate(procedures)
   instrs.each do |instr|
     instr.each_with_index do |arg, idx|
       if arg.is_a?(Array) && arg[0] == :label
-        instr[idx] = labels[arg[1]]
+        instr[idx] = val(labels[arg[1]])
       end
     end
   end
