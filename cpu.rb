@@ -13,12 +13,12 @@
 class Context
   attr_reader :instrs
   attr_reader :registers
-  attr_reader :memory
+  attr_reader :stack
 
   def initialize(instrs)
     @instrs = instrs
     @registers = { pc: 0 }
-    @memory = {}
+    @stack = []
   end
 end
 
@@ -112,6 +112,14 @@ def ifz(r, ctx)
   end
 end
 
+def push(a, ctx)
+  ctx.stack << value_or_register(a, ctx)
+end
+
+def pop(a, ctx)
+  ctx.registers[a] = ctx.stack.pop
+end
+
 def eval(instrs, ctx)
   instr = ctx.instrs[ctx.registers[:pc]]
 
@@ -139,6 +147,10 @@ def eval(instrs, ctx)
     halt(ctx)
   when :mod
     mod(instr[1], instr[2], instr[3], ctx)
+  when :push
+    push(instr[1], ctx)
+  when :pop
+    pop(instr[1], ctx)
   end
 
   ctx.registers[:pc] += 1
@@ -159,9 +171,11 @@ program = {
     [:set, 0, :pc],
     [:set, 42, :a],
     [:set, 14, :b],
-    [:add, :pc, 1, :d], # return address
+    [:add, :pc, 2, :d], # return address
+    [:push, :d], # return address
     [:set, label(:gcd), :pc], # jump
     [:dis, :a],
+    [:dis, 666],
     [:halt],
   ],
   gcd: [
@@ -170,7 +184,7 @@ program = {
     [:set, :c, :b],
     [:ifnz, :c],
     [:set, label(:gcd), :pc], # jump
-    [:set, :d, :pc],
+    [:pop, :pc],
   ]
 }
 
