@@ -10,6 +10,21 @@
 #   * direct jump: jmp
 #   * conditional jump: if-zero, if-negative
 
+def label(name)
+  [:label, name]
+end
+
+def reg(name)
+  # TODO: make this more obvious
+  name
+end
+
+A = reg(:a)
+B = reg(:b)
+C = reg(:c)
+R = reg(:r)
+PC = reg(:pc)
+
 class Context
   attr_reader :instrs
   attr_reader :registers
@@ -84,7 +99,7 @@ def mod(a, b, dst, ctx)
 end
 
 def halt(ctx)
-  ctx.registers[:pc] -= 1
+  ctx.registers[PC] -= 1
 end
 
 # SET <value> <register>
@@ -102,18 +117,18 @@ end
 
 def ifnz(r, ctx)
   if ctx.registers[r] != 0
-    ctx.registers[:pc] += 1
+    ctx.registers[PC] += 1
   end
 end
 
 def ifz(r, ctx)
   if ctx.registers[r] == 0
-    ctx.registers[:pc] += 1
+    ctx.registers[PC] += 1
   end
 end
 
 def push(a, ctx)
-  ctx.stack << value_or_register(a, ctx)
+  ctx.stack.push(value_or_register(a, ctx))
 end
 
 def pop(a, ctx)
@@ -121,10 +136,10 @@ def pop(a, ctx)
 end
 
 def eval(instrs, ctx)
-  instr = ctx.instrs[ctx.registers[:pc]]
+  instr = ctx.instrs[ctx.registers[PC]]
 
   if instr.nil?
-    raise "No instruction at #{ctx.registers[:pc]}"
+    raise "No instruction at #{ctx.registers[PC]}"
   end
 
   # p instr
@@ -151,26 +166,13 @@ def eval(instrs, ctx)
     push(instr[1], ctx)
   when :pop
     pop(instr[1], ctx)
+  when :noop
   end
+  # p [ctx.stack, ctx.registers]
 
-  ctx.registers[:pc] += 1
+  ctx.registers[PC] += 1
   sleep 0.01
 end
-
-def label(name)
-  [:label, name]
-end
-
-def reg(name)
-  # TODO: make this more obvious
-  name
-end
-
-A = reg(:a)
-B = reg(:b)
-C = reg(:c)
-D = reg(:d)
-PC = reg(:pc)
 
 program = {
   main: [
@@ -185,8 +187,8 @@ program = {
     # calc gcd
     [:push, 42],
     [:push, 14],
-    [:add, PC, 2, D], # return address
-    [:push, D], # return address
+    [:add, PC, 2, A], # return address
+    [:push, A], # return address
     [:set, label(:gcd), PC], # jump
     [:dis, A],
 
@@ -195,7 +197,8 @@ program = {
     [:halt],
   ],
   gcd: [
-    [:pop, :d], # return address
+    [:noop],
+    [:pop, R], # return address
     [:pop, A],
     [:pop, B],
   ],
@@ -205,7 +208,7 @@ program = {
     [:set, C, B],
     [:ifnz, C],
     [:set, label(:gcd_loop), PC], # jump
-    [:set, D, PC],
+    [:set, R, PC],
   ]
 }
 
