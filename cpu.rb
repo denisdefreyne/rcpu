@@ -236,6 +236,44 @@ end
 
 ###############################################################################
 
+class Compiler
+  def compile(procedures, data)
+    labels = {}
+    i = 0
+    instrs = {}
+    mem = {}
+
+    # Build instrs and remember labels
+    procedures.each do |name, sub_instrs|
+      labels[name] = i
+      sub_instrs.each do |sub_instr|
+        instrs[i] = sub_instr
+        i += 1
+      end
+    end
+
+    # Get data labels
+    data.each do |name, value|
+      labels[name] = i
+      mem[i] = value
+      i += 1
+    end
+
+    # Translate labels
+    instrs.each do |_, instr|
+      instr.each_with_index do |arg, idx|
+        if arg.is_a?(Label)
+          instr[idx] = val(labels[arg.name])
+        end
+      end
+    end
+
+    [instrs, mem]
+  end
+end
+
+###############################################################################
+
 class DSL
   attr_reader :instrs
 
@@ -361,41 +399,7 @@ data = {
   hello: "Hello, world!"
 }
 
-def translate(procedures, data)
-  labels = {}
-  i = 0
-  instrs = {}
-  mem = {}
-
-  # Build instrs and remember labels
-  procedures.each do |name, sub_instrs|
-    labels[name] = i
-    sub_instrs.each do |sub_instr|
-      instrs[i] = sub_instr
-      i += 1
-    end
-  end
-
-  # Get data labels
-  data.each do |name, value|
-    labels[name] = i
-    mem[i] = value
-    i += 1
-  end
-
-  # Translate labels
-  instrs.each do |_, instr|
-    instr.each_with_index do |arg, idx|
-      if arg.is_a?(Label)
-        instr[idx] = val(labels[arg.name])
-      end
-    end
-  end
-
-  [instrs, mem]
-end
-
-instrs, mem = *translate(program, data)
+instrs, mem = *Compiler.new.compile(program, data)
 
 ctx = Context.new(instrs, mem)
 interpreter = Interpreter.new(ctx)
