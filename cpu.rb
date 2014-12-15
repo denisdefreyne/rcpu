@@ -89,10 +89,8 @@ end
 
 # ADD <value-or-register> <value-or-register> <register>
 def add(a, b, dst, ctx)
-  p [a,b]
   a = resolve(a, ctx)
   b = resolve(b, ctx)
-  p [a,b]
 
   ctx.set_reg(dst, a + b)
 end
@@ -131,7 +129,6 @@ end
 
 # SET <value-or-register> <register>
 def set(src, dst, ctx)
-  p [:SET, src, dst, resolve(src, ctx), ctx.registers]
   ctx.set_reg(dst, resolve(src, ctx))
 end
 
@@ -182,7 +179,9 @@ def eval(instrs, ctx)
     raise "No instruction at #{ctx.get_reg(PC)}"
   end
 
-  p instr
+  puts "--- STACK:     #{ctx.stack.inspect}"
+  puts "--- REGISTERS: #{ctx.registers.inspect}"
+  puts "--- Evaluating #{instr.inspect}"
   case instr[0]
   when :dis
     dis(instr[1], ctx)
@@ -208,7 +207,6 @@ def eval(instrs, ctx)
     pop(instr[1], ctx)
   when :noop
   end
-  p [ctx.stack, ctx.registers]
 
   ctx.update_reg(PC) { |v| v + 1 }
   sleep 0.01
