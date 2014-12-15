@@ -92,9 +92,9 @@ class Interpreter
       raise "No instruction at #{ctx.get_reg(PC)}"
     end
 
-    puts "--- STACK:     #{ctx.stack.inspect}"
-    puts "--- REGISTERS: #{ctx.registers.inspect}"
-    puts "--- Evaluating #{instr.inspect}"
+    puts "--- Stack:     #{ctx.stack.inspect}"
+    puts "--- Registers: #{ctx.registers.inspect}"
+    puts "=== Evaluating #{instr.inspect}"
     case instr[0]
     when :dis
       dis(instr[1], ctx)
@@ -211,14 +211,14 @@ class Interpreter
 
   # IFNZ <value-or-register>
   def ifnz(r, ctx)
-    if ctx.get_reg(r) != 0
+    if ctx.get_reg(r) == 0
       ctx.update_reg(PC) { |v| v + 1 }
     end
   end
 
   # IFZ <value-or-register>
   def ifz(r, ctx)
-    if ctx.get_reg(r) == 0
+    if ctx.get_reg(r) != 0
       ctx.update_reg(PC) { |v| v + 1 }
     end
   end
@@ -326,8 +326,24 @@ class BlockDSL
     @instrs << [:ifz, x]
   end
 
+  def ifnz(x)
+    @instrs << [:ifnz, x]
+  end
+
   def halt
     @instrs << [:halt]
+  end
+
+  def push(x)
+    @instrs << [:push, x]
+  end
+
+  def pop(r)
+    @instrs << [:pop, r]
+  end
+
+  def noop
+    @instrs << [:noop]
   end
 end
 
@@ -339,64 +355,48 @@ program = DSL.define do
   end
 
   label(:count) do
+    # count
     set val(100), A
     dis A
     add A, val(1), A
     mod A, val(20), B
-    ifz B
+    ifnz B
     set label(:count), PC
+
+    # calc gcd
+    push val(42)
+    push val(14)
+    add PC, val(2), A # return address
+    push A # return address
+    set label(:gcd), PC # jump
+    dis A
+
+    # done
+    fmt label(:bye)
     halt
+  end
+
+  label(:gcd) do
+    noop
+    pop R # return address
+    pop A
+    pop B
+  end
+
+  label(:gcd_loop) do
+    noop
+    mod A, B, C
+    set B, A
+    set C, B
+    ifnz B
+    set label(:gcd_loop), PC # jump
+    set R, PC
   end
 end
 
-p program
-
-###############################################################################
-
-program2 = {
-  main: [
-    # greet
-    [:fmt, label(:hello)],
-  ],
-  count: [
-    # count
-    [:set, val(100), A],
-    [:dis, A],
-    [:add, A, val(1), A],
-    [:mod, A, val(20), B],
-    [:ifz, B],
-    [:set, label(:count), PC],
-
-    # calc gcd
-    [:push, val(42)],
-    [:push, val(14)],
-    [:add, PC, val(2), A], # return address
-    [:push, A], # return address
-    [:set, label(:gcd), PC], # jump
-    [:dis, A],
-
-    # done
-    [:dis, val(666)],
-    [:halt],
-  ],
-  gcd: [
-    [:noop],
-    [:pop, R], # return address
-    [:pop, A],
-    [:pop, B],
-  ],
-  gcd_loop: [
-    [:mod, A, B, C],
-    [:set, B, A],
-    [:set, C, B],
-    [:ifnz, C],
-    [:set, label(:gcd_loop), PC], # jump
-    [:set, R, PC],
-  ]
-}
-
 data = {
-  hello: "Hello, world!"
+  hello: 'Hello, world!',
+  bye: 'Goodbye, world!',
 }
 
 instrs, mem = *Compiler.new.compile(program, data)
