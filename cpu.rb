@@ -1,14 +1,7 @@
-# * Data
-#   * SET value, register
-#   * MOV memloc, register // MOV register, memloc
-#   * DIS (display)
-# * Arith
-#   * ADD, SUB, MUL, DIV
-#   * bitwise operations (shl, shr, ^, &, |, ~)
-#   * compare
-# * control flow
-#   * direct jump: jmp
-#   * conditional jump: if-zero, if-negative
+# To do:
+#
+# - access memory (mov)
+# - static data (strings)
 
 class Label < Struct.new(:name)
   def inspect
