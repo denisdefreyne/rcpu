@@ -145,31 +145,63 @@ def eval(instrs, ctx)
   sleep 0.01
 end
 
-instrs = {
-  0 => [:set, 100, :a],
-  1 => [:dis, :a],
-  2 => [:add, :a, 1, :a],
-  3 => [:mod, :a, 20, :b],
-  4 => [:ifz, :b],
-  5 => [:set, 0, :pc],
-  6 => [:dis, 666],
-  7 => [:set, 42, :a],
-  8 => [:set, 14, :b],
-  9 => [:set, 10, :d], # return address
-  10 => [:set, 1_000, :pc], # jmp
-  11 => [:dis, :a],
-  12 => [:dis, 777],
-  13 => [:halt],
+def label(name)
+  [:label, name]
+end
 
-  # gcd (d contains return address)
-  1_000 => [:mod, :a, :b, :c],
-  1_001 => [:set, :b, :a],
-  1_002 => [:set, :c, :b],
-  1_003 => [:ifnz, :c],
-  1_004 => [:set, 1_000, :pc],
-  1_005 => [:set, :d, :pc],
+program = {
+  main: [
+    [:set, 100, :a],
+    [:dis, :a],
+    [:add, :a, 1, :a],
+    [:mod, :a, 20, :b],
+    [:ifz, :b],
+    [:set, 0, :pc],
+    [:dis, 666],
+    [:set, 42, :a],
+    [:set, 14, :b],
+    [:add, :pc, 1, :d], # return address
+    [:set, label(:gcd), :pc], # jump
+    [:dis, :a],
+    [:dis, 777],
+    [:halt],
+  ],
+  gcd: [
+    [:mod, :a, :b, :c],
+    [:set, :b, :a],
+    [:set, :c, :b],
+    [:ifnz, :c],
+    [:set, label(:gcd), :pc], # jump
+    [:set, :d, :pc],
+  ]
 }
 
+def translate(procedures)
+  # Build instrs
+  instrs = []
+  i = 0
+  labels = {}
+  procedures.each do |name, sub_instrs|
+    labels[name] = i
+    sub_instrs.each do |sub_instr|
+      instrs[i] = sub_instr
+      i += 1
+    end
+  end
+
+  # Translate labels
+  instrs.each do |instr|
+    instr.each_with_index do |arg, idx|
+      if arg.is_a?(Array) && arg[0] == :label
+        instr[idx] = labels[arg[1]]
+      end
+    end
+  end
+
+  instrs
+end
+
+instrs = translate(program)
 ctx = Context.new(instrs)
 loop do
   eval(instrs, ctx)
