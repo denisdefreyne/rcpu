@@ -161,23 +161,34 @@ def label(name)
   [:label, name]
 end
 
+def reg(name)
+  # TODO: make this more obvious
+  name
+end
+
+A = reg(:a)
+B = reg(:b)
+C = reg(:c)
+D = reg(:d)
+PC = reg(:pc)
+
 program = {
   main: [
     # count
-    [:set, 100, :a],
-    [:dis, :a],
-    [:add, :a, 1, :a],
-    [:mod, :a, 20, :b],
-    [:ifz, :b],
-    [:set, 0, :pc],
+    [:set, 100, A],
+    [:dis, A],
+    [:add, A, 1, A],
+    [:mod, A, 20, B],
+    [:ifz, B],
+    [:set, 0, PC],
 
     # calc gcd
     [:push, 42],
     [:push, 14],
-    [:add, :pc, 2, :d], # return address
-    [:push, :d], # return address
-    [:set, label(:gcd), :pc], # jump
-    [:dis, :a],
+    [:add, PC, 2, D], # return address
+    [:push, D], # return address
+    [:set, label(:gcd), PC], # jump
+    [:dis, A],
 
     # done
     [:dis, 666],
@@ -185,16 +196,16 @@ program = {
   ],
   gcd: [
     [:pop, :d], # return address
-    [:pop, :a],
-    [:pop, :b],
+    [:pop, A],
+    [:pop, B],
   ],
   gcd_loop: [
-    [:mod, :a, :b, :c],
-    [:set, :b, :a],
-    [:set, :c, :b],
-    [:ifnz, :c],
-    [:set, label(:gcd_loop), :pc], # jump
-    [:set, :d, :pc],
+    [:mod, A, B, C],
+    [:set, B, A],
+    [:set, C, B],
+    [:ifnz, C],
+    [:set, label(:gcd_loop), PC], # jump
+    [:set, D, PC],
   ]
 }
 
