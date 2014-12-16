@@ -34,6 +34,7 @@ def val(value)
 end
 
 PC = reg(:PC)
+SP = reg(:SP)
 R = reg(:R)
 A = reg(:A)
 B = reg(:B)
@@ -42,22 +43,21 @@ C = reg(:C)
 class Context
   attr_reader :mem
   attr_reader :registers
-  attr_reader :stack
 
   def initialize(mem)
     @mem = mem
     @registers = {
       PC => val(0),
+      SP => val(mem.keys.max),
       R => val(0),
       A => val(0),
       B => val(0),
       C => val(0),
     }
-    @stack = []
   end
 
   def inspect
-    "Context(stack = #{stack.inspect}, registers = #{registers.map { |k,v| k.name.to_s + '=' + v.value.to_s }.join(' ')})"
+    "Context(mem = #{mem.inspect}, registers = #{registers.map { |k,v| k.name.to_s + '=' + v.value.to_s }.join(' ')})"
   end
 
   def get_reg(reg)
@@ -231,12 +231,17 @@ class Interpreter
 
   # PUSH <value-or-register>
   def push(a, ctx)
-    ctx.stack.push(resolve(a, ctx))
+    sp_val = ctx.registers[SP].value
+    ctx.registers[SP] = val(sp_val + 1)
+    ctx.mem[sp_val + 1] = resolve(a, ctx)
   end
 
   # POP <register>
   def pop(a, ctx)
-    ctx.set_reg(a, ctx.stack.pop)
+    sp_val = ctx.registers[SP].value
+    deref_val = ctx.mem[sp_val]
+    ctx.set_reg(a, deref_val)
+    ctx.registers[SP] = val(sp_val - 1)
   end
 end
 
