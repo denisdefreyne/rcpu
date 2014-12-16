@@ -3,6 +3,8 @@
 # - access memory (mov)
 # - static data (strings)
 
+require 'terminal-table'
+
 class Label < Struct.new(:name)
   def inspect
     "label(#{name})"
@@ -59,7 +61,9 @@ class Context
   end
 
   def inspect
-    "Context(mem = #{mem.inspect}, registers = #{registers.map { |k,v| k.name.to_s + '=' + v.to_s }.join(' ')})"
+    rows = mem.map { |k,v| [k,v] }.zip(registers.to_a).map { |x| [x[0][0], x[0][1].inspect, x[1] && x[1][0].name, x[1] && x[1][1]] }
+    table = Terminal::Table.new(rows: rows, headings: ['mem loc', 'val', 'reg', 'val'])
+    table.to_s
   end
 
   def get_reg(reg)
