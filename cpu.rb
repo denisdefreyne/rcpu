@@ -40,13 +40,11 @@ B = reg(:B)
 C = reg(:C)
 
 class Context
-  attr_reader :instrs
   attr_reader :mem
   attr_reader :registers
   attr_reader :stack
 
-  def initialize(instrs, mem)
-    @instrs = instrs
+  def initialize(mem)
     @mem = mem
     @registers = {
       PC => val(0),
@@ -95,7 +93,7 @@ class Interpreter
   end
 
   def step
-    instr = ctx.instrs[ctx.get_reg(PC)]
+    instr = ctx.mem[ctx.get_reg(PC)]
 
     if instr.nil?
       raise "No instruction at #{ctx.get_reg(PC)}"
@@ -248,14 +246,13 @@ class Compiler
   def compile(procedures, data)
     labels = {}
     i = 0
-    instrs = {}
     mem = {}
 
     # Build instrs and remember labels
     procedures.each do |name, sub_instrs|
       labels[name] = i
       sub_instrs.each do |sub_instr|
-        instrs[i] = sub_instr
+        mem[i] = sub_instr
         i += 1
       end
     end
@@ -268,15 +265,18 @@ class Compiler
     end
 
     # Translate labels
-    instrs.each do |_, instr|
-      instr.each_with_index do |arg, idx|
-        if arg.is_a?(Label)
-          instr[idx] = val(labels[arg.name])
+    mem.each do |_, item|
+      p item
+      if item.is_a?(Array)
+        item.each_with_index do |arg, idx|
+          if arg.is_a?(Label)
+            item[idx] = val(labels[arg.name])
+          end
         end
       end
     end
 
-    Context.new(instrs, mem)
+    Context.new(mem)
   end
 end
 
