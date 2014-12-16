@@ -49,30 +49,29 @@ class Context
   def initialize(mem)
     @mem = mem
     @registers = {
-      PC => val(0),
-      SP => val(mem.keys.max),
-      R => val(0),
-      A => val(0),
-      B => val(0),
-      C => val(0),
+      PC => 0,
+      SP => mem.keys.max,
+      R  => 0,
+      A  => 0,
+      B  => 0,
+      C  => 0,
     }
   end
 
   def inspect
-    "Context(mem = #{mem.inspect}, registers = #{registers.map { |k,v| k.name.to_s + '=' + v.value.to_s }.join(' ')})"
+    "Context(mem = #{mem.inspect}, registers = #{registers.map { |k,v| k.name.to_s + '=' + v.to_s }.join(' ')})"
   end
 
   def get_reg(reg)
-    v = @registers[reg]
-    v && v.value
+    @registers[reg]
   end
 
   def set_reg(reg, val)
     case val
     when Value
-      @registers[reg] = val
+      @registers[reg] = val.value
     else
-      @registers[reg] = Value.new(val)
+      @registers[reg] = val
     end
   end
 
@@ -233,17 +232,17 @@ class Interpreter
 
   # PUSH <value-or-register>
   def push(a, ctx)
-    sp_val = ctx.registers[SP].value
-    ctx.registers[SP] = val(sp_val + 1)
-    ctx.mem[sp_val + 1] = resolve(a, ctx)
+    new_sp = ctx.registers[SP] + 1
+    ctx.registers[SP] = new_sp
+    ctx.mem[new_sp] = resolve(a, ctx)
   end
 
   # POP <register>
   def pop(a, ctx)
-    sp_val = ctx.registers[SP].value
-    deref_val = ctx.mem[sp_val]
-    ctx.set_reg(a, deref_val)
-    ctx.registers[SP] = val(sp_val - 1)
+    sp = ctx.registers[SP]
+    sp_deref = ctx.mem[sp]
+    ctx.set_reg(a, sp_deref)
+    ctx.registers[SP] = sp - 1
   end
 end
 
