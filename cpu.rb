@@ -84,7 +84,6 @@ end
 ###############################################################################
 
 class Interpreter
-  attr_reader :instrs
   attr_reader :ctx
 
   def initialize(ctx)
@@ -277,7 +276,7 @@ class Compiler
       end
     end
 
-    [instrs, mem]
+    Context.new(instrs, mem)
   end
 end
 
@@ -408,8 +407,6 @@ data = {
   bye: 'Goodbye, world!',
 }
 
-instrs, mem = *Compiler.new.compile(program, data)
-
-ctx = Context.new(instrs, mem)
+ctx = Compiler.new.compile(program, data)
 interpreter = Interpreter.new(ctx)
 interpreter.run
