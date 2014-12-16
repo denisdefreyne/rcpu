@@ -41,7 +41,9 @@ B = reg(:B)
 C = reg(:C)
 
 class Context
+  # instructions + static data + stack (stack grows upwards)
   attr_reader :mem
+
   attr_reader :registers
 
   def initialize(mem)
