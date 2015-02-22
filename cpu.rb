@@ -252,8 +252,8 @@ end
 
 ###############################################################################
 
-class Compiler
-  def compile(procedures, data)
+class Assembler
+  def assemble(procedures, data)
     labels = {}
     i = 0
     mem = {}
@@ -419,6 +419,6 @@ data = {
   bye: 'Goodbye, world!',
 }
 
-ctx = Compiler.new.compile(program, data)
+ctx = Assembler.new.assemble(program, data)
 interpreter = Interpreter.new(ctx)
 interpreter.run
