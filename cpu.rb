@@ -104,8 +104,9 @@ class Interpreter
       raise "No instruction at #{ctx.get_reg(PC)}"
     end
 
-    puts "--- Context:   #{ctx.inspect}"
     puts "=== Evaluating #{instr.inspect}"
+    puts "--- Context:"
+    puts ctx.inspect
     case instr[0]
     when :dis
       dis(instr[1], ctx)
@@ -286,7 +287,7 @@ class Assembler
       end
     end
 
-    Context.new(mem)
+    mem
   end
 end
 
@@ -419,6 +420,7 @@ data = {
   bye: 'Goodbye, world!',
 }
 
-ctx = Assembler.new.assemble(program, data)
+mem = Assembler.new.assemble(program, data)
+ctx = Context.new(mem)
 interpreter = Interpreter.new(ctx)
 interpreter.run
