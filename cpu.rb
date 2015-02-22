@@ -307,6 +307,7 @@ class DSL
 
   def label(name, &block)
     @instrs[name] = []
+    BlockDSL.define(@instrs[name]) { noop }
     BlockDSL.define(@instrs[name], &block)
   end
 end
@@ -372,9 +373,12 @@ program = DSL.define do
     fmt label(:hello)
   end
 
+  label(:count_init) do
+    set val(100), A
+  end
+
   label(:count) do
     # count
-    set val(100), A
     dis A
     add A, val(1), A
     mod A, val(20), B
@@ -395,14 +399,12 @@ program = DSL.define do
   end
 
   label(:gcd) do
-    noop
     pop R # return address
     pop A
     pop B
   end
 
   label(:gcd_loop) do
-    noop
     mod A, B, C
     set B, A
     set C, B
