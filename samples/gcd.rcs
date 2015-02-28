@@ -1,12 +1,12 @@
     movi r0 252
     movi r1 105
 start
-	cmpi r1 0
+    cmpi r1 0
     je @end
     mov r2 r1
     mod r1 r0 r1
     mov r0 r2
     jmp @start
 end
-	prn r0
+    prn r0
     halt
