@@ -1,0 +1,10 @@
+start
+	movi r0 1
+	movi r1 0
+loop
+	mov r2 r1 # previous value
+	add r1 r0 r1
+	mov r0 r2
+	prn r0
+	j @loop
+end

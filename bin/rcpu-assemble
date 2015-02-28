@@ -19,6 +19,10 @@ def resolve_reg(s)
     6
   when 'r7'
     7
+  when 'rpc'
+    8
+  when 'rflags'
+    9
   else
     raise "Unknown register: #{s}"
   end
@@ -50,56 +54,113 @@ def handle_instruction(instr, program, labels)
   case instr[0]
   when 'nop'
     program << 0x00
-  when 'addi'
-    program << 0x01
+  when 'pushf'
+    # not implemented
+  when 'call'
+    # not implemented
+  when 'ret'
+    # not implemented
+  when 'push'
+    # not implemented
+  when 'pop'
+    # not implemented
+  when 'jmp'
+    program << 0x06
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'je'
+    program << 0x07
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'jne'
+    program << 0x08
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'jg'
+    program << 0x09
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'jge'
+    program << 0x0a
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'jl'
+    program << 0x0b
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'jle'
+    program << 0x0c
+    program << (labels ? parse_label(instr[1], labels) : 0x00)
+  when 'not'
+    program << 0x0d
+    program << resolve_reg(instr[1])
+  when 'prn'
+    program << 0x0e
+    program << resolve_reg(instr[1])
+  when 'mov'
+    program << 0x0f
+    program << resolve_reg(instr[1])
+    program << resolve_reg(instr[2])
+  when 'movi'
+    program << 0x10
+    program << resolve_reg(instr[1])
+    program << parse_imm(instr[2])
+  when 'cmp'
+    program << 0x11
+    program << resolve_reg(instr[1])
+    program << resolve_reg(instr[2])
+  when 'cmpi'
+    program << 0x12
     program << resolve_reg(instr[1])
     program << parse_imm(instr[2])
   when 'mod'
-    program << 0x02
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
-  when 'mov'
-    program << 0x03
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
-  when 'jrz'
-    program << 0x04
-    program << resolve_reg(instr[1])
-    if label?(instr[2])
-      if labels
-        here = program.size
-        there = parse_label(instr[2], labels)
-        program << there - here + 2 # 2, to take this instruction size into account
-      else
-        program << 0x00 # tmp
-      end
-    else
-      program << parse_imm(instr[2])
-    end
-  when 'movi'
-    program << 0x05
-    program << resolve_reg(instr[1])
-    program << parse_imm(instr[2])
-  when 'jrb'
-    program << 0x06
-    if label?(instr[1])
-      if labels
-        here = program.size
-        there = parse_label(instr[1], labels)
-        program << here - there - 1
-      else
-        program << 0x00 # tmp
-      end
-    else
-      program << parse_imm(instr[1])
-    end
-  when 'halt'
-    program << 0x07
-  when 'mod2'
-    program << 0x08
+    program << 0x13
     program << resolve_reg(instr[1])
     program << resolve_reg(instr[2])
     program << resolve_reg(instr[3])
+  when 'modi'
+    program << 0x14
+    program << resolve_reg(instr[1])
+    program << resolve_reg(instr[2])
+    program << parse_imm(instr[3])
+  when 'add'
+    program << 0x15
+    program << resolve_reg(instr[1])
+    program << resolve_reg(instr[2])
+    program << resolve_reg(instr[3])
+  when 'addi'
+    program << 0x16
+    program << resolve_reg(instr[1])
+    program << resolve_reg(instr[2])
+    program << parse_imm(instr[3])
+  when 'sub'
+    # not implemented
+  when 'subi'
+    # not implemented
+  when 'mul'
+    # not implemented
+  when 'muli'
+    # not implemented
+  when 'div'
+    # not implemented
+  when 'divi'
+    # not implemented
+  when 'xor'
+    # not implemented
+  when 'xori'
+    # not implemented
+  when 'or'
+    # not implemented
+  when 'ori'
+    # not implemented
+  when 'and'
+    # not implemented
+  when 'andi'
+    # not implemented
+  when 'shl'
+    # not implemented
+  when 'shli'
+    # not implemented
+  when 'shr'
+    # not implemented
+  when 'shri'
+    # not implemented
+  when 'halt'
+    program << 0xff
   else
     raise "Unknown instruction name: #{instr[0]}"
   end

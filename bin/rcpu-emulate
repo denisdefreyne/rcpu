@@ -21,16 +21,6 @@ class Context
   end
 
   def inspect
-    mem = ''
-    @mem.each.with_index do |val, idx|
-      mem << format('%02x', val)
-      if idx % 8 == 7
-        mem << "\n"
-      elsif idx % 2 == 1
-        mem << ' '
-      end
-    end
-
     reg = ''
     reg << '┌─────┬───────────┬───────────┐' << "\n"
     reg << '│ loc │ val (hex) │ val (dec) │' << "\n"
@@ -45,8 +35,7 @@ class Context
       reg << ' │' << "\n"
     end
     reg << '└─────┴───────────┴───────────┘' << "\n"
-
-    [mem, reg].join("\n")
+    reg
   end
 end
 
@@ -68,6 +57,8 @@ class CPU
     end
   end
 
+  private
+
   def mem
     @context.mem
   end
@@ -77,44 +68,83 @@ class CPU
   end
 
   PC = 8
+  FLAGS = 9
 
   def step
-    puts @context.inspect
     opcode = at_pc
-    puts "Opcode #{opcode.inspect}"
-
     a0 = at_pc(1)
     a1 = at_pc(2)
     a2 = at_pc(3)
 
     case opcode
-    when 0 # nop
+    when 0x00 # nop
       advance(1)
-    when 1 # addi reg, imm
-      reg[a0] += a1
-      advance(3)
-    when 2 # mod reg, reg
-      reg[a0] = reg[a0] % reg[a1]
-      advance(3)
-    when 3 # mov reg, reg
+    when 0x01 # pushf
+    when 0x02 # call
+    when 0x03 # ret
+    when 0x04 # push
+    when 0x05 # pop
+    when 0x06 # jmp
+      reg[PC] = a0
+    when 0x07 # je
+      if reg[FLAGS] & 0x03 == 0x01 then reg[PC] = a0 else advance(2) end
+    when 0x08 # jne
+    when 0x09 # jg
+      if reg[FLAGS] & 0x03 == 0x02 then reg[PC] = a0 else advance(2) end
+    when 0x0a # jge
+    when 0x0b # jl
+      if reg[FLAGS] & 0x03 == 0x00 then reg[PC] = a0 else advance(2) end
+    when 0x0c # jle
+    when 0x0d # not
+    when 0x0e # prn
+      puts "#{reg[a0]}"
+      advance(2)
+    when 0x0f # mov
       reg[a0] = reg[a1]
       advance(3)
-    when 4 # jrz reg, imm
-      if reg[a0] == 0
-        reg[PC] += a1
-      else
-        advance(3)
-      end
-    when 5 # movi reg, imm
+    when 0x10 # movi
       reg[a0] = a1
       advance(3)
-    when 6 # jrb imm
-      reg[PC] -= a0
-    when 7 # halt
-      raise HaltException
-    when 8 # mod2 reg, reg, reg
+    when 0x11 # cmp
+      reg[FLAGS] =
+        (reg[a0] == reg[a1] ? 0x01 : 0x00) |
+        (reg[a0] > reg[a1]  ? 0x02 : 0x00)
+      advance(3)
+    when 0x12 # cmpi
+      reg[FLAGS] =
+        (reg[a0] == a1 ? 0x01 : 0x00) |
+        (reg[a0] > a1  ? 0x02 : 0x00)
+      advance(3)
+    when 0x13 # mod
       reg[a0] = reg[a1] % reg[a2]
       advance(4)
+    when 0x14 # modi
+      reg[a0] = reg[a1] % a2
+      advance(4)
+    when 0x15 # add
+      reg[a0] = reg[a1] + reg[a2]
+      advance(4)
+    when 0x16 # addi
+      reg[a0] = reg[a1] + a2
+      advance(4)
+    when 0x17 # sub
+    when 0x18 # subi
+    when 0x19 # mul
+    when 0x1a # muli
+    when 0x1b # div
+    when 0x1c # divi
+    when 0x1d # xor
+    when 0x1e # xori
+    when 0x1f # or
+    when 0x20 # ori
+    when 0x21 # and
+    when 0x22 # andi
+    when 0x23 # shl
+    when 0x24 # shli
+    when 0x25 # shr
+    when 0x26 # shri
+    when 0xff # halt
+      raise HaltException
     else
       raise "Unknown opcode: #{@opcode.inspect}"
     end
