@@ -1,8 +1,3 @@
-# To do:
-#
-# - access memory (mov)
-# - static data (strings)
-
 require 'terminal-table'
 
 class Label < Struct.new(:name)
@@ -61,7 +56,10 @@ class Context
   end
 
   def inspect
-    rows = mem.map { |k,v| [k,v] }.zip(registers.to_a).map { |x| [x[0][0], x[0][1].inspect, x[1] && x[1][0].name, x[1] && x[1][1]] }
+    rows = mem
+      .map { |k,v| [k,v] }
+      .zip(registers.to_a)
+      .map { |x| [x[0][0], x[0][1].inspect, x[1] && x[1][0].name, x[1] && x[1][1]] }
     table = Terminal::Table.new(rows: rows, headings: ['mem loc', 'val', 'reg', 'val'])
     table.to_s
   end
@@ -104,8 +102,8 @@ class Interpreter
       raise "No instruction at #{ctx.get_reg(PC)}"
     end
 
-    puts "=== Evaluating #{instr.inspect}"
-    puts "--- Context:"
+    # puts "=== Evaluating #{instr.inspect}"
+    # puts "--- Context:"
     puts ctx.inspect
     case instr[0]
     when :dis
@@ -285,6 +283,7 @@ class Assembler
           end
         end
       end
+      p item
     end
 
     mem
@@ -323,7 +322,7 @@ class BlockDSL
   end
 
   def fmt(x)
-    @instrs << [:fmt, x]
+    # @instrs << [:fmt, x]
   end
 
   def set(src, dst)
@@ -331,7 +330,7 @@ class BlockDSL
   end
 
   def dis(x)
-    @instrs << [:dis, x]
+    # @instrs << [:dis, x]
   end
 
   def add(a, b, r)
@@ -382,7 +381,7 @@ program = DSL.define do
     # count
     dis A
     add A, val(1), A
-    mod A, val(20), B
+    mod A, val(120), B
     ifnz B
     set label(:count), PC
 
@@ -406,9 +405,9 @@ program = DSL.define do
   end
 
   label(:gcd_loop) do
-    mod A, B, C
-    set B, A
-    set C, B
+    mod A, B, C # A % B -> C
+    set B, A    # B -> A
+    set C, B    # C -> B
     ifnz B
     set label(:gcd_loop), PC # jump
     set R, PC
