@@ -1,5 +1,5 @@
-    movi r0 252
-    movi r1 105
+    movi r0 819000
+    movi r1 254163
 start
     cmpi r1 0
     je @end

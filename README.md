@@ -49,5 +49,4 @@ Two register and one immediate/register arg:
 
 ## To do
 
-* Allow 32-bit immediates
 * Finish implementing all opcodes

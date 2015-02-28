@@ -29,12 +29,20 @@ def resolve_reg(s)
 end
 
 def parse_imm(s)
-  case s
-  when /\A0x/
-    s.to_i(16)
-  else
-    s.to_i(10)
-  end
+  raw =
+    case s
+    when /\A0x/
+      s.to_i(16)
+    else
+      s.to_i(10)
+    end
+
+  [
+    (raw & 0xff000000) >> 24,
+    (raw & 0xff0000) >> 16,
+    (raw & 0xff00) >> 8,
+    (raw & 0xff),
+  ]
 end
 
 def label?(s)
@@ -98,7 +106,7 @@ def handle_instruction(instr, program, labels)
   when 'movi'
     program << 0x10
     program << resolve_reg(instr[1])
-    program << parse_imm(instr[2])
+    parse_imm(instr[2]).each { |i| program << i }
   when 'cmp'
     program << 0x11
     program << resolve_reg(instr[1])
@@ -106,7 +114,7 @@ def handle_instruction(instr, program, labels)
   when 'cmpi'
     program << 0x12
     program << resolve_reg(instr[1])
-    program << parse_imm(instr[2])
+    parse_imm(instr[2]).each { |i| program << i }
   when 'mod'
     program << 0x13
     program << resolve_reg(instr[1])
@@ -116,7 +124,7 @@ def handle_instruction(instr, program, labels)
     program << 0x14
     program << resolve_reg(instr[1])
     program << resolve_reg(instr[2])
-    program << parse_imm(instr[3])
+    parse_imm(instr[3]).each { |i| program << i }
   when 'add'
     program << 0x15
     program << resolve_reg(instr[1])
@@ -126,7 +134,7 @@ def handle_instruction(instr, program, labels)
     program << 0x16
     program << resolve_reg(instr[1])
     program << resolve_reg(instr[2])
-    program << parse_imm(instr[3])
+    parse_imm(instr[3]).each { |i| program << i }
   when 'sub'
     # not implemented
   when 'subi'
