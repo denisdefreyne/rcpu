@@ -29,7 +29,7 @@ def parse_imm(s)
   when /\A0x/
     s.to_i(16)
   else
-    raise "Cannot parse immediate: #{s}"
+    s.to_i(10)
   end
 end
 

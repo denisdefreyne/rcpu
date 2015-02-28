@@ -1,5 +1,5 @@
-    movi r0 0xfc
-    movi r1 0x69
+    movi r0 250
+    movi r1 20
 start
     jrz r1 @end
     mov r2 r1
