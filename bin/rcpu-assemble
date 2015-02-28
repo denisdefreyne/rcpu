@@ -46,9 +46,7 @@ def parse_label(s, labels)
   end
 end
 
-def handle_instruction(instr, program, labels, resolve_labels)
-  $stderr.puts(instr.inspect)
-
+def handle_instruction(instr, program, labels)
   case instr[0]
   when 'nop'
     program << 0x00
@@ -68,7 +66,7 @@ def handle_instruction(instr, program, labels, resolve_labels)
     program << 0x04
     program << resolve_reg(instr[1])
     if label?(instr[2])
-      if resolve_labels
+      if labels
         here = program.size
         there = parse_label(instr[2], labels)
         program << there - here + 2 # 2, to take this instruction size into account
@@ -85,10 +83,9 @@ def handle_instruction(instr, program, labels, resolve_labels)
   when 'jrb'
     program << 0x06
     if label?(instr[1])
-      if resolve_labels
+      if labels
         here = program.size
         there = parse_label(instr[1], labels)
-        $stderr.puts [here, there].inspect
         program << here - there - 1
       else
         program << 0x00 # tmp
@@ -118,13 +115,11 @@ lines.each do |line|
   if line =~ /\A\s+/
     # Instruction
     instr = line.strip.split(/ +/)
-    handle_instruction(instr, program, nil, false)
+    handle_instruction(instr, program, nil)
   else
     # Label
     label = line.strip
     labels[label] = program.size
-
-    $stderr.puts("#{label} -> #{labels[label]}")
   end
 end
 
@@ -134,7 +129,7 @@ lines.each do |line|
   if line =~ /\A\s+/
     # Instruction
     instr = line.strip.split(/ +/)
-    handle_instruction(instr, program, labels, true)
+    handle_instruction(instr, program, labels)
   end
 end
 
