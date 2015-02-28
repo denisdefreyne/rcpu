@@ -50,6 +50,4 @@ Two register and one immediate/register arg:
 ## To do
 
 * Allow 32-bit immediates
-* Rearrange opcodes so they make more sense
-* Add more opcodes
-* Write assembler
+* Finish implementing all opcodes
