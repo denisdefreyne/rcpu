@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # encoding: utf-8
 
 class Context
@@ -79,49 +80,49 @@ class CPU
 
   def step
     puts @context.inspect
-    opcode = mem[reg[PC]]
+    opcode = at_pc
     puts "Opcode #{opcode.inspect}"
 
     case opcode
     when 0 # nop
       reg[PC] += 1
     when 1 # addi reg, imm
-      r = mem[reg[PC] + 1]
-      i = mem[reg[PC] + 2]
+      r = at_pc(1)
+      i = at_pc(2)
       reg[r] += i
       reg[PC] += 3
     when 2 # mod reg, reg
-      r1 = mem[reg[PC] + 1]
-      r2 = mem[reg[PC] + 2]
+      r1 = at_pc(1)
+      r2 = at_pc(2)
       reg[r1] = reg[r1] % reg[r2]
       reg[PC] += 3
     when 3 # mov reg, reg
-      r1 = mem[reg[PC] + 1]
-      r2 = mem[reg[PC] + 2]
+      r1 = at_pc(1)
+      r2 = at_pc(2)
       reg[r1] = reg[r2]
       reg[PC] += 3
     when 4 # jrz reg, imm
-      r = mem[reg[PC] + 1]
-      i = mem[reg[PC] + 2]
+      r = at_pc(1)
+      i = at_pc(2)
       if reg[r] == 0
         reg[PC] += i
       else
         reg[PC] += 3
       end
     when 5 # movi reg, imm
-      r = mem[reg[PC] + 1]
-      i = mem[reg[PC] + 2]
+      r = at_pc(1)
+      i = at_pc(2)
       reg[r] = i
       reg[PC] += 3
     when 6 # jrb imm
-      i = mem[reg[PC] + 1]
+      i = at_pc(1)
       reg[PC] -= i
     when 7 # halt
       raise HaltException
     when 8 # mod2 reg, reg, reg
-      r1 = mem[reg[PC] + 1]
-      r2 = mem[reg[PC] + 2]
-      r3 = mem[reg[PC] + 3]
+      r1 = at_pc(1)
+      r2 = at_pc(2)
+      r3 = at_pc(3)
       reg[r1] = reg[r2] % reg[r3]
       reg[PC] += 4
     else
@@ -129,7 +130,7 @@ class CPU
     end
   end
 
-  def pc(offset=0)
+  def at_pc(offset=0)
     mem[reg[PC] + offset]
   end
 end
