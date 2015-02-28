@@ -83,48 +83,38 @@ class CPU
     opcode = at_pc
     puts "Opcode #{opcode.inspect}"
 
+    a0 = at_pc(1)
+    a1 = at_pc(2)
+    a2 = at_pc(3)
+
     case opcode
     when 0 # nop
-      reg[PC] += 1
+      advance(1)
     when 1 # addi reg, imm
-      r = at_pc(1)
-      i = at_pc(2)
-      reg[r] += i
-      reg[PC] += 3
+      reg[a0] += a1
+      advance(3)
     when 2 # mod reg, reg
-      r1 = at_pc(1)
-      r2 = at_pc(2)
-      reg[r1] = reg[r1] % reg[r2]
-      reg[PC] += 3
+      reg[a0] = reg[a0] % reg[a1]
+      advance(3)
     when 3 # mov reg, reg
-      r1 = at_pc(1)
-      r2 = at_pc(2)
-      reg[r1] = reg[r2]
-      reg[PC] += 3
+      reg[a0] = reg[a1]
+      advance(3)
     when 4 # jrz reg, imm
-      r = at_pc(1)
-      i = at_pc(2)
-      if reg[r] == 0
-        reg[PC] += i
+      if reg[a0] == 0
+        reg[PC] += a1
       else
-        reg[PC] += 3
+        advance(3)
       end
     when 5 # movi reg, imm
-      r = at_pc(1)
-      i = at_pc(2)
-      reg[r] = i
-      reg[PC] += 3
+      reg[a0] = a1
+      advance(3)
     when 6 # jrb imm
-      i = at_pc(1)
-      reg[PC] -= i
+      reg[PC] -= a0
     when 7 # halt
       raise HaltException
     when 8 # mod2 reg, reg, reg
-      r1 = at_pc(1)
-      r2 = at_pc(2)
-      r3 = at_pc(3)
-      reg[r1] = reg[r2] % reg[r3]
-      reg[PC] += 4
+      reg[a0] = reg[a1] % reg[a2]
+      advance(4)
     else
       raise "Unknown opcode: #{@opcode.inspect}"
     end
@@ -132,6 +122,10 @@ class CPU
 
   def at_pc(offset=0)
     mem[reg[PC] + offset]
+  end
+
+  def advance(amount)
+    reg[PC] += amount
   end
 end
 
