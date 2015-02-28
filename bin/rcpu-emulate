@@ -118,7 +118,7 @@ class CPU
       reg[FLAGS] =
         (reg[a0] == i ? 0x01 : 0x00) |
         (reg[a0] > i  ? 0x02 : 0x00)
-      advance(3)
+      advance(6)
     when 0x13 # mod
       reg[a0] = reg[a1] % reg[a2]
       advance(4)
