@@ -33,10 +33,20 @@ def parse_imm(s)
   end
 end
 
-program = []
+def label?(s)
+  s =~ /\A@/
+end
 
-File.readlines(ARGV[0]).each do |line|
-  instr = line.strip.split(/ +/)
+def parse_label(s, labels)
+  res = labels[s[1..-1]]
+  if res.nil?
+    raise "Unknown label: #{s}"
+  else
+    res
+  end
+end
+
+def handle_instruction(instr, program, labels, resolve_labels)
   $stderr.puts(instr.inspect)
 
   case instr[0]
@@ -57,14 +67,35 @@ File.readlines(ARGV[0]).each do |line|
   when 'jrz'
     program << 0x04
     program << resolve_reg(instr[1])
-    program << parse_imm(instr[2])
+    if label?(instr[2])
+      if resolve_labels
+        here = program.size
+        there = parse_label(instr[2], labels)
+        program << there - here + 2 # 2, to take this instruction size into account
+      else
+        program << 0x00 # tmp
+      end
+    else
+      program << parse_imm(instr[2])
+    end
   when 'movi'
     program << 0x05
     program << resolve_reg(instr[1])
     program << parse_imm(instr[2])
   when 'jrb'
     program << 0x06
-    program << parse_imm(instr[1])
+    if label?(instr[1])
+      if resolve_labels
+        here = program.size
+        there = parse_label(instr[1], labels)
+        $stderr.puts [here, there].inspect
+        program << here - there - 1
+      else
+        program << 0x00 # tmp
+      end
+    else
+      program << parse_imm(instr[1])
+    end
   when 'halt'
     program << 0x07
   when 'mod2'
@@ -74,6 +105,36 @@ File.readlines(ARGV[0]).each do |line|
     program << resolve_reg(instr[3])
   else
     raise "Unknown instruction name: #{instr[0]}"
+  end
+end
+
+lines = File.readlines(ARGV[0])
+
+labels = {}
+
+# First pass
+program = []
+lines.each do |line|
+  if line =~ /\A\s+/
+    # Instruction
+    instr = line.strip.split(/ +/)
+    handle_instruction(instr, program, nil, false)
+  else
+    # Label
+    label = line.strip
+    labels[label] = program.size
+
+    $stderr.puts("#{label} -> #{labels[label]}")
+  end
+end
+
+# Second pass
+program = []
+lines.each do |line|
+  if line =~ /\A\s+/
+    # Instruction
+    instr = line.strip.split(/ +/)
+    handle_instruction(instr, program, labels, true)
   end
 end
 
