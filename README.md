@@ -11,6 +11,7 @@ Instructions are of variable length. The first byte is the opcode.
 No args:
 
 * `nop`
+* `halt`
 * `pushf`
 * `call`
 * `ret`
