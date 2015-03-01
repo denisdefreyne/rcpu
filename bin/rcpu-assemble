@@ -39,9 +39,9 @@ def parse_imm(s)
 
   [
     (raw & 0xff000000) >> 24,
-    (raw & 0xff0000) >> 16,
-    (raw & 0xff00) >> 8,
-    (raw & 0xff),
+    (raw & 0x00ff0000) >> 16,
+    (raw & 0x0000ff00) >> 8,
+    (raw & 0x000000ff),
   ]
 end
 
@@ -106,7 +106,7 @@ def handle_instruction(instr, program, labels)
   when 'movi'
     program << 0x10
     program << resolve_reg(instr[1])
-    parse_imm(instr[2]).each { |i| program << i }
+    parse_imm(instr[2]).each { |byte| program << byte }
   when 'cmp'
     program << 0x11
     program << resolve_reg(instr[1])
@@ -114,7 +114,7 @@ def handle_instruction(instr, program, labels)
   when 'cmpi'
     program << 0x12
     program << resolve_reg(instr[1])
-    parse_imm(instr[2]).each { |i| program << i }
+    parse_imm(instr[2]).each { |byte| program << byte }
   when 'mod'
     program << 0x13
     program << resolve_reg(instr[1])
@@ -124,7 +124,7 @@ def handle_instruction(instr, program, labels)
     program << 0x14
     program << resolve_reg(instr[1])
     program << resolve_reg(instr[2])
-    parse_imm(instr[3]).each { |i| program << i }
+    parse_imm(instr[3]).each { |byte| program << byte }
   when 'add'
     program << 0x15
     program << resolve_reg(instr[1])
@@ -134,7 +134,7 @@ def handle_instruction(instr, program, labels)
     program << 0x16
     program << resolve_reg(instr[1])
     program << resolve_reg(instr[2])
-    parse_imm(instr[3]).each { |i| program << i }
+    parse_imm(instr[3]).each { |byte| program << byte }
   when 'sub'
     # not implemented
   when 'subi'
@@ -178,7 +178,7 @@ lines = File.readlines(ARGV[0])
 
 labels = {}
 
-# First pass
+# First pass: collect labels
 program = []
 lines.each do |line|
   if line =~ /\A\s+/
@@ -192,7 +192,7 @@ lines.each do |line|
   end
 end
 
-# Second pass
+# Second pass: write instructions
 program = []
 lines.each do |line|
   if line =~ /\A\s+/
