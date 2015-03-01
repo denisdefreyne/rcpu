@@ -114,27 +114,27 @@ class CPU
     when 0x02 # ret
     when 0x03 # push
       raw = reg[a0]
-      mem[reg[SP] - 0] = (raw & 0xff000000) >> 24
-      mem[reg[SP] - 1] = (raw & 0x00ff0000) >> 16
-      mem[reg[SP] - 2] = (raw & 0x0000ff00) >> 8
-      mem[reg[SP] - 3] = (raw & 0x000000ff)
       reg[SP] -= 4
+      mem[reg[SP] + 3] = (raw & 0xff000000) >> 24
+      mem[reg[SP] + 2] = (raw & 0x00ff0000) >> 16
+      mem[reg[SP] + 1] = (raw & 0x0000ff00) >> 8
+      mem[reg[SP] + 0] = (raw & 0x000000ff)
       advance(2)
     when 0x04 # pushi
-      mem[reg[SP] - 0] = a0
-      mem[reg[SP] - 1] = a1
-      mem[reg[SP] - 2] = a2
-      mem[reg[SP] - 3] = a3
       reg[SP] -= 4
+      mem[reg[SP] + 3] = a0
+      mem[reg[SP] + 2] = a1
+      mem[reg[SP] + 1] = a2
+      mem[reg[SP] + 0] = a3
       advance(5)
     when 0x05 # pop
-      reg[SP] += 4
       reg[a0] = reconstruct_int(
-        mem.fetch(reg[SP] - 0),
-        mem.fetch(reg[SP] - 1),
-        mem.fetch(reg[SP] - 2),
-        mem.fetch(reg[SP] - 3)
+        mem.fetch(reg[SP] + 3),
+        mem.fetch(reg[SP] + 2),
+        mem.fetch(reg[SP] + 1),
+        mem.fetch(reg[SP] + 0)
       )
+      reg[SP] += 4
       advance(2)
     when 0x06 # jmp
       reg[PC] = a0
