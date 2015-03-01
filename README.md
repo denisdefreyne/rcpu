@@ -72,3 +72,5 @@ Several opcodes have an `(i)` variant. These variants take a four-byte immediate
 ## To do
 
 * Finish implementing all opcodes
+* Improve assembly syntax (commas, labels ending with :, registers with %)
+* Implement accessing memory using `[r0]`
