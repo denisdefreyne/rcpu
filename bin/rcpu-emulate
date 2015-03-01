@@ -17,6 +17,7 @@ class Registers
       9  => 0,      # rflags
       10 => 0xffff, # rsp
       11 => 0,      # rbp
+      12 => 0,      # rr
     }
   end
 

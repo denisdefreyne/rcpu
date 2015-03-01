@@ -1,11 +1,13 @@
     pushi 819000
     pushi 254163
     call @gcd
+    prn rr
     subi rsp, rsp, 8
 
     pushi 1470
     pushi 1050
     call @gcd
+    prn rr
     subi rsp, rsp, 8
 
     halt
@@ -27,5 +29,5 @@ start:
     jmpi @start
 
 end:
-    prn r0
+    mov rr, r0
     ret

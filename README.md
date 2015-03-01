@@ -32,6 +32,7 @@ The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **
 | rflags | 0x09 | 1            | contains result of `cmp(i)`
 | rsp    | 0x0a | 4            | stack pointer
 | rbp    | 0x0b | 4            | base pointer
+| rr     | 0x0c | 4            | return value
 
 ## Instruction format
 

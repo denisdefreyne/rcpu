@@ -15,6 +15,7 @@ class RegArg
     'rflags' => 9,
     'rsp'    => 10,
     'rbp'    => 11,
+    'rr'     => 12,
   }
 
   attr_reader :name
