@@ -1,67 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-def resolve_reg(s)
-  case s
-  when 'r0'
-    0
-  when 'r1'
-    1
-  when 'r2'
-    2
-  when 'r3'
-    3
-  when 'r4'
-    4
-  when 'r5'
-    5
-  when 'r6'
-    6
-  when 'r7'
-    7
-  when 'rpc'
-    8
-  when 'rflags'
-    9
-  when 'rsp'
-    10
-  when 'rbp'
-    11
-  else
-    raise "Unknown register: #{s}"
-  end
-end
-
-def parse_imm(s)
-  raw =
-    case s
-    when /\A0x/
-      s.to_i(16)
-    else
-      s.to_i(10)
-    end
-
-  [
-    (raw & 0xff000000) >> 24,
-    (raw & 0x00ff0000) >> 16,
-    (raw & 0x0000ff00) >> 8,
-    (raw & 0x000000ff),
-  ]
-end
-
-def label?(s)
-  s =~ /\A@/
-end
-
-def parse_label(s, labels)
-  res = labels[s[1..-1]]
-  if res.nil?
-    raise "Unknown label: #{s}"
-  else
-    res
-  end
-end
-
 def handle_instruction(instr, program, labels)
   $stderr.puts "Assembling #{instr}"
 
@@ -74,76 +13,76 @@ def handle_instruction(instr, program, labels)
     # not implemented
   when 'push'
     program << 0x03
-    program << resolve_reg(instr.args[0])
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'pushi'
     program << 0x04
-    parse_imm(instr.args[0]).each { |byte| program << byte }
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'pop'
     program << 0x05
-    program << resolve_reg(instr.args[0])
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'jmp'
     program << 0x06
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'je'
     program << 0x07
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'jne'
     program << 0x08
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'jg'
     program << 0x09
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'jge'
     program << 0x0a
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'jl'
     program << 0x0b
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'jle'
     program << 0x0c
-    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'not'
     program << 0x0d
-    program << resolve_reg(instr.args[0])
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'prn'
     program << 0x0e
-    program << resolve_reg(instr.args[0])
+    instr.args[0].bytes(labels).each { |b| program << b }
   when 'mov'
     program << 0x0f
-    program << resolve_reg(instr.args[0])
-    program << resolve_reg(instr.args[1])
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
   when 'movi'
     program << 0x10
-    program << resolve_reg(instr.args[0])
-    parse_imm(instr.args[1]).each { |byte| program << byte }
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
   when 'cmp'
     program << 0x11
-    program << resolve_reg(instr.args[0])
-    program << resolve_reg(instr.args[1])
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
   when 'cmpi'
     program << 0x12
-    program << resolve_reg(instr.args[0])
-    parse_imm(instr.args[1]).each { |byte| program << byte }
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
   when 'mod'
     program << 0x13
-    program << resolve_reg(instr.args[0])
-    program << resolve_reg(instr.args[1])
-    program << resolve_reg(instr.args[2])
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
+    instr.args[2].bytes(labels).each { |b| program << b }
   when 'modi'
     program << 0x14
-    program << resolve_reg(instr.args[0])
-    program << resolve_reg(instr.args[1])
-    parse_imm(instr.args[2]).each { |byte| program << byte }
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
+    instr.args[2].bytes(labels).each { |b| program << b }
   when 'add'
     program << 0x15
-    program << resolve_reg(instr.args[0])
-    program << resolve_reg(instr.args[1])
-    program << resolve_reg(instr.args[2])
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
+    instr.args[2].bytes(labels).each { |b| program << b }
   when 'addi'
     program << 0x16
-    program << resolve_reg(instr.args[0])
-    program << resolve_reg(instr.args[1])
-    parse_imm(instr.args[2]).each { |byte| program << byte }
+    instr.args[0].bytes(labels).each { |b| program << b }
+    instr.args[1].bytes(labels).each { |b| program << b }
+    instr.args[2].bytes(labels).each { |b| program << b }
   when 'sub'
     # not implemented
   when 'subi'
@@ -191,6 +130,109 @@ def parse_line(string)
   end
 end
 
+def parse_arg(string)
+  case string
+  when /\A@/
+    LabelArg.new(string[1..-1])
+  when /\Ar/
+    RegisterArg.new(string)
+  when /\A0x\d+/
+    ImmediateArg.new(string[2..-1].to_i(16))
+  when /\A\d+/
+    ImmediateArg.new(string.to_i)
+  else
+    raise "Cannot parse argument: #{string.inspect}"
+  end
+end
+
+class RegisterArg
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def inspect
+    "reg(#{@name})"
+  end
+
+  def bytes(_labels)
+    num =
+      case name
+      when 'r0'
+        0
+      when 'r1'
+        1
+      when 'r2'
+        2
+      when 'r3'
+        3
+      when 'r4'
+        4
+      when 'r5'
+        5
+      when 'r6'
+        6
+      when 'r7'
+        7
+      when 'rpc'
+        8
+      when 'rflags'
+        9
+      when 'rsp'
+        10
+      when 'rbp'
+        11
+      else
+        raise "Unknown register: #{s}"
+      end
+
+    [num]
+  end
+end
+
+class ImmediateArg
+  attr_reader :value
+
+  def initialize(value)
+    @value = value
+  end
+
+  def inspect
+    "imm(#{@value})"
+  end
+
+  def bytes(_labels)
+    [
+      (value & 0xff000000) >> 24,
+      (value & 0x00ff0000) >> 16,
+      (value & 0x0000ff00) >> 8,
+      (value & 0x000000ff),
+    ]
+  end
+end
+
+class LabelArg
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def inspect
+    "label(#{@name})"
+  end
+
+  def bytes(labels)
+    # FIXME: Should labels not be 4 bytes?
+    if labels
+      [labels[name]]
+    else
+      [0x00]
+    end
+  end
+end
+
 class Instruction
   attr_reader :opcode_mnemonic
   attr_reader :args
@@ -199,7 +241,7 @@ class Instruction
     parts = string.split(/ +/)
 
     opcode_mnemonic = parts[0]
-    args = parts[1..-1]
+    args = parts[1..-1].map { |s| parse_arg(s) }
 
     new(opcode_mnemonic, args)
   end
@@ -216,11 +258,6 @@ class Instruction
   def instruction?
     true
   end
-
-  def label?
-    false
-  end
-
 end
 
 class Label
@@ -236,10 +273,6 @@ class Label
 
   def instruction?
     false
-  end
-
-  def label?
-    true
   end
 end
 
