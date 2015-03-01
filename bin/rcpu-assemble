@@ -1,150 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-def handle_instruction(instr, program, labels)
-  $stderr.puts "Assembling #{instr}"
-
-  case instr.opcode_mnemonic
-  when 'nop'
-    program << 0x00
-  when 'call'
-    # not implemented
-  when 'ret'
-    # not implemented
-  when 'push'
-    program << 0x03
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'pushi'
-    program << 0x04
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'pop'
-    program << 0x05
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'jmp'
-    program << 0x06
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'je'
-    program << 0x07
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'jne'
-    program << 0x08
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'jg'
-    program << 0x09
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'jge'
-    program << 0x0a
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'jl'
-    program << 0x0b
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'jle'
-    program << 0x0c
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'not'
-    program << 0x0d
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'prn'
-    program << 0x0e
-    instr.args[0].bytes(labels).each { |b| program << b }
-  when 'mov'
-    program << 0x0f
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-  when 'movi'
-    program << 0x10
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-  when 'cmp'
-    program << 0x11
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-  when 'cmpi'
-    program << 0x12
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-  when 'mod'
-    program << 0x13
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-    instr.args[2].bytes(labels).each { |b| program << b }
-  when 'modi'
-    program << 0x14
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-    instr.args[2].bytes(labels).each { |b| program << b }
-  when 'add'
-    program << 0x15
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-    instr.args[2].bytes(labels).each { |b| program << b }
-  when 'addi'
-    program << 0x16
-    instr.args[0].bytes(labels).each { |b| program << b }
-    instr.args[1].bytes(labels).each { |b| program << b }
-    instr.args[2].bytes(labels).each { |b| program << b }
-  when 'sub'
-    # not implemented
-  when 'subi'
-    # not implemented
-  when 'mul'
-    # not implemented
-  when 'muli'
-    # not implemented
-  when 'div'
-    # not implemented
-  when 'divi'
-    # not implemented
-  when 'xor'
-    # not implemented
-  when 'xori'
-    # not implemented
-  when 'or'
-    # not implemented
-  when 'ori'
-    # not implemented
-  when 'and'
-    # not implemented
-  when 'andi'
-    # not implemented
-  when 'shl'
-    # not implemented
-  when 'shli'
-    # not implemented
-  when 'shr'
-    # not implemented
-  when 'shri'
-    # not implemented
-  when 'halt'
-    program << 0xff
-  else
-    raise "Unknown instruction name: #{instr.opcode_mnemonic}"
-  end
-end
-
-def parse_line(string)
-  if string =~ /\A\s+/
-    Instruction.parse(string.strip)
-  else
-    Label.new(string.strip)
-  end
-end
-
-def parse_arg(string)
-  case string
-  when /\A@/
-    LabelArg.new(string[1..-1])
-  when /\Ar/
-    RegisterArg.new(string)
-  when /\A0x\d+/
-    ImmediateArg.new(string[2..-1].to_i(16))
-  when /\A\d+/
-    ImmediateArg.new(string.to_i)
-  else
-    raise "Cannot parse argument: #{string.inspect}"
-  end
-end
-
 class RegisterArg
   attr_reader :name
 
@@ -237,15 +93,6 @@ class Instruction
   attr_reader :opcode_mnemonic
   attr_reader :args
 
-  def self.parse(string)
-    parts = string.split(/ +/)
-
-    opcode_mnemonic = parts[0]
-    args = parts[1..-1].map { |s| parse_arg(s) }
-
-    new(opcode_mnemonic, args)
-  end
-
   def initialize(opcode_mnemonic, args)
     @opcode_mnemonic = opcode_mnemonic
     @args = args
@@ -276,6 +123,195 @@ class Label
   end
 end
 
+class Parser
+  def parse_line(string)
+    if string =~ /\A\s+/
+      parts = string.strip.split(/ +/)
+
+      opcode_mnemonic = parts[0]
+      args = parts[1..-1].map { |s| parse_arg(s) }
+
+      Instruction.new(opcode_mnemonic, args)
+    else
+      Label.new(string.strip)
+    end
+  end
+
+  def parse_arg(string)
+    case string
+    when /\A@/
+      LabelArg.new(string[1..-1])
+    when /\Ar/
+      RegisterArg.new(string)
+    when /\A0x\d+/
+      ImmediateArg.new(string[2..-1].to_i(16))
+    when /\A\d+/
+      ImmediateArg.new(string.to_i)
+    else
+      raise "Cannot parse argument: #{string.inspect}"
+    end
+  end
+end
+
+class Assembler
+  def initialize(raw_lines)
+    @raw_lines = raw_lines
+  end
+
+  def assemble
+    parser = Parser.new
+    lines = @raw_lines.map { |s| parser.parse_line(s) }
+    labels = collect_labels(lines)
+    program = generate_program(lines, labels)
+    program.pack('C*')
+  end
+
+  private
+
+  def collect_labels(lines)
+    labels = {}
+    program = []
+    lines.each do |line|
+      if line.instruction?
+        handle_instruction(line, program, nil)
+      else
+        labels[line.name] = program.size
+      end
+    end
+    labels
+  end
+
+  def generate_program(lines, labels)
+    program = []
+    lines.each do |line|
+      if line.instruction?
+        handle_instruction(line, program, labels)
+      end
+    end
+    program
+  end
+
+  def handle_instruction(instr, program, labels)
+    case instr.opcode_mnemonic
+    when 'nop'
+      program << 0x00
+    when 'call'
+      # not implemented
+    when 'ret'
+      # not implemented
+    when 'push'
+      program << 0x03
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'pushi'
+      program << 0x04
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'pop'
+      program << 0x05
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'jmp'
+      program << 0x06
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'je'
+      program << 0x07
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'jne'
+      program << 0x08
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'jg'
+      program << 0x09
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'jge'
+      program << 0x0a
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'jl'
+      program << 0x0b
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'jle'
+      program << 0x0c
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'not'
+      program << 0x0d
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'prn'
+      program << 0x0e
+      instr.args[0].bytes(labels).each { |b| program << b }
+    when 'mov'
+      program << 0x0f
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+    when 'movi'
+      program << 0x10
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+    when 'cmp'
+      program << 0x11
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+    when 'cmpi'
+      program << 0x12
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+    when 'mod'
+      program << 0x13
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+      instr.args[2].bytes(labels).each { |b| program << b }
+    when 'modi'
+      program << 0x14
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+      instr.args[2].bytes(labels).each { |b| program << b }
+    when 'add'
+      program << 0x15
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+      instr.args[2].bytes(labels).each { |b| program << b }
+    when 'addi'
+      program << 0x16
+      instr.args[0].bytes(labels).each { |b| program << b }
+      instr.args[1].bytes(labels).each { |b| program << b }
+      instr.args[2].bytes(labels).each { |b| program << b }
+    when 'sub'
+      # not implemented
+    when 'subi'
+      # not implemented
+    when 'mul'
+      # not implemented
+    when 'muli'
+      # not implemented
+    when 'div'
+      # not implemented
+    when 'divi'
+      # not implemented
+    when 'xor'
+      # not implemented
+    when 'xori'
+      # not implemented
+    when 'or'
+      # not implemented
+    when 'ori'
+      # not implemented
+    when 'and'
+      # not implemented
+    when 'andi'
+      # not implemented
+    when 'shl'
+      # not implemented
+    when 'shli'
+      # not implemented
+    when 'shr'
+      # not implemented
+    when 'shri'
+      # not implemented
+    when 'halt'
+      program << 0xff
+    else
+      raise "Unknown instruction name: #{instr.opcode_mnemonic}"
+    end
+  end
+end
+
+# Get filenames
 if ARGV.size != 1
   $stderr.puts 'usage: rcpu-assemble [filename]'
   exit 1
@@ -286,29 +322,11 @@ output_filename =
     File.dirname(input_filename),
     File.basename(input_filename, '.rcs') + '.rcb')
 
+# Read
 raw_lines = File.readlines(input_filename)
 
-labels = {}
+# Assemble
+data = Assembler.new(raw_lines).assemble
 
-# First pass: collect labels
-$stderr.puts "*** Pass 1: collecting labels"
-program = []
-lines = raw_lines.map { |s| parse_line(s) }
-lines.each do |line|
-  if line.instruction?
-    handle_instruction(line, program, nil)
-  else
-    labels[line.name] = program.size
-  end
-end
-
-# Second pass: write instructions
-$stderr.puts "*** Pass 2: assembling"
-program = []
-lines.each do |line|
-  if line.instruction?
-    handle_instruction(line, program, labels)
-  end
-end
-
-File.open(output_filename, 'w') { |io| io << program.pack('C*') }
+# Write
+File.open(output_filename, 'w') { |io| io << data }
