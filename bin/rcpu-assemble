@@ -123,7 +123,7 @@ end
 class Parser
   # * [DONE] Support empty lines
   # * Support comments
-  # * Add : to end of labels
+  # * [DONE] Add : to end of labels
   # * [DONE] Add commas between arguments
 
   def parse_raw_lines(raw_lines)
@@ -141,7 +141,7 @@ class Parser
 
       Instruction.new(opcode_mnemonic, args)
     else
-      Label.new(raw_line.strip)
+      Label.new(raw_line.strip.sub(/:\z/, ''))
     end
   end
 
