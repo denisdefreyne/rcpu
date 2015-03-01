@@ -183,7 +183,17 @@ def handle_instruction(instr, program, labels)
   end
 end
 
-lines = File.readlines(ARGV[0])
+if ARGV.size != 1
+  $stderr.puts 'usage: rcpu-assemble [filename]'
+  exit 1
+end
+input_filename = ARGV[0]
+output_filename =
+  File.join(
+    File.dirname(input_filename),
+    File.basename(input_filename, '.rcs') + '.rcb')
+
+lines = File.readlines(input_filename)
 
 labels = {}
 
@@ -213,4 +223,4 @@ lines.each do |line|
   end
 end
 
-print program.pack('C*')
+File.open(output_filename, 'w') { |io| io << program.pack('C*') }
