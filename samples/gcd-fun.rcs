@@ -20,14 +20,14 @@ gcd:
     prn r0
     prn r1
 
-start:
+gcd-start:
     cmpi r1 0
-    je @end
+    je @gcd-end
     mov r2 r1
     mod r1 r0 r1
     mov r0 r2
-    jmpi @start
+    jmpi @gcd-start
 
-end:
+gcd-end:
     mov rr, r0
     ret
