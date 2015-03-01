@@ -1,7 +1,7 @@
 	pushi 0
 
 build:
-	pop r0
+	pop r0 # poppity pop!
 	push r0
 	prn r0
 	cmpi r0, 100
