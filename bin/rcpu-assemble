@@ -18,13 +18,15 @@ class RegArg
   }
 
   attr_reader :name
+  attr_reader :deref
 
-  def initialize(name)
+  def initialize(name, deref)
     @name = name
+    @deref = deref
   end
 
   def inspect
-    "reg(#{@name})"
+    "reg(#{@name}, #{@deref})"
   end
 
   def valid?
@@ -32,7 +34,12 @@ class RegArg
   end
 
   def bytes(_labels)
-    [MAPPING[name]]
+    raw = MAPPING[name]
+    if deref
+      [raw | 0x80]
+    else
+      [raw]
+    end
   end
 end
 
@@ -144,13 +151,15 @@ class Parser
 
   def parse_arg(string)
     case string
-    when /\A@/
+    when /\A@[a-z-]+\z/
       LabelArg.new(string[1..-1])
-    when /\Ar/
-      RegArg.new(string)
-    when /\A0x\d+/
+    when /\Ar[a-z0-9]+\z/
+      RegArg.new(string, false)
+    when /\A\[(r[a-z0-9]+)\]\z/
+      RegArg.new($1, true)
+    when /\A0x\d+\z/
       ImmArg.new(string[2..-1].to_i(16))
-    when /\A\d+/
+    when /\A\d+\z/
       ImmArg.new(string.to_i)
     else
       raise "Cannot parse argument: #{string.inspect}"

@@ -1,8 +1,7 @@
 	pushi 0
 
 build:
-	pop r0 # poppity pop!
-	push r0
+	mov r0, [rsp]
 	prn r0
 	cmpi r0, 100
 	je @unroll
@@ -11,7 +10,7 @@ build:
 	jmp @build
 
 unroll:
-	pop r0
+	pop r0 # poppity pop!
 	prn r0
 	cmpi r0, 0
 	je @done

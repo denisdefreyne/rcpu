@@ -1,11 +1,9 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-class Context
-  attr_reader :reg
-  attr_accessor :mem
-
-  def initialize
+class Registers
+  def initialize(mem)
+    @mem = mem
     @reg = {
       0  => 0,      # r0
       1  => 0,      # r1
@@ -20,7 +18,32 @@ class Context
       10 => 0xffff, # rsp
       11 => 0,      # rbp
     }
+  end
+
+  def [](num)
+    if num & 0x80 != 0x00
+      @mem.fetch(self[num & ~0x80])
+    else
+      @reg.fetch(num)
+    end
+  end
+
+  def []=(num, value)
+    if num & 0x80 != 0x00
+      raise 'not supported'
+    else
+      @reg[num] = value
+    end
+  end
+end
+
+class Context
+  attr_reader :reg
+  attr_accessor :mem
+
+  def initialize
     @mem = {}
+    @reg = Registers.new(@mem)
   end
 
   def inspect
