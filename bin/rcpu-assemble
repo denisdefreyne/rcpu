@@ -217,7 +217,7 @@ class Assembler
     'push'  => { opcode: 0x03, args: [RegArg] },
     'pushi' => { opcode: 0x04, args: [ImmArg] },
     'pop'   => { opcode: 0x05, args: [RegArg] },
-    'jmp'   => { opcode: 0x06, args: [LabelArg] },
+    'jmp'   => { opcode: 0x06, args: [[LabelArg, RegArg]] },
     'je'    => { opcode: 0x07, args: [LabelArg] },
     'jne'   => { opcode: 0x08, args: [LabelArg] },
     'jg'    => { opcode: 0x09, args: [LabelArg] },
@@ -267,8 +267,8 @@ class Assembler
       raise "Incorrect argument count (#{instr.inspect}; is #{instr.args.size}, expected #{instr_def.fetch(:args).size}"
     end
     instr.args.each_with_index do |arg, i|
-      arg_def = instr_def.fetch(:args).fetch(i)
-      unless arg.instance_of?(arg_def)
+      arg_def = [instr_def.fetch(:args).fetch(i)].flatten
+      unless arg_def.any? { |d| arg.instance_of?(d) }
         raise "Incorrect argument type (#{instr.inspect}; is #{arg.class}, expected #{arg_def})"
       end
       unless arg.valid?
