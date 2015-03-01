@@ -191,122 +191,59 @@ class Assembler
     program
   end
 
+  OPCODES = {
+    'nop'   => 0x00,
+    'call'  => 0x01,
+    'ret'   => 0x02,
+    'push'  => 0x03,
+    'pushi' => 0x04,
+    'pop'   => 0x05,
+    'jmp'   => 0x06,
+    'je'    => 0x07,
+    'jne'   => 0x08,
+    'jg'    => 0x09,
+    'jge'   => 0x0a,
+    'jl'    => 0x0b,
+    'jle'   => 0x0c,
+    'not'   => 0x0d,
+    'prn'   => 0x0e,
+    'mov'   => 0x0f,
+    'movi'  => 0x10,
+    'cmp'   => 0x11,
+    'cmpi'  => 0x12,
+    'mod'   => 0x13,
+    'modi'  => 0x14,
+    'add'   => 0x15,
+    'addi'  => 0x16,
+    'sub'   => 0x17,
+    'subi'  => 0x18,
+    'mul'   => 0x19,
+    'muli'  => 0x1a,
+    'div'   => 0x1b,
+    'divi'  => 0x1c,
+    'xor'   => 0x1d,
+    'xori'  => 0x1e,
+    'or'    => 0x1f,
+    'ori'   => 0x20,
+    'and'   => 0x21,
+    'andi'  => 0x22,
+    'shl'   => 0x23,
+    'shli'  => 0x24,
+    'shr'   => 0x25,
+    'shri'  => 0x26,
+    'halt'  => 0xff,
+  }
+
   def handle_instruction(instr, program, labels)
-    case instr.opcode_mnemonic
-    when 'nop'
-      program << 0x00
-    when 'call'
-      # not implemented
-    when 'ret'
-      # not implemented
-    when 'push'
-      program << 0x03
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'pushi'
-      program << 0x04
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'pop'
-      program << 0x05
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'jmp'
-      program << 0x06
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'je'
-      program << 0x07
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'jne'
-      program << 0x08
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'jg'
-      program << 0x09
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'jge'
-      program << 0x0a
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'jl'
-      program << 0x0b
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'jle'
-      program << 0x0c
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'not'
-      program << 0x0d
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'prn'
-      program << 0x0e
-      instr.args[0].bytes(labels).each { |b| program << b }
-    when 'mov'
-      program << 0x0f
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-    when 'movi'
-      program << 0x10
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-    when 'cmp'
-      program << 0x11
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-    when 'cmpi'
-      program << 0x12
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-    when 'mod'
-      program << 0x13
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-      instr.args[2].bytes(labels).each { |b| program << b }
-    when 'modi'
-      program << 0x14
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-      instr.args[2].bytes(labels).each { |b| program << b }
-    when 'add'
-      program << 0x15
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-      instr.args[2].bytes(labels).each { |b| program << b }
-    when 'addi'
-      program << 0x16
-      instr.args[0].bytes(labels).each { |b| program << b }
-      instr.args[1].bytes(labels).each { |b| program << b }
-      instr.args[2].bytes(labels).each { |b| program << b }
-    when 'sub'
-      # not implemented
-    when 'subi'
-      # not implemented
-    when 'mul'
-      # not implemented
-    when 'muli'
-      # not implemented
-    when 'div'
-      # not implemented
-    when 'divi'
-      # not implemented
-    when 'xor'
-      # not implemented
-    when 'xori'
-      # not implemented
-    when 'or'
-      # not implemented
-    when 'ori'
-      # not implemented
-    when 'and'
-      # not implemented
-    when 'andi'
-      # not implemented
-    when 'shl'
-      # not implemented
-    when 'shli'
-      # not implemented
-    when 'shr'
-      # not implemented
-    when 'shri'
-      # not implemented
-    when 'halt'
-      program << 0xff
-    else
+    # Add opcode
+    opcode = OPCODES.fetch(instr.opcode_mnemonic) do
       raise "Unknown instruction name: #{instr.opcode_mnemonic}"
+    end
+    program << opcode
+
+    # Add args
+    instr.args.each do |arg|
+      arg.bytes(labels).each { |b| program << b }
     end
   end
 end
