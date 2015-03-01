@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-class RegisterArg
+class RegArg
   attr_reader :name
 
   def initialize(name)
@@ -47,7 +47,7 @@ class RegisterArg
   end
 end
 
-class ImmediateArg
+class ImmArg
   attr_reader :value
 
   def initialize(value)
@@ -142,11 +142,11 @@ class Parser
     when /\A@/
       LabelArg.new(string[1..-1])
     when /\Ar/
-      RegisterArg.new(string)
+      RegArg.new(string)
     when /\A0x\d+/
-      ImmediateArg.new(string[2..-1].to_i(16))
+      ImmArg.new(string[2..-1].to_i(16))
     when /\A\d+/
-      ImmediateArg.new(string.to_i)
+      ImmArg.new(string.to_i)
     else
       raise "Cannot parse argument: #{string.inspect}"
     end
@@ -191,55 +191,68 @@ class Assembler
     program
   end
 
-  OPCODES = {
-    'nop'   => 0x00,
-    'call'  => 0x01,
-    'ret'   => 0x02,
-    'push'  => 0x03,
-    'pushi' => 0x04,
-    'pop'   => 0x05,
-    'jmp'   => 0x06,
-    'je'    => 0x07,
-    'jne'   => 0x08,
-    'jg'    => 0x09,
-    'jge'   => 0x0a,
-    'jl'    => 0x0b,
-    'jle'   => 0x0c,
-    'not'   => 0x0d,
-    'prn'   => 0x0e,
-    'mov'   => 0x0f,
-    'movi'  => 0x10,
-    'cmp'   => 0x11,
-    'cmpi'  => 0x12,
-    'mod'   => 0x13,
-    'modi'  => 0x14,
-    'add'   => 0x15,
-    'addi'  => 0x16,
-    'sub'   => 0x17,
-    'subi'  => 0x18,
-    'mul'   => 0x19,
-    'muli'  => 0x1a,
-    'div'   => 0x1b,
-    'divi'  => 0x1c,
-    'xor'   => 0x1d,
-    'xori'  => 0x1e,
-    'or'    => 0x1f,
-    'ori'   => 0x20,
-    'and'   => 0x21,
-    'andi'  => 0x22,
-    'shl'   => 0x23,
-    'shli'  => 0x24,
-    'shr'   => 0x25,
-    'shri'  => 0x26,
-    'halt'  => 0xff,
+  INSTRUCTION_DEFS = {
+    'nop'   => { opcode: 0x00, args: [] },
+    'call'  => { opcode: 0x01, args: [] }, # TODO: configure args
+    'ret'   => { opcode: 0x02, args: [] }, # TODO: configure args
+    'push'  => { opcode: 0x03, args: [RegArg] },
+    'pushi' => { opcode: 0x04, args: [ImmArg] },
+    'pop'   => { opcode: 0x05, args: [RegArg] },
+    'jmp'   => { opcode: 0x06, args: [LabelArg] },
+    'je'    => { opcode: 0x07, args: [LabelArg] },
+    'jne'   => { opcode: 0x08, args: [LabelArg] },
+    'jg'    => { opcode: 0x09, args: [LabelArg] },
+    'jge'   => { opcode: 0x0a, args: [LabelArg] },
+    'jl'    => { opcode: 0x0b, args: [LabelArg] },
+    'jle'   => { opcode: 0x0c, args: [LabelArg] },
+    'not'   => { opcode: 0x0d, args: [RegArg, RegArg] },
+    'prn'   => { opcode: 0x0e, args: [RegArg] },
+    'mov'   => { opcode: 0x0f, args: [RegArg, RegArg] },
+    'movi'  => { opcode: 0x10, args: [RegArg, ImmArg] },
+    'cmp'   => { opcode: 0x11, args: [RegArg, RegArg] },
+    'cmpi'  => { opcode: 0x12, args: [RegArg, ImmArg] },
+    'mod'   => { opcode: 0x13, args: [RegArg, RegArg, RegArg] },
+    'modi'  => { opcode: 0x14, args: [RegArg, RegArg, ImmArg] },
+    'add'   => { opcode: 0x15, args: [RegArg, RegArg, RegArg] },
+    'addi'  => { opcode: 0x16, args: [RegArg, RegArg, ImmArg] },
+    'sub'   => { opcode: 0x17, args: [RegArg, RegArg, RegArg] },
+    'subi'  => { opcode: 0x18, args: [RegArg, RegArg, ImmArg] },
+    'mul'   => { opcode: 0x19, args: [RegArg, RegArg, RegArg] },
+    'muli'  => { opcode: 0x1a, args: [RegArg, RegArg, ImmArg] },
+    'div'   => { opcode: 0x1b, args: [RegArg, RegArg, RegArg] },
+    'divi'  => { opcode: 0x1c, args: [RegArg, RegArg, ImmArg] },
+    'xor'   => { opcode: 0x1d, args: [RegArg, RegArg, RegArg] },
+    'xori'  => { opcode: 0x1e, args: [RegArg, RegArg, ImmArg] },
+    'or'    => { opcode: 0x1f, args: [RegArg, RegArg, RegArg] },
+    'ori'   => { opcode: 0x20, args: [RegArg, RegArg, ImmArg] },
+    'and'   => { opcode: 0x21, args: [RegArg, RegArg, RegArg] },
+    'andi'  => { opcode: 0x22, args: [RegArg, RegArg, ImmArg] },
+    'shl'   => { opcode: 0x23, args: [RegArg, RegArg, RegArg] },
+    'shli'  => { opcode: 0x24, args: [RegArg, RegArg, ImmArg] },
+    'shr'   => { opcode: 0x25, args: [RegArg, RegArg, RegArg] },
+    'shri'  => { opcode: 0x26, args: [RegArg, RegArg, ImmArg] },
+    'halt'  => { opcode: 0xff, args: [] },
   }
 
   def handle_instruction(instr, program, labels)
-    # Add opcode
-    opcode = OPCODES.fetch(instr.opcode_mnemonic) do
+    instr_def = INSTRUCTION_DEFS.fetch(instr.opcode_mnemonic) do
       raise "Unknown instruction name: #{instr.opcode_mnemonic}"
     end
+
+    # Add opcode
+    opcode = instr_def.fetch(:opcode)
     program << opcode
+
+    # Validate args
+    if instr.args.size != instr_def.fetch(:args).size
+      raise "Incorrect argument count (#{instr}; is #{instr.args.size}, expected #{instr_def.fetch(:args).size}"
+    end
+    instr.args.each_with_index do |arg, i|
+      arg_def = instr_def.fetch(:args).fetch(i)
+      unless arg.instance_of?(arg_def)
+        raise "Incorrect argument type (#{instr}; is #{arg.class}, expected #{arg_def})"
+      end
+    end
 
     # Add args
     instr.args.each do |arg|
