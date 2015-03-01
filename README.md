@@ -27,12 +27,12 @@ Instructions are of variable length. The first byte is the opcode.
 | `pop`     |        | 1 (reg)               | pop into a0 (reg)
 | `prn`     |        | 1 (reg)               | print a0 (reg)
 | `jmp`     |        | 1 (label)             | pc ← a0
-| `je`      |        | 1 (label)             | if flags & 0x01 == 0x01: pc ← a0
-| `jne`     |        | 1 (label)             | if flags & 0x01 == 0x00: pc ← a0
-| `jg`      |        | 1 (label)             | if flags & 0x02 == 0x02: pc ← a0
-| `jge`     |        | 1 (label)             | if flags & 0x03 != 0x00: pc ← a0
-| `jl`      |        | 1 (label)             | if flags & 0x03 == 0x00: pc ← a0
-| `jle`     |        | 1 (label)             | if flags & 0x02 == 0x00: pc ← a0
+| `je`      |        | 1 (label)             | if == then pc ← a0
+| `jne`     |        | 1 (label)             | if != then pc ← a0
+| `jg`      |        | 1 (label)             | if >  then pc ← a0
+| `jge`     |        | 1 (label)             | if >= then pc ← a0
+| `jl`      |        | 1 (label)             | if <  then pc ← a0
+| `jle`     |        | 1 (label)             | if <= then pc ← a0
 | `push(i)` |        | 1 (reg/imm)           | push a0 onto stack
 | `not`     |        | 2 (reg, reg)          | a0 ← ~a1
 | `mov(i)`  |        | 2 (reg, reg/imm)      | a0 ← a1
