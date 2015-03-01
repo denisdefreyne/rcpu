@@ -41,8 +41,8 @@ Instructions are of variable length. The first byte is the opcode.
 | --------- | ------ | --------------------- | ------
 | `nop`     | 0x00   | 0                     | nothing
 | `halt`    | 0xff   | 0                     | stops emulation
-| `pop`     |        | 1 (reg)               | pop into a0 (reg)
-| `prn`     |        | 1 (reg)               | print a0 (reg)
+| `pop`     |        | 1 (reg)               | pop into a0
+| `prn`     |        | 1 (reg)               | print a0
 | `jmp`     |        | 1 (label)             | pc ← a0
 | `je`      |        | 1 (label)             | if == then pc ← a0
 | `jne`     |        | 1 (label)             | if != then pc ← a0
