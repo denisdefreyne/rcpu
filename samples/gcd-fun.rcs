@@ -1,0 +1,31 @@
+    pushi 819000
+    pushi 254163
+    call @gcd
+    subi rsp, rsp, 8
+
+    pushi 1470
+    pushi 1050
+    call @gcd
+    subi rsp, rsp, 8
+
+    halt
+
+gcd:
+    addi r2, rsp, 4
+    addi r3, rsp, 8
+    mov r0, [r2]
+    mov r1, [r3]
+    prn r0
+    prn r1
+
+start:
+    cmpi r1 0
+    je @end
+    mov r2 r1
+    mod r1 r0 r1
+    mov r0 r2
+    jmpi @start
+
+end:
+    prn r0
+    ret
