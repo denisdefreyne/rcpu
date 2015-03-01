@@ -4,6 +4,16 @@ _RCPU_ is a virtual machine emulator and assembler written in Ruby.
 
 Very much work in progress.
 
+## Usage
+
+To assemble a file, use _rcpu-assemble_, passing the input filename (with the _rcs_ extension). This will generate a corresponding _rcb_ file. For example:
+
+	% ./bin/rcpu-assemble samples/counter.rcs
+
+To run a file, use _rcpu-emulate_, passing the input filename (with the _rcb_ extension). For example:
+
+	% ./bin/rcpu-emulate samples/counter.rcb
+
 ## Instruction format
 
 Instructions are of variable length. The first byte is the opcode.
