@@ -63,9 +63,9 @@ def parse_label(s, labels)
 end
 
 def handle_instruction(instr, program, labels)
-  $stderr.puts "Assembling #{instr.join(' ')}"
+  $stderr.puts "Assembling #{instr}"
 
-  case instr[0]
+  case instr.opcode_mnemonic
   when 'nop'
     program << 0x00
   when 'call'
@@ -74,76 +74,76 @@ def handle_instruction(instr, program, labels)
     # not implemented
   when 'push'
     program << 0x03
-    program << resolve_reg(instr[1])
+    program << resolve_reg(instr.args[0])
   when 'pushi'
     program << 0x04
-    parse_imm(instr[1]).each { |byte| program << byte }
+    parse_imm(instr.args[0]).each { |byte| program << byte }
   when 'pop'
     program << 0x05
-    program << resolve_reg(instr[1])
+    program << resolve_reg(instr.args[0])
   when 'jmp'
     program << 0x06
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'je'
     program << 0x07
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'jne'
     program << 0x08
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'jg'
     program << 0x09
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'jge'
     program << 0x0a
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'jl'
     program << 0x0b
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'jle'
     program << 0x0c
-    program << (labels ? parse_label(instr[1], labels) : 0x00)
+    program << (labels ? parse_label(instr.args[0], labels) : 0x00)
   when 'not'
     program << 0x0d
-    program << resolve_reg(instr[1])
+    program << resolve_reg(instr.args[0])
   when 'prn'
     program << 0x0e
-    program << resolve_reg(instr[1])
+    program << resolve_reg(instr.args[0])
   when 'mov'
     program << 0x0f
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
+    program << resolve_reg(instr.args[0])
+    program << resolve_reg(instr.args[1])
   when 'movi'
     program << 0x10
-    program << resolve_reg(instr[1])
-    parse_imm(instr[2]).each { |byte| program << byte }
+    program << resolve_reg(instr.args[0])
+    parse_imm(instr.args[1]).each { |byte| program << byte }
   when 'cmp'
     program << 0x11
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
+    program << resolve_reg(instr.args[0])
+    program << resolve_reg(instr.args[1])
   when 'cmpi'
     program << 0x12
-    program << resolve_reg(instr[1])
-    parse_imm(instr[2]).each { |byte| program << byte }
+    program << resolve_reg(instr.args[0])
+    parse_imm(instr.args[1]).each { |byte| program << byte }
   when 'mod'
     program << 0x13
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
-    program << resolve_reg(instr[3])
+    program << resolve_reg(instr.args[0])
+    program << resolve_reg(instr.args[1])
+    program << resolve_reg(instr.args[2])
   when 'modi'
     program << 0x14
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
-    parse_imm(instr[3]).each { |byte| program << byte }
+    program << resolve_reg(instr.args[0])
+    program << resolve_reg(instr.args[1])
+    parse_imm(instr.args[2]).each { |byte| program << byte }
   when 'add'
     program << 0x15
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
-    program << resolve_reg(instr[3])
+    program << resolve_reg(instr.args[0])
+    program << resolve_reg(instr.args[1])
+    program << resolve_reg(instr.args[2])
   when 'addi'
     program << 0x16
-    program << resolve_reg(instr[1])
-    program << resolve_reg(instr[2])
-    parse_imm(instr[3]).each { |byte| program << byte }
+    program << resolve_reg(instr.args[0])
+    program << resolve_reg(instr.args[1])
+    parse_imm(instr.args[2]).each { |byte| program << byte }
   when 'sub'
     # not implemented
   when 'subi'
@@ -179,7 +179,67 @@ def handle_instruction(instr, program, labels)
   when 'halt'
     program << 0xff
   else
-    raise "Unknown instruction name: #{instr[0]}"
+    raise "Unknown instruction name: #{instr.opcode_mnemonic}"
+  end
+end
+
+def parse_line(string)
+  if string =~ /\A\s+/
+    Instruction.parse(string.strip)
+  else
+    Label.new(string.strip)
+  end
+end
+
+class Instruction
+  attr_reader :opcode_mnemonic
+  attr_reader :args
+
+  def self.parse(string)
+    parts = string.split(/ +/)
+
+    opcode_mnemonic = parts[0]
+    args = parts[1..-1]
+
+    new(opcode_mnemonic, args)
+  end
+
+  def initialize(opcode_mnemonic, args)
+    @opcode_mnemonic = opcode_mnemonic
+    @args = args
+  end
+
+  def to_s
+    "instr(#{@opcode_mnemonic}, args = #{@args.inspect})"
+  end
+
+  def instruction?
+    true
+  end
+
+  def label?
+    false
+  end
+
+end
+
+class Label
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    "label(#{name.inspect})"
+  end
+
+  def instruction?
+    false
+  end
+
+  def label?
+    true
   end
 end
 
@@ -193,22 +253,19 @@ output_filename =
     File.dirname(input_filename),
     File.basename(input_filename, '.rcs') + '.rcb')
 
-lines = File.readlines(input_filename)
+raw_lines = File.readlines(input_filename)
 
 labels = {}
 
 # First pass: collect labels
 $stderr.puts "*** Pass 1: collecting labels"
 program = []
+lines = raw_lines.map { |s| parse_line(s) }
 lines.each do |line|
-  if line =~ /\A\s+/
-    # Instruction
-    instr = line.strip.split(/ +/)
-    handle_instruction(instr, program, nil)
+  if line.instruction?
+    handle_instruction(line, program, nil)
   else
-    # Label
-    label = line.strip
-    labels[label] = program.size
+    labels[line.name] = program.size
   end
 end
 
@@ -216,10 +273,8 @@ end
 $stderr.puts "*** Pass 2: assembling"
 program = []
 lines.each do |line|
-  if line =~ /\A\s+/
-    # Instruction
-    instr = line.strip.split(/ +/)
-    handle_instruction(instr, program, labels)
+  if line.instruction?
+    handle_instruction(line, program, labels)
   end
 end
 
