@@ -20,45 +20,33 @@ The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **
 
 Instructions are of variable length. The first byte is the opcode.
 
-No args:
-
-* `nop`
-* `halt`
-* `pushf`
-* `call`
-* `ret`
-
-One register arg: (POSSIBLY also immediate)
-
-* `push`: push a0
-* `pop`:  pop a0
-* `jmp`:  pc ← a0
-* `je`:   if flags & 0x01 == 0x01: pc ← a0
-* `jne`:  if flags & 0x01 == 0x00: pc ← a0
-* `jg`:   if flags & 0x02 == 0x02: pc ← a0
-* `jge`:  if flags & 0x03 != 0x00: pc ← a0
-* `jl`:   if flags & 0x03 == 0x00: pc ← a0
-* `jle`:  if flags & 0x02 == 0x00: pc ← a0
-* `not`:  a0 ← ~a0
-* `prn`:  (print a0)
-
-One register and one immediate/register arg:
-
-* `mov(i)`: a0 ← a1
-* `cmp(i)`: flags ← (a0 == a1 ? 0x01 : 0x00) | (a0 > a1 ? 0x02 : 0x00)
-
-Two register and one immediate/register arg:
-
-* `mod(i)`: a0 ← a1 % a2
-* `add(i)`: a0 ← a1 + a2
-* `sub(i)`: a0 ← a1 - a2
-* `mul(i)`: a0 ← a1 * a2
-* `div(i)`: a0 ← a1 / a2
-* `xor(i)`: a0 ← a1 ^ a2
-* `or(i)`:  a0 ← a1 | a2
-* `and(i)`: a0 ← a1 & a2
-* `shl(i)`: a0 ← a1 << a2
-* `shr(i)`: a0 ← a1 >> a2
+| Mnemonic  | Opcode | Arguments             | Effect
+| --------- | ------ | --------------------- | ------
+| `nop`     | 0x00   | 0                     | nothing
+| `halt`    | 0xff   | 0                     | stops emulation
+| `pop`     |        | 1 (reg)               | pop into a0 (reg)
+| `prn`     |        | 1 (reg)               | print a0 (reg)
+| `jmp`     |        | 1 (label)             | pc ← a0
+| `je`      |        | 1 (label)             | if flags & 0x01 == 0x01: pc ← a0
+| `jne`     |        | 1 (label)             | if flags & 0x01 == 0x00: pc ← a0
+| `jg`      |        | 1 (label)             | if flags & 0x02 == 0x02: pc ← a0
+| `jge`     |        | 1 (label)             | if flags & 0x03 != 0x00: pc ← a0
+| `jl`      |        | 1 (label)             | if flags & 0x03 == 0x00: pc ← a0
+| `jle`     |        | 1 (label)             | if flags & 0x02 == 0x00: pc ← a0
+| `push(i)` |        | 1 (reg/imm)           | push a0 onto stack
+| `not`     |        | 2 (reg, reg)          | a0 ← ~a1
+| `mov(i)`  |        | 2 (reg, reg/imm)      | a0 ← a1
+| `cmp(i)`  |        | 2 (reg, reg/imm)      | flags ← (a0 == a1 ? 0x01 : 0x00) \| (a0 > a1 ? 0x02 : 0x00)
+| `mod(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 % a2
+| `add(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 + a2
+| `sub(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 - a2
+| `mul(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 * a2
+| `div(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 / a2
+| `xor(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 ^ a2
+| `or(i)`:  |        | 2 (reg, reg, reg/imm) | a0 ← a1 \| a2
+| `and(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 & a2
+| `shl(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 << a2
+| `shr(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 >> a2
 
 ## To do
 
