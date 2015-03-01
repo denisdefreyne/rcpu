@@ -18,20 +18,20 @@ The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **
 
 ## Registers
 
-| Name   | Code | Purpose
-| ------ | ---- | -------
-| r0     | 0x00 | general-purpose
-| r1     | 0x01 | general-purpose
-| r2     | 0x02 | general-purpose
-| r3     | 0x03 | general-purpose
-| r4     | 0x04 | general-purpose
-| r5     | 0x05 | general-purpose
-| r6     | 0x06 | general-purpose
-| r7     | 0x07 | general-purpose
-| rpc    | 0x08 | program counter (a.k.a instruction pointer)
-| rflags | 0x09 | contains result of `cmp(i)`
-| rsp    | 0x0a | stack pointer
-| rbp    | 0x0b | base pointer
+| Name   | Code | Size (bytes) | Purpose
+| ------ | ---- | ------------ | -------
+| r0     | 0x00 | 4            | general-purpose
+| r1     | 0x01 | 4            | general-purpose
+| r2     | 0x02 | 4            | general-purpose
+| r3     | 0x03 | 4            | general-purpose
+| r4     | 0x04 | 4            | general-purpose
+| r5     | 0x05 | 4            | general-purpose
+| r6     | 0x06 | 4            | general-purpose
+| r7     | 0x07 | 4            | general-purpose
+| rpc    | 0x08 | 4            | program counter (a.k.a instruction pointer)
+| rflags | 0x09 | 1            | contains result of `cmp(i)`
+| rsp    | 0x0a | 4            | stack pointer
+| rbp    | 0x0b | 4            | base pointer
 
 ## Instruction format
 
