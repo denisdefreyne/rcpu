@@ -121,16 +121,22 @@ class Label
 end
 
 class Parser
-  def parse_line(string)
-    if string =~ /\A\s+/
-      parts = string.strip.split(/ +/)
+  def parse_raw_lines(raw_lines)
+    raw_lines.map { |rl| parse_raw_line(rl) }.compact
+  end
+
+  def parse_raw_line(raw_line)
+    if raw_line.strip.empty?
+      nil
+    elsif raw_line =~ /\A\s+/
+      parts = raw_line.strip.split(/ +/)
 
       opcode_mnemonic = parts[0]
       args = parts[1..-1].map { |s| parse_arg(s) }
 
       Instruction.new(opcode_mnemonic, args)
     else
-      Label.new(string.strip)
+      Label.new(raw_line.strip)
     end
   end
 
@@ -157,7 +163,7 @@ class Assembler
 
   def assemble
     parser = Parser.new
-    lines = @raw_lines.map { |s| parser.parse_line(s) }
+    lines = parser.parse_raw_lines(@raw_lines)
     labels = collect_labels(lines)
     program = generate_program(lines, labels)
     program.pack('C*')
