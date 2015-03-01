@@ -2,6 +2,21 @@
 # encoding: utf-8
 
 class RegArg
+  MAPPING = {
+    'r0'     => 0,
+    'r1'     => 1,
+    'r2'     => 2,
+    'r3'     => 3,
+    'r4'     => 4,
+    'r5'     => 5,
+    'r6'     => 6,
+    'r7'     => 7,
+    'rpc'    => 8,
+    'rflags' => 9,
+    'rsp'    => 10,
+    'rbp'    => 11,
+  }
+
   attr_reader :name
 
   def initialize(name)
@@ -12,38 +27,12 @@ class RegArg
     "reg(#{@name})"
   end
 
-  def bytes(_labels)
-    num =
-      case name
-      when 'r0'
-        0
-      when 'r1'
-        1
-      when 'r2'
-        2
-      when 'r3'
-        3
-      when 'r4'
-        4
-      when 'r5'
-        5
-      when 'r6'
-        6
-      when 'r7'
-        7
-      when 'rpc'
-        8
-      when 'rflags'
-        9
-      when 'rsp'
-        10
-      when 'rbp'
-        11
-      else
-        raise "Unknown register: #{s}"
-      end
+  def valid?
+    MAPPING.key?(name)
+  end
 
-    [num]
+  def bytes(_labels)
+    [MAPPING[name]]
   end
 end
 
@@ -56,6 +45,10 @@ class ImmArg
 
   def inspect
     "imm(#{@value})"
+  end
+
+  def valid?
+    true
   end
 
   def bytes(_labels)
@@ -79,6 +72,10 @@ class LabelArg
     "label(#{@name})"
   end
 
+  def valid?
+    true
+  end
+
   def bytes(labels)
     # FIXME: Should labels not be 4 bytes?
     if labels
@@ -98,7 +95,7 @@ class Instruction
     @args = args
   end
 
-  def to_s
+  def inspect
     "instr(#{@opcode_mnemonic}, args = #{@args.inspect})"
   end
 
@@ -114,7 +111,7 @@ class Label
     @name = name
   end
 
-  def to_s
+  def inspect
     "label(#{name.inspect})"
   end
 
@@ -245,12 +242,15 @@ class Assembler
 
     # Validate args
     if instr.args.size != instr_def.fetch(:args).size
-      raise "Incorrect argument count (#{instr}; is #{instr.args.size}, expected #{instr_def.fetch(:args).size}"
+      raise "Incorrect argument count (#{instr.inspect}; is #{instr.args.size}, expected #{instr_def.fetch(:args).size}"
     end
     instr.args.each_with_index do |arg, i|
       arg_def = instr_def.fetch(:args).fetch(i)
       unless arg.instance_of?(arg_def)
-        raise "Incorrect argument type (#{instr}; is #{arg.class}, expected #{arg_def})"
+        raise "Incorrect argument type (#{instr.inspect}; is #{arg.class}, expected #{arg_def})"
+      end
+      unless arg.valid?
+        raise "Invalid argument (#{instr.inspect}; #{arg.inspect})"
       end
     end
 
