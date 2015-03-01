@@ -23,6 +23,10 @@ def resolve_reg(s)
     8
   when 'rflags'
     9
+  when 'rsp'
+    10
+  when 'rbp'
+    11
   else
     raise "Unknown register: #{s}"
   end
@@ -59,19 +63,24 @@ def parse_label(s, labels)
 end
 
 def handle_instruction(instr, program, labels)
+  $stderr.puts "Assembling #{instr.join(' ')}"
+
   case instr[0]
   when 'nop'
     program << 0x00
-  when 'pushf'
-    # not implemented
   when 'call'
     # not implemented
   when 'ret'
     # not implemented
   when 'push'
-    # not implemented
+    program << 0x03
+    program << resolve_reg(instr[1])
+  when 'pushi'
+    program << 0x04
+    parse_imm(instr[1]).each { |byte| program << byte }
   when 'pop'
-    # not implemented
+    program << 0x05
+    program << resolve_reg(instr[1])
   when 'jmp'
     program << 0x06
     program << (labels ? parse_label(instr[1], labels) : 0x00)
@@ -179,6 +188,7 @@ lines = File.readlines(ARGV[0])
 labels = {}
 
 # First pass: collect labels
+$stderr.puts "*** Pass 1: collecting labels"
 program = []
 lines.each do |line|
   if line =~ /\A\s+/
@@ -193,6 +203,7 @@ lines.each do |line|
 end
 
 # Second pass: write instructions
+$stderr.puts "*** Pass 2: assembling"
 program = []
 lines.each do |line|
   if line =~ /\A\s+/
