@@ -43,12 +43,14 @@ Instructions are of variable length. The first byte is the opcode.
 | `mul(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 * a2
 | `div(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 / a2
 | `xor(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 ^ a2
-| `or(i)`:  |        | 2 (reg, reg, reg/imm) | a0 ← a1 \| a2
+| `or(i)`   |        | 2 (reg, reg, reg/imm) | a0 ← a1 \| a2
 | `and(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 & a2
 | `shl(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 << a2
 | `shr(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 >> a2
 
 `cmp(i)` updates the `flags` register and sets the 0x01 bit to true if the arguments are equal, and the 0x02 bit to true if the first argument is greater than the second.
+
+Several opcodes have an `(i)` variant. These variants take a four-byte immediate argument (meaning the data is encoded in the instruction) rather than a register name. For opcodes that have immediate variants, the _Opcode_ column contains the non-immediate variant followed by the immediate variant.
 
 ## To do
 
