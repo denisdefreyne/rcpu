@@ -14,6 +14,8 @@ To run a file, use _rcpu-emulate_, passing the input filename (with the _rcb_ ex
 
 	% ./bin/rcpu-emulate samples/counter.rcb
 
+The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **RC**PU **b**inary (i.e. compiled) files.
+
 ## Instruction format
 
 Instructions are of variable length. The first byte is the opcode.
