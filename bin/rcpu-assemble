@@ -121,6 +121,11 @@ class Label
 end
 
 class Parser
+  # * [DONE] Support empty lines
+  # * Support comments
+  # * Add : to end of labels
+  # * [DONE] Add commas between arguments
+
   def parse_raw_lines(raw_lines)
     raw_lines.map { |rl| parse_raw_line(rl) }.compact
   end
@@ -132,7 +137,7 @@ class Parser
       parts = raw_line.strip.split(/ +/)
 
       opcode_mnemonic = parts[0]
-      args = parts[1..-1].map { |s| parse_arg(s) }
+      args = parts[1..-1].map { |s| parse_arg(s.sub(/,\z/, '')) }
 
       Instruction.new(opcode_mnemonic, args)
     else
