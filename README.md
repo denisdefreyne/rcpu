@@ -16,6 +16,23 @@ To run a file, use _rcpu-emulate_, passing the input filename (with the _rcb_ ex
 
 The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **RC**PU **b**inary (i.e. compiled) files.
 
+## Registers
+
+| Name   | Code | Purpose
+| ------ | ---- | -------
+| r0     | 0    | general-purpose
+| r1     | 1    | general-purpose
+| r2     | 2    | general-purpose
+| r3     | 3    | general-purpose
+| r4     | 4    | general-purpose
+| r5     | 5    | general-purpose
+| r6     | 6    | general-purpose
+| r7     | 7    | general-purpose
+| rpc    | 8    | program counter (a.k.a instruction pointer)
+| rflags | 9    | contains result of `cmp(i)`
+| rsp    | a    | stack pointer
+| rbp    | b    | base pointer
+
 ## Instruction format
 
 Instructions are of variable length. The first byte is the opcode.
