@@ -160,19 +160,26 @@ class CPU
       reg[SP] += 4
       advance(2)
     when 0x06 # jmp
-      reg[PC] = a0
+      i = reconstruct_int(a0, a1, a2, a3)
+      reg[PC] = i
     when 0x07 # je
-      if reg[FLAGS] & 0x01 == 0x01 then reg[PC] = a0 else advance(2) end
+      i = reconstruct_int(a0, a1, a2, a3)
+      if reg[FLAGS] & 0x01 == 0x01 then reg[PC] = i else advance(5) end
     when 0x08 # jne
-      if reg[FLAGS] & 0x01 == 0x00 then reg[PC] = a0 else advance(2) end
+      i = reconstruct_int(a0, a1, a2, a3)
+      if reg[FLAGS] & 0x01 == 0x00 then reg[PC] = i else advance(5) end
     when 0x09 # jg
-      if reg[FLAGS] & 0x02 == 0x02 then reg[PC] = a0 else advance(2) end
+      i = reconstruct_int(a0, a1, a2, a3)
+      if reg[FLAGS] & 0x02 == 0x02 then reg[PC] = i else advance(5) end
     when 0x0a # jge
-      if reg[FLAGS] & 0x03 != 0x00 then reg[PC] = a0 else advance(2) end
+      i = reconstruct_int(a0, a1, a2, a3)
+      if reg[FLAGS] & 0x03 != 0x00 then reg[PC] = i else advance(5) end
     when 0x0b # jl
-      if reg[FLAGS] & 0x03 == 0x00 then reg[PC] = a0 else advance(2) end
+      i = reconstruct_int(a0, a1, a2, a3)
+      if reg[FLAGS] & 0x03 == 0x00 then reg[PC] = i else advance(5) end
     when 0x0c # jle
-      if reg[FLAGS] & 0x02 == 0x00 then reg[PC] = a0 else advance(2) end
+      i = reconstruct_int(a0, a1, a2, a3)
+      if reg[FLAGS] & 0x02 == 0x00 then reg[PC] = i else advance(5) end
     when 0x0d # not
     when 0x0e # prn
       puts "#{reg[a0]}"
