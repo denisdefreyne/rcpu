@@ -212,12 +212,13 @@ class Assembler
 
   INSTRUCTION_DEFS = {
     'nop'   => { opcode: 0x00, args: [] },
-    'call'  => { opcode: 0x01, args: [] }, # TODO: configure args
-    'ret'   => { opcode: 0x02, args: [] }, # TODO: configure args
+    'call'  => { opcode: 0x01, args: [LabelArg] },
+    'ret'   => { opcode: 0x02, args: [] },
     'push'  => { opcode: 0x03, args: [RegArg] },
     'pushi' => { opcode: 0x04, args: [ImmArg] },
     'pop'   => { opcode: 0x05, args: [RegArg] },
-    'jmp'   => { opcode: 0x06, args: [[LabelArg, RegArg]] },
+    'jmpi'  => { opcode: 0x06, args: [LabelArg] }, # FIXME: rearrange opcodes
+    'jmp'   => { opcode: 0xa6, args: [RegArg] },
     'je'    => { opcode: 0x07, args: [LabelArg] },
     'jne'   => { opcode: 0x08, args: [LabelArg] },
     'jg'    => { opcode: 0x09, args: [LabelArg] },
