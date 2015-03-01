@@ -36,7 +36,7 @@ Instructions are of variable length. The first byte is the opcode.
 | `push(i)` |        | 1 (reg/imm)           | push a0 onto stack
 | `not`     |        | 2 (reg, reg)          | a0 ← ~a1
 | `mov(i)`  |        | 2 (reg, reg/imm)      | a0 ← a1
-| `cmp(i)`  |        | 2 (reg, reg/imm)      | flags ← (a0 == a1 ? 0x01 : 0x00) \| (a0 > a1 ? 0x02 : 0x00)
+| `cmp(i)`  |        | 2 (reg, reg/imm)      | (see below)
 | `mod(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 % a2
 | `add(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 + a2
 | `sub(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 - a2
@@ -47,6 +47,8 @@ Instructions are of variable length. The first byte is the opcode.
 | `and(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 & a2
 | `shl(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 << a2
 | `shr(i)`  |        | 2 (reg, reg, reg/imm) | a0 ← a1 >> a2
+
+`cmp(i)` updates the `flags` register and sets the 0x01 bit to true if the arguments are equal, and the 0x02 bit to true if the first argument is greater than the second.
 
 ## To do
 
