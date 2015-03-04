@@ -24,10 +24,10 @@ class Registers
   def [](num)
     if num & 0x80 != 0x00
       address = self[num & ~0x80]
-      (@mem.fetch(address + 3) << 24) +
-      (@mem.fetch(address + 2) << 16) +
-      (@mem.fetch(address + 1) << 8) +
-      (@mem.fetch(address + 0) << 0)
+      (@mem.fetch(address + 0) << 24) +
+      (@mem.fetch(address + 1) << 16) +
+      (@mem.fetch(address + 2) << 8) +
+      (@mem.fetch(address + 3) << 0)
     else
       @reg.fetch(num)
     end
@@ -145,42 +145,42 @@ class CPU
     when 0x01 # call
       reg[SP] -= 4
       new_pc = reg[PC] + 5
-      mem[reg[SP] + 3] = (new_pc & 0xff000000) >> 24
-      mem[reg[SP] + 2] = (new_pc & 0x00ff0000) >> 16
-      mem[reg[SP] + 1] = (new_pc & 0x0000ff00) >> 8
-      mem[reg[SP] + 0] = (new_pc & 0x000000ff)
+      mem[reg[SP] + 0] = ((new_pc & 0xff000000) >> 24)
+      mem[reg[SP] + 1] = ((new_pc & 0x00ff0000) >> 16)
+      mem[reg[SP] + 2] = ((new_pc & 0x0000ff00) >> 8)
+      mem[reg[SP] + 3] = ((new_pc & 0x000000ff))
       i = reconstruct_int(a0, a1, a2, a3)
       reg[PC] = i
     when 0x02 # ret
       i = reconstruct_int(
-        mem.fetch(reg[SP] + 3),
-        mem.fetch(reg[SP] + 2),
+        mem.fetch(reg[SP] + 0),
         mem.fetch(reg[SP] + 1),
-        mem.fetch(reg[SP] + 0)
+        mem.fetch(reg[SP] + 2),
+        mem.fetch(reg[SP] + 3)
       )
       reg[SP] += 4
       reg[PC] = i
     when 0x03 # push
       raw = reg[a0]
       reg[SP] -= 4
-      mem[reg[SP] + 3] = (raw & 0xff000000) >> 24
-      mem[reg[SP] + 2] = (raw & 0x00ff0000) >> 16
-      mem[reg[SP] + 1] = (raw & 0x0000ff00) >> 8
-      mem[reg[SP] + 0] = (raw & 0x000000ff)
+      mem[reg[SP] + 0] = ((raw & 0xff000000) >> 24)
+      mem[reg[SP] + 1] = ((raw & 0x00ff0000) >> 16)
+      mem[reg[SP] + 2] = ((raw & 0x0000ff00) >> 8)
+      mem[reg[SP] + 3] = ((raw & 0x000000ff))
       advance(2)
     when 0x04 # pushi
       reg[SP] -= 4
-      mem[reg[SP] + 3] = a0
-      mem[reg[SP] + 2] = a1
-      mem[reg[SP] + 1] = a2
-      mem[reg[SP] + 0] = a3
+      mem[reg[SP] + 0] = a0
+      mem[reg[SP] + 1] = a1
+      mem[reg[SP] + 2] = a2
+      mem[reg[SP] + 3] = a3
       advance(5)
     when 0x05 # pop
       reg[a0] = reconstruct_int(
-        mem.fetch(reg[SP] + 3),
-        mem.fetch(reg[SP] + 2),
+        mem.fetch(reg[SP] + 0),
         mem.fetch(reg[SP] + 1),
-        mem.fetch(reg[SP] + 0)
+        mem.fetch(reg[SP] + 2),
+        mem.fetch(reg[SP] + 3)
       )
       reg[SP] += 4
       advance(2)
