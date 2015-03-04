@@ -69,7 +69,8 @@ class ImmArg
   end
 end
 
-class LabelArg
+# Inherits from ImmArg because this is a sort of unresolved immediate arg
+class LabelArg < ImmArg
   attr_reader :name
 
   def initialize(name)
@@ -115,6 +116,14 @@ class Instruction
   def instruction?
     true
   end
+
+  def label?
+    false
+  end
+
+  def data?
+    false
+  end
 end
 
 class Label
@@ -130,6 +139,38 @@ class Label
 
   def instruction?
     false
+  end
+
+  def label?
+    true
+  end
+
+  def data?
+    false
+  end
+end
+
+class Datax # Because Data is taken
+  attr_reader :value
+
+  def initialize(value)
+    @value = value
+  end
+
+  def inspect
+    "data(#{name.inspect})"
+  end
+
+  def instruction?
+    false
+  end
+
+  def label?
+    false
+  end
+
+  def data?
+    true
   end
 end
 
@@ -150,23 +191,41 @@ class Parser
       args = parts[1..-1].map { |s| parse_arg(s.sub(/,\z/, '')) }
 
       Instruction.new(opcode_mnemonic, args)
+    elsif raw_line =~ /\A\.data/
+      part = raw_line.sub(/\A\.data\s+/, '').strip
+      Datax.new(parse_number(part))
     else
       Label.new(raw_line.strip.sub(/:\z/, ''))
     end
   end
 
-  def parse_arg(string)
+  def parse_number(string)
     case string
-    when /\A@[a-z-]+\z/
+    when /\A0x[0-9a-fA-F]+\z/
+      string[2..-1].to_i(16)
+    when /\A0b[0-1]+\z/
+      string[2..-1].to_i(2)
+    when /\A\d+\z/
+      string.to_i
+    else
+      nil
+    end
+  end
+
+  def parse_arg(string)
+    # Try as number
+    number = parse_number(string)
+    if number
+      return ImmArg.new(number)
+    end
+
+    case string
+    when /\A@[a-z0-9-]+\z/
       LabelArg.new(string[1..-1])
     when /\Ar[a-z0-9]+\z/
       RegArg.new(string, false)
     when /\A\[(r[a-z0-9]+)\]\z/
       RegArg.new($1, true)
-    when /\A0x\d+\z/
-      ImmArg.new(string[2..-1].to_i(16))
-    when /\A\d+\z/
-      ImmArg.new(string.to_i)
     else
       raise "Cannot parse argument: #{string.inspect}"
     end
@@ -194,7 +253,7 @@ class Assembler
     lines.each do |line|
       if line.instruction?
         handle_instruction(line, program, nil)
-      else
+      elsif line.label?
         labels[line.name] = program.size
       end
     end
@@ -206,6 +265,11 @@ class Assembler
     lines.each do |line|
       if line.instruction?
         handle_instruction(line, program, labels)
+      elsif line.data?
+        program << ((line.value & 0xff000000) >> 24)
+        program << ((line.value & 0x00ff0000) >> 16)
+        program << ((line.value & 0x0000ff00) >> 8)
+        program << ((line.value & 0x000000ff) >> 0)
       end
     end
     program
@@ -270,7 +334,7 @@ class Assembler
     end
     instr.args.each_with_index do |arg, i|
       arg_def = [instr_def.fetch(:args).fetch(i)].flatten
-      unless arg_def.any? { |d| arg.instance_of?(d) }
+      unless arg_def.any? { |d| arg.is_a?(d) }
         raise "Incorrect argument type (#{instr.inspect}; is #{arg.class}, expected #{arg_def})"
       end
       unless arg.valid?
