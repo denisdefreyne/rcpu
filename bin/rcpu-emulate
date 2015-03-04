@@ -35,7 +35,11 @@ class Registers
 
   def []=(num, value)
     if num & 0x80 != 0x00
-      raise 'not supported'
+      address = self[num & ~0x80]
+      @mem[address + 0] = ((value & 0xff000000) >> 24)
+      @mem[address + 1] = ((value & 0x00ff0000) >> 16)
+      @mem[address + 2] = ((value & 0x0000ff00) >> 8)
+      @mem[address + 3] = ((value & 0x000000ff))
     else
       @reg[num] = value
     end
@@ -284,10 +288,56 @@ class CPU
   end
 end
 
-# Run
 context = Context.new
+
+# Read instructions into memory
 bytes = File.read(ARGV[0]).unpack('C*')
 bytes.each_with_index do |byte, index|
   context.mem[index] = byte
 end
-CPU.new(context).run
+
+# Set video memory
+160.times do |x|
+  120.times do |y|
+    context.mem[0x10000 + (x * 120 + y) * 4 + 0] = 0
+    context.mem[0x10000 + (x * 120 + y) * 4 + 1] = 0
+    context.mem[0x10000 + (x * 120 + y) * 4 + 2] = 0
+    context.mem[0x10000 + (x * 120 + y) * 4 + 3] = 0
+  end
+end
+
+require 'sdl'
+
+class Video
+  def initialize(mem)
+    @mem = mem
+  end
+
+  def init
+    SDL.init(SDL::INIT_VIDEO)
+    @screen = SDL::Screen.open(640, 480, 16, SDL::SWSURFACE)
+    SDL::WM::set_caption('RCPU', 'RCPU')
+
+    @black = @screen.format.map_rgb(0, 0, 0)
+    @white = @screen.format.map_rgb(255, 255, 255)
+  end
+
+  def draw_memory
+    160.times do |x|
+      120.times do |y|
+        bit = @mem.fetch(0x10000 + (x + y * 160) * 4 + 3)
+        color = bit == 1 ? @white : @black
+        @screen.fill_rect(x * 4, y * 4, 4, 4, color)
+      end
+    end
+    @screen.flip
+  end
+end
+
+# Run
+Thread.abort_on_exception = true
+Thread.new { CPU.new(context).run }
+
+video = Video.new(context.mem)
+video.init
+loop { video.draw_memory }

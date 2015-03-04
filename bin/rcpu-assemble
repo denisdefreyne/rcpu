@@ -255,6 +255,11 @@ class Assembler
         handle_instruction(line, program, nil)
       elsif line.label?
         labels[line.name] = program.size
+      elsif line.data?
+        program << 0x00
+        program << 0x00
+        program << 0x00
+        program << 0x00
       end
     end
     labels

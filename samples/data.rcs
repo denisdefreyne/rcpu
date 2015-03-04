@@ -1,0 +1,1133 @@
+    pushi @char-0
+    pushi 0
+    pushi 0
+    call @print-char
+
+    pushi @char-1
+    pushi 1
+    pushi 0
+    call @print-char
+
+    pushi @char-2
+    pushi 0
+    pushi 1
+    call @print-char
+
+    pushi @char-3
+    pushi 1
+    pushi 1
+    call @print-char
+
+loop:
+    jmpi @loop
+
+print-char:
+    # get args
+    addi r0, rsp, 12
+    addi r1, rsp, 8
+    addi r2, rsp, 4
+    mov r3, [r0] # char start address
+    mov r4, [r1] # x offset
+    mov r5, [r2] # y offset
+
+    # setup
+    mov r1, r3
+    movi r2, 0x10000
+
+    # move into position
+    muli r4, r4, 4
+    muli r4, r4, 5 # sprite width + padding
+    muli r5, r5, 4
+    muli r5, r5, 6 # sprite height + padding
+    muli r5, r5, 160
+    add r2, r2, r4
+    add r2, r2, r5
+
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    subi r2, r2, 16
+    addi r2, r2, 640
+
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    subi r2, r2, 16
+    addi r2, r2, 640
+
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    subi r2, r2, 16
+    addi r2, r2, 640
+
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    subi r2, r2, 16
+    addi r2, r2, 640
+
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    mov [r2], [r1]
+    addi r1, r1, 4
+    addi r2, r2, 4
+    subi r2, r2, 16
+    addi r2, r2, 640
+
+    ret
+
+char-0:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-1:
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+
+char-2:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-3:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-4:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+
+char-5:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-6:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-7:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+
+char-8:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-9:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-a:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-b:
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+
+char-c:
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+
+char-d:
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+
+char-e:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-f:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+
+char-g:
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+
+char-h:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-i:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-j:
+.data 0
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+
+char-k:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-l:
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-m:
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-n:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-o:
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+
+char-p:
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+
+char-q:
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+
+char-r:
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-s:
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+
+char-t:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+
+char-u:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+
+char-v:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+
+char-w:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+
+char-x:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+
+char-y:
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+
+char-z:
+.data 1
+.data 1
+.data 1
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 1
+.data 1
+.data 1
+
+char-period:
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+
+char-comma:
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+
+char-space:
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+
+char-exclamation-mark:
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+
+char-question-mark:
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+
+char-colon:
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+
+char-left-double-quote:
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+
+char-right-double-quote:
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 0
+.data 1
+.data 1
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+.data 0
+
+char-left-parenthesis:
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+
+char-right-parenthesis:
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
+.data 1
+.data 0
+.data 0
