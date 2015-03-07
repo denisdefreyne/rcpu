@@ -268,6 +268,40 @@ class CPU
     when 0x24 # shli
     when 0x25 # shr
     when 0x26 # shri
+      i = reconstruct_int(a2, a3, a4, a5)
+      reg[a0] = (reg[a1] >> i)
+      advance(7)
+    when 0x27 # li
+      reg[a0] = reconstruct_int(a1, a2, a3, a4)
+      advance(6)
+    when 0x28 # lw
+      reg[a0] = reg[a1]
+      advance(3)
+    when 0x29 # lh
+      reg[a0] = reg[a1] & 0x0000ffff
+      advance(3)
+    when 0x2a # lb
+      reg[a0] = reg[a1] & 0x000000ff
+      advance(3)
+    when 0x2b # sw
+      # TODO: fixme
+      raw = reg[a1]
+      mem[reg[a0] + 0] = ((raw & 0xff000000) >> 24)
+      mem[reg[a0] + 1] = ((raw & 0x00ff0000) >> 16)
+      mem[reg[a0] + 2] = ((raw & 0x0000ff00) >> 8)
+      mem[reg[a0] + 3] = ((raw & 0x000000ff))
+      advance(3)
+    when 0x2c # sh
+      # TODO: fixme
+      raw = reg[a1]
+      mem[reg[a0] + 0] = ((raw & 0x0000ff00) >> 8)
+      mem[reg[a0] + 1] = ((raw & 0x000000ff))
+      advance(3)
+    when 0x2d # sb
+      address = reg[a1 & ~0x80]
+      raw = mem[address]
+      mem[reg[a0] + 0] = ((raw & 0x000000ff))
+      advance(3)
     when 0xff # halt
       raise HaltException
     else
@@ -299,10 +333,7 @@ end
 # Set video memory
 160.times do |x|
   120.times do |y|
-    context.mem[0x10000 + (x * 120 + y) * 4 + 0] = 0
-    context.mem[0x10000 + (x * 120 + y) * 4 + 1] = 0
-    context.mem[0x10000 + (x * 120 + y) * 4 + 2] = 0
-    context.mem[0x10000 + (x * 120 + y) * 4 + 3] = 0
+    context.mem[0x10000 + (x * 120 + y)] = 0
   end
 end
 
@@ -323,13 +354,20 @@ class Video
   end
 
   def draw_memory
-    160.times do |x|
-      120.times do |y|
-        bit = @mem.fetch(0x10000 + (x + y * 160) * 4 + 3)
-        color = bit == 1 ? @white : @black
-        @screen.fill_rect(x * 4, y * 4, 4, 4, color)
-      end
+    row_length_in_bytes = 160
+    num_rows = 120
+
+    num_bytes = num_rows * row_length_in_bytes
+
+    num_bytes.times do |index|
+      x = (index % row_length_in_bytes)
+      y = (index / row_length_in_bytes)
+
+      byte = @mem.fetch(0x10000 + index)
+      color = (byte != 0x00) ? @white : @black
+      @screen.fill_rect(x * 4, y * 4, 4, 4, color)
     end
+
     @screen.flip
   end
 end

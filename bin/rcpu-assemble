@@ -151,10 +151,12 @@ class Label
 end
 
 class Datax # Because Data is taken
-  attr_reader :value
+  attr_reader :length
+  attr_reader :number
 
-  def initialize(value)
-    @value = value
+  def initialize(length, number)
+    @length = length
+    @number = number
   end
 
   def inspect
@@ -171,6 +173,16 @@ class Datax # Because Data is taken
 
   def data?
     true
+  end
+
+  def serialize
+    res = []
+    (0..length-1).reverse_each do |i|
+      shift = i << 3
+      mask = 0xff << shift
+      res << ((number & mask) >> shift)
+    end
+    res
   end
 end
 
@@ -191,12 +203,29 @@ class Parser
       args = parts[1..-1].map { |s| parse_arg(s.sub(/,\z/, '')) }
 
       Instruction.new(opcode_mnemonic, args)
-    elsif raw_line =~ /\A\.data/
-      part = raw_line.sub(/\A\.data\s+/, '').strip
-      Datax.new(parse_number(part))
+    elsif raw_line =~ /\A\.([a-z]+) (.*)/
+      parse_special($1, $2)
     else
       Label.new(raw_line.strip.sub(/:\z/, ''))
     end
+  end
+
+  def parse_special(raw_type, raw_value)
+    number = parse_number(raw_value)
+
+    length =
+      case raw_type
+      when 'byte'
+        1
+      when 'half'
+        2
+      when 'word'
+        4
+      else
+        raise "Unrecognised special: #{raw_type}"
+      end
+
+    Datax.new(length, number)
   end
 
   def parse_number(string)
@@ -256,10 +285,7 @@ class Assembler
       elsif line.label?
         labels[line.name] = program.size
       elsif line.data?
-        program << 0x00
-        program << 0x00
-        program << 0x00
-        program << 0x00
+        line.length.times { program << 0x00 }
       end
     end
     labels
@@ -271,10 +297,7 @@ class Assembler
       if line.instruction?
         handle_instruction(line, program, labels)
       elsif line.data?
-        program << ((line.value & 0xff000000) >> 24)
-        program << ((line.value & 0x00ff0000) >> 16)
-        program << ((line.value & 0x0000ff00) >> 8)
-        program << ((line.value & 0x000000ff) >> 0)
+        line.serialize.each { |byte| program << byte }
       end
     end
     program
@@ -321,8 +344,25 @@ class Assembler
     'shli'  => { opcode: 0x24, args: [RegArg, RegArg, ImmArg] },
     'shr'   => { opcode: 0x25, args: [RegArg, RegArg, RegArg] },
     'shri'  => { opcode: 0x26, args: [RegArg, RegArg, ImmArg] },
+    'li'    => { opcode: 0x27, args: [RegArg, ImmArg] },
+    'lw'    => { opcode: 0x28, args: [RegArg, RegArg] },
+    'lh'    => { opcode: 0x29, args: [RegArg, RegArg] },
+    'lb'    => { opcode: 0x2a, args: [RegArg, RegArg] },
+    'sw'    => { opcode: 0x2b, args: [RegArg, RegArg] },
+    'sh'    => { opcode: 0x2c, args: [RegArg, RegArg] },
+    'sb'    => { opcode: 0x2d, args: [RegArg, RegArg] },
     'halt'  => { opcode: 0xff, args: [] },
   }
+
+  # TODO: .byte
+  # TODO: .word
+  # TODO: .half
+  # TODO: .align
+  # TODO: .ascii / .asciiz
+
+  # TODO: remove mov
+  # TODO: replace [] syntax with imm(reg) syntax
+  # TODO: use ; for comments
 
   def handle_instruction(instr, program, labels)
     instr_def = INSTRUCTION_DEFS.fetch(instr.opcode_mnemonic) do
