@@ -1,23 +1,3 @@
-    # pushi @char-0
-    # pushi 0
-    # pushi 0
-    # call @print-char
-#
-    # pushi @char-1
-    # pushi 5
-    # pushi 0
-    # call @print-char
-#
-    # pushi @char-2
-    # pushi 0
-    # pushi 6
-    # call @print-char
-#
-    # pushi @char-3
-    # pushi 5
-    # pushi 6
-    # call @print-char
-
     call @print-string
 
 loop:
@@ -180,11 +160,13 @@ string:
 .word @char-l
 .word @char-o
 .word @char-space
-.word @char-w
-.word @char-o
 .word @char-r
-.word @char-l
-.word @char-d
+.word @char-u
+.word @char-g
+.word @char-colon
+.word @char-colon
+.word @char-b
+.word @char-exclamation-mark
 .word 0x00000000
 
 char-0:
