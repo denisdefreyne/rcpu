@@ -29,8 +29,6 @@ print-char:
     mov r0, [r0] # char start address
     mov r1, [r1] # x offset
     mov r2, [r2] # y offset
-    prn r1
-    prn r2
 
     # setup char ptr
     mov r3, r0
