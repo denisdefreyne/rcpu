@@ -1,31 +1,79 @@
-    pushi @char-0
-    pushi 0
-    pushi 0
-    call @print-char
+    # pushi @char-0
+    # pushi 0
+    # pushi 0
+    # call @print-char
+#
+    # pushi @char-1
+    # pushi 5
+    # pushi 0
+    # call @print-char
+#
+    # pushi @char-2
+    # pushi 0
+    # pushi 6
+    # call @print-char
+#
+    # pushi @char-3
+    # pushi 5
+    # pushi 6
+    # call @print-char
 
-    pushi @char-1
-    pushi 5
-    pushi 0
-    call @print-char
-
-    pushi @char-2
-    pushi 0
-    pushi 6
-    call @print-char
-
-    pushi @char-3
-    pushi 5
-    pushi 6
-    call @print-char
+    call @print-string
 
 loop:
     jmpi @loop
 
+print-string:
+    push rbp
+    mov rbp, rsp
+
+    push r0
+    push r1
+    push r2
+    push r3
+
+    li r0, @string
+    mov r1, [r0]
+    li r2, 0
+
+print-string-loop:
+    push r1
+    push r2
+    pushi 0
+    call @print-char
+    addi rsp, rsp, 12
+    addi r2, r2, 5
+    addi r0, r0, 4
+    mov r1, [r0] # r1 = address of char
+    cmpi r1, 0
+    jne @print-string-loop
+
+    pop r3
+    pop r2
+    pop r1
+    pop r0
+
+    pop rbp
+
+    ret
+
 print-char:
+    push rbp
+    mov rbp, rsp
+
+    push r0
+    push r1
+    push r2
+    push r3
+    push r4
+    push r5
+    push r6
+    push r7
+
     # get args
-    addi r0, rsp, 12
-    addi r1, rsp, 8
-    addi r2, rsp, 4
+    addi r0, rbp, 16
+    addi r1, rbp, 12
+    addi r2, rbp, 8
     mov r0, [r0] # char start address
     mov r1, [r1] # x offset
     mov r2, [r2] # y offset
@@ -112,7 +160,32 @@ print-char:
     addi r3, r3, 1
     addi r4, r4, 157
 
+    pop r7
+    pop r6
+    pop r5
+    pop r4
+    pop r3
+    pop r2
+    pop r1
+    pop r0
+
+    pop rbp
+
     ret
+
+string:
+.word @char-h
+.word @char-e
+.word @char-l
+.word @char-l
+.word @char-o
+.word @char-space
+.word @char-w
+.word @char-o
+.word @char-r
+.word @char-l
+.word @char-d
+.word 0x00000000
 
 char-0:
 .byte 1

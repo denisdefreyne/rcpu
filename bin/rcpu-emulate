@@ -141,7 +141,9 @@ class CPU
     a5 = at_pc(6)
 
     # puts @context.inspect
-    # puts "*** 0x#{opcode.to_s(16)}"
+    # puts "*** #{format('0x%02x', opcode)} @ #{format('0x%08x', reg[PC])}"
+
+    300.times { 100.times { } }
 
     case opcode
     when 0x00 # nop

@@ -152,11 +152,11 @@ end
 
 class Datax # Because Data is taken
   attr_reader :length
-  attr_reader :number
+  attr_reader :arg
 
-  def initialize(length, number)
+  def initialize(length, arg)
     @length = length
-    @number = number
+    @arg = arg
   end
 
   def inspect
@@ -175,14 +175,8 @@ class Datax # Because Data is taken
     true
   end
 
-  def serialize
-    res = []
-    (0..length-1).reverse_each do |i|
-      shift = i << 3
-      mask = 0xff << shift
-      res << ((number & mask) >> shift)
-    end
-    res
+  def bytes(labels)
+    arg.bytes(labels).last(length)
   end
 end
 
@@ -211,7 +205,13 @@ class Parser
   end
 
   def parse_special(raw_type, raw_value)
-    number = parse_number(raw_value)
+    value = parse_number(raw_value)
+    arg =
+      if value
+        ImmArg.new(value)
+      elsif raw_value =~ /\A@[a-z0-9-]+\z/
+        LabelArg.new(raw_value[1..-1])
+      end
 
     length =
       case raw_type
@@ -225,7 +225,7 @@ class Parser
         raise "Unrecognised special: #{raw_type}"
       end
 
-    Datax.new(length, number)
+    Datax.new(length, arg)
   end
 
   def parse_number(string)
@@ -297,7 +297,7 @@ class Assembler
       if line.instruction?
         handle_instruction(line, program, labels)
       elsif line.data?
-        line.serialize.each { |byte| program << byte }
+        line.bytes(labels).each { |byte| program << byte }
       end
     end
     program
