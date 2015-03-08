@@ -2,8 +2,7 @@
 # encoding: utf-8
 
 class Registers
-  def initialize(mem)
-    @mem = mem
+  def initialize
     @reg = {
       0  => 0,      # r0
       1  => 0,      # r1
@@ -22,27 +21,15 @@ class Registers
   end
 
   def [](num)
-    if num & 0x80 != 0x00
-      address = self[num & ~0x80]
-      (@mem.fetch(address + 0) << 24) +
-      (@mem.fetch(address + 1) << 16) +
-      (@mem.fetch(address + 2) << 8) +
-      (@mem.fetch(address + 3) << 0)
-    else
-      @reg.fetch(num)
-    end
+    @reg.fetch(num)
   end
 
   def []=(num, value)
-    if num & 0x80 != 0x00
-      address = self[num & ~0x80]
-      @mem[address + 0] = ((value & 0xff000000) >> 24)
-      @mem[address + 1] = ((value & 0x00ff0000) >> 16)
-      @mem[address + 2] = ((value & 0x0000ff00) >> 8)
-      @mem[address + 3] = ((value & 0x000000ff))
-    else
-      @reg[num] = value
+    unless @reg.key?(num)
+      raise "Unknown register: #{num}"
     end
+
+    @reg[num] = value
   end
 
   def each
@@ -56,7 +43,7 @@ class Context
 
   def initialize
     @mem = {}
-    @reg = Registers.new(@mem)
+    @reg = Registers.new
   end
 
   def inspect
@@ -140,8 +127,13 @@ class CPU
     a4 = at_pc(5)
     a5 = at_pc(6)
 
-    # puts @context.inspect
-    # puts "*** #{format('0x%02x', opcode)} @ #{format('0x%08x', reg[PC])}"
+    debug_count = ARGV.count { |a| a == '--debug' }
+    if debug_count >= 2
+      puts @context.inspect
+    end
+    if debug_count >= 1
+      puts "*** #{format('0x%02x', opcode)} @ #{format('0x%08x', reg[PC])}"
+    end
 
     100.times { 100.times { } }
 
@@ -215,7 +207,7 @@ class CPU
       if reg[FLAGS] & 0x02 == 0x00 then reg[PC] = i else advance(5) end
     when 0x0d # not
     when 0x0e # prn
-      puts "#{reg[a0]}"
+      puts "#{reg[a0]} / #{format('0x%02x', reg[a0])}"
       advance(2)
     when 0x11 # cmp
       reg[FLAGS] =
@@ -271,15 +263,26 @@ class CPU
       reg[a0] = reconstruct_int(a1, a2, a3, a4)
       advance(6)
     when 0x28 # lw
-      reg[a0] = reg[a1]
+      address = reg[a1]
+      reg[a0] =
+        (mem[address + 0] << 24) |
+        (mem[address + 1] << 16) |
+        (mem[address + 2] << 8)  |
+        (mem[address + 3] << 0)
       advance(3)
     when 0x29 # lh
-      reg[a0] = reg[a1] & 0x0000ffff
+      address = reg[a1]
+      reg[a0] =
+        (mem[address + 0] << 8)  |
+        (mem[address + 1] << 0)
       advance(3)
     when 0x2a # lb
-      reg[a0] = reg[a1] & 0x000000ff
+      address = reg[a1]
+      reg[a0] =
+        (mem[address + 0] << 0)
       advance(3)
     when 0x2b # sw
+      raise 'broken'
       # TODO: fixme
       raw = reg[a1]
       mem[reg[a0] + 0] = ((raw & 0xff000000) >> 24)
@@ -288,14 +291,14 @@ class CPU
       mem[reg[a0] + 3] = ((raw & 0x000000ff))
       advance(3)
     when 0x2c # sh
+      raise 'broken'
       # TODO: fixme
       raw = reg[a1]
       mem[reg[a0] + 0] = ((raw & 0x0000ff00) >> 8)
       mem[reg[a0] + 1] = ((raw & 0x000000ff))
       advance(3)
     when 0x2d # sb
-      address = reg[a1 & ~0x80]
-      raw = mem[address]
+      raw = reg[a1]
       mem[reg[a0] + 0] = ((raw & 0x000000ff))
       advance(3)
     when 0xff # halt
@@ -321,7 +324,7 @@ end
 context = Context.new
 
 # Read instructions into memory
-bytes = File.read(ARGV[0]).unpack('C*')
+bytes = File.read(ARGV.find { |a| a !~ /\A--/ }).unpack('C*')
 bytes.each_with_index do |byte, index|
   context.mem[index] = byte
 end

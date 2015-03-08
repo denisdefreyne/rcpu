@@ -1,33 +1,45 @@
+### MAIN
+
     call @print-string
 
 loop:
     jmpi @loop
 
+### PRINT-STRING
+
 print-string:
     push rbp
-    mov rbp, rsp
+    addi rbp, rsp, 0
 
     push r0
     push r1
     push r2
     push r3
 
-    li r0, @string
-    mov r1, [r0]
+    # setup
+    li r0, @string           # r0 = string address
     li r2, 0
 
 print-string-loop:
+    # load char
+    lw r1, r0                # r1 = char address
+    cmpi r1, 0
+    je @print-string-done
+
+    # print char
     push r1
     push r2
     pushi 0
     call @print-char
     addi rsp, rsp, 12
+
+    # next
     addi r2, r2, 5
     addi r0, r0, 4
-    mov r1, [r0] # r1 = address of char
-    cmpi r1, 0
-    jne @print-string-loop
 
+    jmpi @print-string-loop
+
+print-string-done:
     pop r3
     pop r2
     pop r1
@@ -37,9 +49,11 @@ print-string-loop:
 
     ret
 
+### PRINT-CHAR
+
 print-char:
     push rbp
-    mov rbp, rsp
+    addi rbp, rsp, 0
 
     push r0
     push r1
@@ -54,89 +68,109 @@ print-char:
     addi r0, rbp, 16
     addi r1, rbp, 12
     addi r2, rbp, 8
-    mov r0, [r0] # char start address
-    mov r1, [r1] # x offset
-    mov r2, [r2] # y offset
+    lw r0, r0                # char start address
+    lw r1, r1                # x offset
+    lw r2, r2                # y offset
 
     # setup char ptr
-    mov r3, r0
+    addi r3, r0, 0
 
     # setup video mem ptr
     li r4, 0x10000
-    # add r1 (x offset)
-    add r4, r4, r1
-    # add r2 (y offset) * 160
-    mov r5, r2
-    muli r5, r5, 160
+    add r4, r4, r1           # add r1 (x offset)
+    muli r5, r2, 160         # add r2 (y offset) * 160
     add r4, r4, r5
 
+    prn r3
+    prn r4
+
     # write line
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 157
 
     # write line
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 157
 
     # write line
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 157
 
     # write line
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 157
 
     # write line
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 1
-    sb r4, [r3]
+    lb r5, r3
+    sb r4, r5
     addi r3, r3, 1
     addi r4, r4, 157
 
@@ -152,6 +186,8 @@ print-char:
     pop rbp
 
     ret
+
+### DATA
 
 string:
 .word @char-h
@@ -542,6 +578,12 @@ char-g:
 .byte 1
 .byte 1
 .byte 1
+
+stuff:
+.byte 255
+.byte 254
+.byte 253
+.byte 252
 
 char-h:
 .byte 1
