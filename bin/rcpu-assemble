@@ -354,10 +354,6 @@ class Assembler
     'halt'  => { opcode: 0xff, args: [] },
   }
 
-  # TODO: .byte
-  # TODO: .word
-  # TODO: .half
-  # TODO: .align
   # TODO: .ascii / .asciiz
 
   # TODO: remove mov
