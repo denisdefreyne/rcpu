@@ -135,7 +135,9 @@ class CPU
       puts "*** #{format('0x%02x', opcode)} @ #{format('0x%08x', reg[PC])}"
     end
 
-    100.times { 100.times { } }
+    if ARGV.any? { |a| a == '--slow' }
+      100000.times { }
+    end
 
     case opcode
     when 0x00 # nop

@@ -81,9 +81,6 @@ print-char:
     muli r5, r2, 160         # add r2 (y offset) * 160
     add r4, r4, r5
 
-    prn r3
-    prn r4
-
     # write line
     lb r5, r3
     sb r4, r5
@@ -578,12 +575,6 @@ char-g:
 .byte 1
 .byte 1
 .byte 1
-
-stuff:
-.byte 255
-.byte 254
-.byte 253
-.byte 252
 
 char-h:
 .byte 1
