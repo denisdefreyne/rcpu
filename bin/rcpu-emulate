@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
+Thread.abort_on_exception = true
+
 class Registers
   def initialize
     @reg = {
@@ -354,7 +356,7 @@ class Video
     @white = @screen.format.map_rgb(255, 255, 255)
   end
 
-  def draw_memory
+  def draw
     row_length_in_bytes = 160
     num_rows = 120
 
@@ -371,16 +373,30 @@ class Video
 
     @screen.flip
   end
+
+  def loop_draw
+    @running = true
+    loop do
+      draw
+      break unless @running
+    end
+  end
+
+  def stop_drawing
+    @running = false
+  end
 end
 
 # Run
-Thread.abort_on_exception = true
-Thread.new { CPU.new(context).run }
 
 if ARGV.find { |a| a == '--video' }
   video = Video.new(context.mem)
   video.init
-  loop { video.draw_memory }
+  Thread.new do
+    CPU.new(context).run
+    video.stop_drawing
+  end
+  video.loop_draw
 else
-  loop { sleep 1 }
+  CPU.new(context).run
 end
