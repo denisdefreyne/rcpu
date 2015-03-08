@@ -377,6 +377,10 @@ end
 Thread.abort_on_exception = true
 Thread.new { CPU.new(context).run }
 
-video = Video.new(context.mem)
-video.init
-loop { video.draw_memory }
+if ARGV.find { |a| a == '--video' }
+  video = Video.new(context.mem)
+  video.init
+  loop { video.draw_memory }
+else
+  loop { sleep 1 }
+end
