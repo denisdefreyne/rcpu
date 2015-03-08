@@ -15,19 +15,19 @@
 gcd:
     addi r2, rsp, 4
     addi r3, rsp, 8
-    mov r0, [r2]
-    mov r1, [r3]
+    lw r0, r2
+    lw r1, r3
     prn r0
     prn r1
 
 gcd-start:
     cmpi r1 0
     je @gcd-end
-    mov r2 r1
+    addi r2, r1, 0
     mod r1 r0 r1
-    mov r0 r2
+    addi r0, r2, 0
     jmpi @gcd-start
 
 gcd-end:
-    mov rr, r0
+    addi rr, r0, 0
     ret
