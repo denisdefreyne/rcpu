@@ -17,14 +17,18 @@ print-string:
     push r3
 
     # setup
-    li r0, @string           # r0 = string address
+    li r0, @ascii-string     # r0 = string address
     li r2, 0
 
 print-string-loop:
     # load char
-    lw r1, r0                # r1 = char address
-    cmpi r1, 0
+    lb r1, r0                # r1 = ascii value
+    cmpi r1, 0x00
     je @print-string-done
+    muli r1, r1, 0x04        # address size is 4
+    li r5, @ascii
+    addi r1, r1, @ascii      # r1 = char address
+    lw r1, r1
 
     # print char
     push r1
@@ -35,7 +39,7 @@ print-string-loop:
 
     # next
     addi r2, r2, 5
-    addi r0, r0, 4
+    addi r0, r0, 1
 
     jmpi @print-string-loop
 
@@ -186,21 +190,166 @@ print-char:
 
 ### DATA
 
-string:
-.word @char-h
-.word @char-e
-.word @char-l
-.word @char-l
-.word @char-o
-.word @char-space
-.word @char-r
-.word @char-u
-.word @char-g
-.word @char-colon
-.word @char-colon
-.word @char-b
-.word @char-exclamation-mark
-.word 0x00000000
+ascii:
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+.word @char-question-mark
+
+.word @char-space             #
+.word @char-exclamation-mark  # !
+.word @char-left-double-quote # " - TODO
+.word @char-question-mark     # # - TODO
+.word @char-question-mark     # $ - TODO
+.word @char-question-mark     # % - TODO
+.word @char-question-mark     # & - TODO
+.word @char-question-mark     # ' - TODO
+
+.word @char-question-mark     # ( - TODO
+.word @char-question-mark     # ) - TODO
+.word @char-question-mark     # * - TODO
+.word @char-question-mark     # + - TODO
+.word @char-question-mark     # , - TODO
+.word @char-question-mark     # - - TODO
+.word @char-question-mark     # . - TODO
+.word @char-question-mark     # / - TODO
+
+.word @char-0                 # 0
+.word @char-1                 # 1
+.word @char-2                 # 2
+.word @char-3                 # 3
+.word @char-4                 # 4
+.word @char-5                 # 5
+.word @char-6                 # 6
+.word @char-7                 # 7
+
+.word @char-8                 # 8
+.word @char-9                 # 9
+.word @char-colon             # :
+.word @char-question-mark     # ; - TODO
+.word @char-question-mark     # < - TODO
+.word @char-question-mark     # = - TODO
+.word @char-question-mark     # > - TODO
+.word @char-question-mark     # ?
+
+.word @char-question-mark     # @
+.word @char-a                 # A
+.word @char-b                 # B
+.word @char-c                 # C
+.word @char-d                 # D
+.word @char-e                 # E
+.word @char-f                 # F
+.word @char-g                 # G
+
+.word @char-h                 # H
+.word @char-i                 # I
+.word @char-j                 # J
+.word @char-k                 # K
+.word @char-l                 # L
+.word @char-m                 # M
+.word @char-n                 # N
+.word @char-o                 # O
+
+.word @char-p                 # P
+.word @char-q                 # Q
+.word @char-r                 # R
+.word @char-s                 # S
+.word @char-t                 # T
+.word @char-u                 # U
+.word @char-v                 # V
+.word @char-w                 # W
+
+.word @char-x                 # X
+.word @char-y                 # Y
+.word @char-z                 # Z
+.word @char-question-mark     # [ - TODO
+.word @char-question-mark     # \ - TODO
+.word @char-question-mark     # ] - TODO
+.word @char-question-mark     # ^ - TODO
+.word @char-question-mark     # _ - TODO
+
+.word @char-question-mark     # ` - TODO
+.word @char-a                 # a
+.word @char-b                 # b
+.word @char-c                 # c
+.word @char-d                 # d
+.word @char-e                 # e
+.word @char-f                 # f
+.word @char-g                 # g
+
+.word @char-h                 # h
+.word @char-i                 # i
+.word @char-j                 # j
+.word @char-k                 # k
+.word @char-l                 # l
+.word @char-m                 # m
+.word @char-n                 # n
+.word @char-o                 # o
+
+.word @char-p                 # p
+.word @char-q                 # q
+.word @char-r                 # r
+.word @char-s                 # s
+.word @char-t                 # t
+.word @char-u                 # u
+.word @char-v                 # v
+.word @char-w                 # w
+
+.word @char-x                 # x
+.word @char-y                 # y
+.word @char-z                 # z
+.word @char-question-mark     # { - TODO
+.word @char-question-mark     # | - TODO
+.word @char-question-mark     # } - TODO
+.word @char-question-mark     # ~ - TODO
+.word @char-question-mark
+
+ascii-string:
+.byte 0x48 # H
+.byte 0x65 # e
+.byte 0x6c # l
+.byte 0x6c # l
+.byte 0x6f # o
+.byte 0x20 # SP
+.byte 0x52 # R
+.byte 0x55 # U
+.byte 0x47 # G
+.byte 0x3a # :
+.byte 0x3a # :
+.byte 0x42 # B
+.byte 0x21 # !
+.byte 0x00 # NUL
 
 char-0:
 .byte 1
