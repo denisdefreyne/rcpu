@@ -153,7 +153,7 @@ class DataDirective
   end
 
   def inspect
-    "data(#{name.inspect})"
+    "data(arg=#{arg.inspect} length=#{length})"
   end
 
   def instruction?
@@ -190,7 +190,7 @@ class Parser
       args = parts[1..-1].map { |s| parse_arg(s.sub(/,\z/, '')) }
 
       Instruction.new(opcode_mnemonic, args)
-    elsif raw_line =~ /\A\.([a-z]+) (.*)/
+    elsif raw_line.strip =~ /\A\.([a-z]+) (.*)/
       parse_directive($1, $2)
     else
       Label.new(raw_line.strip.sub(/:\z/, ''))
