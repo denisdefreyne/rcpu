@@ -1,0 +1,9 @@
+start:
+    li r0, 123
+    prn r0
+
+    li r0, 0x05
+    lb r1, r0
+    addi r1, r1, 0x01
+    sb r0, r1
+    jmpi @start
