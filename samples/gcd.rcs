@@ -1,12 +1,14 @@
-    movi r0 819000
-    movi r1 254163
-start
+    li r0, 819000
+    li r1, 254163
+
+start:
     cmpi r1 0
     je @end
-    mov r2 r1
+    addi r2, r1, 0
     mod r1 r0 r1
-    mov r0 r2
-    jmp @start
-end
+    addi r0, r2, 0
+    jmpi @start
+
+end:
     prn r0
     halt
