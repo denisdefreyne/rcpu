@@ -217,12 +217,6 @@ class CPU
     when 0x0e # prn
       puts "#{reg[a0]}"
       advance(2)
-    when 0x0f # mov
-      reg[a0] = reg[a1]
-      advance(3)
-    when 0x10 # movi
-      reg[a0] = reconstruct_int(a1, a2, a3, a4)
-      advance(6)
     when 0x11 # cmp
       reg[FLAGS] =
         (reg[a0] == reg[a1] ? 0x01 : 0x00) |

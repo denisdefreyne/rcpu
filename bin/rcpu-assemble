@@ -320,8 +320,6 @@ class Assembler
     'jle'   => { opcode: 0x0c, args: [LabelArg] },
     'not'   => { opcode: 0x0d, args: [RegArg, RegArg] },
     'prn'   => { opcode: 0x0e, args: [RegArg] },
-    'mov'   => { opcode: 0x0f, args: [RegArg, RegArg] },
-    'movi'  => { opcode: 0x10, args: [RegArg, ImmArg] },
     'cmp'   => { opcode: 0x11, args: [RegArg, RegArg] },
     'cmpi'  => { opcode: 0x12, args: [RegArg, ImmArg] },
     'mod'   => { opcode: 0x13, args: [RegArg, RegArg, RegArg] },
@@ -353,12 +351,6 @@ class Assembler
     'sb'    => { opcode: 0x2d, args: [RegArg, RegArg] },
     'halt'  => { opcode: 0xff, args: [] },
   }
-
-  # TODO: .ascii / .asciiz
-
-  # TODO: remove mov
-  # TODO: replace [] syntax with imm(reg) syntax
-  # TODO: use ; for comments
 
   def handle_instruction(instr, program, labels)
     instr_def = INSTRUCTION_DEFS.fetch(instr.opcode_mnemonic) do
