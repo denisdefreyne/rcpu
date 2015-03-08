@@ -295,7 +295,6 @@ class Assembler
   end
 
   INSTRUCTION_DEFS = {
-    'nop'   => { opcode: 0x00, args: [] },
     'call'  => { opcode: 0x01, args: [LabelArg] },
     'ret'   => { opcode: 0x02, args: [] },
     'push'  => { opcode: 0x03, args: [RegArg] },

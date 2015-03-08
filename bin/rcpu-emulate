@@ -142,8 +142,6 @@ class CPU
     end
 
     case opcode
-    when 0x00 # nop
-      advance(1)
     when 0x01 # call
       reg[SP] -= 4
       new_pc = reg[PC] + 5
