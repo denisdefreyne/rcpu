@@ -150,7 +150,7 @@ class Label
   end
 end
 
-class Datax # Because Data is taken
+class DataDirective
   attr_reader :length
   attr_reader :arg
 
@@ -198,13 +198,13 @@ class Parser
 
       Instruction.new(opcode_mnemonic, args)
     elsif raw_line =~ /\A\.([a-z]+) (.*)/
-      parse_special($1, $2)
+      parse_directive($1, $2)
     else
       Label.new(raw_line.strip.sub(/:\z/, ''))
     end
   end
 
-  def parse_special(raw_type, raw_value)
+  def parse_directive(raw_type, raw_value)
     value = parse_number(raw_value)
     arg =
       if value
@@ -222,10 +222,10 @@ class Parser
       when 'word'
         4
       else
-        raise "Unrecognised special: #{raw_type}"
+        raise "Unrecognised directive: #{raw_type}"
       end
 
-    Datax.new(length, arg)
+    DataDirective.new(length, arg)
   end
 
   def parse_number(string)
