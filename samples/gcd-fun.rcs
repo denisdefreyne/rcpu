@@ -2,26 +2,29 @@
     pushi 254163
     call @gcd
     prn rr
-    subi rsp, rsp, 8
+    addi rsp, rsp, 8
 
     pushi 1470
     pushi 1050
     call @gcd
     prn rr
-    subi rsp, rsp, 8
+    addi rsp, rsp, 8
 
     halt
 
 gcd:
-    addi r2, rsp, 4
-    addi r3, rsp, 8
-    lw r0, r2
-    lw r1, r3
-    prn r0
-    prn r1
+    push rbp
+    addi rbp, rsp, 0
+    push r0
+    push r1
+    push r2
+    addi r0, rbp, 8
+    addi r1, rbp, 12
+    lw r0, r0
+    lw r1, r1
 
 gcd-start:
-    cmpi r1 0
+    cmpi r1, 0
     je @gcd-end
     addi r2, r1, 0
     mod r1 r0 r1
@@ -30,4 +33,8 @@ gcd-start:
 
 gcd-end:
     addi rr, r0, 0
+    pop r2
+    pop r1
+    pop r0
+    pop rbp
     ret
