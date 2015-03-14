@@ -18,22 +18,23 @@ print-string:
 
     # setup
     li r0, @ascii-string     # r0 = string address
-    li r2, 0
+    li r2, 0                 # x (in px)
+    li r3, 0                 # y (in px)
 
 print-string-loop:
     # load char
     lb r1, r0                # r1 = ascii value
     cmpi r1, 0x00
     je @print-string-done
+    call @maybe-break-line
     muli r1, r1, 0x04        # address size is 4
-    li r5, @ascii
     addi r1, r1, @ascii      # r1 = char address
     lw r1, r1
 
     # print char
-    push r1
-    push r2
-    pushi 0
+    push r1                  # char address
+    push r2                  # x (in px)
+    push r3                  # y (in px)
     call @print-char
     addi rsp, rsp, 12
 
@@ -52,6 +53,18 @@ print-string-done:
     pop rbp
 
     ret
+
+maybe-break-line:
+    cmpi r1, 0x0a
+    je @break-line
+    ret
+
+break-line:
+    li r2, 0
+    addi r3, r3, 6
+    addi r0, r0, 1
+    addi rsp, rsp, 4 # no return
+    jmpi @print-string-loop
 
 ### PRINT-CHAR
 
@@ -337,7 +350,7 @@ ascii-string:
 .byte 0x6c # l
 .byte 0x6c # l
 .byte 0x6f # o
-.byte 0x20 # SP
+.byte 0x20 # <SP>
 .byte 0x52 # R
 .byte 0x55 # U
 .byte 0x47 # G
@@ -345,7 +358,11 @@ ascii-string:
 .byte 0x3a # :
 .byte 0x42 # B
 .byte 0x21 # !
-.byte 0x00 # NUL
+.byte 0x0a # <NL>
+.byte 0x21 # !
+.byte 0x21 # !
+.byte 0x21 # !
+.byte 0x00 # <NUL>
 
 char-0:
 .byte 1
