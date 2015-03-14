@@ -77,8 +77,8 @@ class ImmArg < Arg
 
   def bytes(_labels)
     [
-      ((value & 0xff000000) >> 0xf8).to_u8,
-      ((value & 0x00ff0000) >> 0xf0).to_u8,
+      ((value & 0xff000000) >> 0x18).to_u8,
+      ((value & 0x00ff0000) >> 0x10).to_u8,
       ((value & 0x0000ff00) >> 0x08).to_u8,
       ((value & 0x000000ff) >> 0x00).to_u8,
     ]
@@ -94,7 +94,7 @@ class LabelArg < Arg
   end
 
   def kind
-    :label
+    :immediate
   end
 
   def inspect
@@ -109,8 +109,8 @@ class LabelArg < Arg
     if labels
       value = labels[name]
       [
-        ((value & 0xff000000) >> 0xf8).to_u8,
-        ((value & 0x00ff0000) >> 0xf0).to_u8,
+        ((value & 0xff000000) >> 0x18).to_u8,
+        ((value & 0x00ff0000) >> 0x10).to_u8,
         ((value & 0x0000ff00) >> 0x08).to_u8,
         ((value & 0x000000ff) >> 0x00).to_u8,
       ]
@@ -198,8 +198,10 @@ class DataDirective
   end
 
   def bytes(labels)
+    p [arg, @length, arg.bytes(labels), arg.bytes(labels).reverse.take(length).reverse]
     bytes = arg.bytes(labels)
-    bytes[-4..-1]
+    bytes.reverse.take(length).reverse
+    # bytes[-(1-length)..-1]
   end
 end
 
@@ -321,7 +323,8 @@ class Assembler
       when Instruction
         handle_instruction(line, program, labels)
       when DataDirective
-        line.bytes(labels).each { |byte| program << byte }
+        p line
+        line.bytes(labels).each { |byte| p byte ; program << byte }
       end
     end
     program
@@ -338,19 +341,19 @@ class Assembler
   end
 
   INSTRUCTION_DEFS = {
-    "call"  => IDef.new(0x01.to_u8, [:label]),
+    "call"  => IDef.new(0x01.to_u8, [:immediate]),
     "ret"   => IDef.new(0x02.to_u8, [] of Symbol),
     "push"  => IDef.new(0x03.to_u8, [:register]),
     "pushi" => IDef.new(0x04.to_u8, [:immediate]),
     "pop"   => IDef.new(0x05.to_u8, [:register]),
-    "jmpi"  => IDef.new(0x06.to_u8, [:label]), # FIXME: rearrange opcodes
+    "jmpi"  => IDef.new(0x06.to_u8, [:immediate]), # FIXME: rearrange opcodes
     "jmp"   => IDef.new(0xa6.to_u8, [:register]),
-    "je"    => IDef.new(0x07.to_u8, [:label]),
-    "jne"   => IDef.new(0x08.to_u8, [:label]),
-    "jg"    => IDef.new(0x09.to_u8, [:label]),
-    "jge"   => IDef.new(0x0a.to_u8, [:label]),
-    "jl"    => IDef.new(0x0b.to_u8, [:label]),
-    "jle"   => IDef.new(0x0c.to_u8, [:label]),
+    "je"    => IDef.new(0x07.to_u8, [:immediate]),
+    "jne"   => IDef.new(0x08.to_u8, [:immediate]),
+    "jg"    => IDef.new(0x09.to_u8, [:immediate]),
+    "jge"   => IDef.new(0x0a.to_u8, [:immediate]),
+    "jl"    => IDef.new(0x0b.to_u8, [:immediate]),
+    "jle"   => IDef.new(0x0c.to_u8, [:immediate]),
     "not"   => IDef.new(0x0d.to_u8, [:register, :register]),
     "prn"   => IDef.new(0x0e.to_u8, [:register]),
     "cmp"   => IDef.new(0x11.to_u8, [:register, :register]),

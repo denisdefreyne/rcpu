@@ -8,8 +8,6 @@ end
 
 require "sdl2"
 
-# Thread.abort_on_exception = true
-
 class Registers
   def initialize
     @reg = {
@@ -46,13 +44,32 @@ class Registers
   end
 end
 
+class Mem
+  def initialize
+    @wrapped = {} of UInt32 => UInt8
+  end
+
+  def [](address)
+    @wrapped[address]
+  end
+
+  def fetch(address)
+    @wrapped.fetch(address)
+  end
+
+  def []=(address, value)
+    puts "WRITE 0x#{address.to_s(16)} <- #{value}" unless $quiet
+    @wrapped[address] = value
+  end
+end
+
 class Context
   getter reg
   getter mem
   setter mem
 
   def initialize
-    @mem = {} of UInt32 => UInt8
+    @mem = Mem.new
     @reg = Registers.new
   end
 
@@ -106,15 +123,26 @@ class CPU
   SP    = 10_u8
   BP    = 11_u8
 
+  getter running
+
   def initialize(context)
     @context = context
+    @running = true
   end
 
-  def run
-    @running = true
-    loop do
-      step
-      break unless @running
+  def run(cycles = -1)
+    return unless @running
+
+    if cycles == -1
+      loop do
+        step
+        break unless @running
+      end
+    else
+      cycles.times do
+        step
+        break unless @running
+      end
     end
   end
 
@@ -135,13 +163,13 @@ class CPU
     end
     if debug_count >= 1
       # puts "*** #{format("0x%02x", opcode)} @ #{format("0x%08x", reg[PC])}"
-      puts "*** #{opcode} (0x#{opcode.to_s(16)}) @ #{reg[PC]}"
+      puts "*** #{opcode} (0x#{opcode.to_s(16)}) @ #{reg[PC]-1}"
     end
 
     case opcode
     when 0x01 # call
       reg[SP] -= 4_u32
-      new_pc = reg[PC] + 5
+      new_pc = reg[PC] + 4
       mem[reg[SP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
       mem[reg[SP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
       mem[reg[SP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
@@ -160,7 +188,7 @@ class CPU
     when 0x03 # push
       a0 = read_byte
       raw = reg[a0]
-      reg[SP] -= 4_u32
+      reg[SP] -= 4
       mem[reg[SP] + 0] = ((raw & 0xff000000) >> 24).to_u8
       mem[reg[SP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
       mem[reg[SP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
@@ -287,6 +315,7 @@ class CPU
     when 0x27 # li
       a0 = read_byte
       a1 = read_u32
+      puts "li done: #{a1}"
       reg[a0] = a1
     when 0x28 # lw
       a0 = read_byte
@@ -308,6 +337,7 @@ class CPU
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
+      puts "lb #{a0} #{a1} - address #{address} (0x#{address.to_s(16)}) - value #{mem[address + 0].to_u32}"
       reg[a0] =
         (mem[address + 0].to_u32 << 0)
     when 0x2b # sw
@@ -333,13 +363,10 @@ class CPU
       mem[reg[a0] + 0] = ((raw & 0x000000ff)).to_u8
     when 0xff # halt
       @running = false
+      advance(-1)
     else
       raise "Unknown opcode: #{@opcode.inspect}"
     end
-  end
-
-  def at_pc(offset=0)
-    mem[reg[PC] + offset]
   end
 
   def advance(amount)
@@ -347,7 +374,7 @@ class CPU
   end
 
   def read_byte
-    at_pc(0).tap { advance(1) }
+    mem[reg[PC]].tap { advance(1) }
   end
 
   def read_u32
@@ -363,6 +390,7 @@ context = Context.new
 
 # Read instructions into memory
 # FIXME: use proper option parser
+$quiet = true
 filename = ARGV.reject { |a| a =~ /\A--/ }.first
 bytes = [] of UInt8
 File.open(filename, "r") do |io|
@@ -386,62 +414,37 @@ end
     context.mem[index.to_u32] = 0_u8
   end
 end
+$quiet = false
 
-class Video
-  def initialize(mem)
-    @mem = mem
-  end
-
-  def init
-    # SDL.init(SDL::INIT_VIDEO)
-    # @screen = SDL::Screen.open(640, 480, 16, SDL::SWSURFACE)
-    # SDL::WM.set_caption("RCPU", "RCPU")
-
-    # @black = @screen.format.map_rgb(0, 0, 0)
-    # @white = @screen.format.map_rgb(255, 255, 255)
-  end
-
-  def draw
-    row_length_in_bytes = 160
-    num_rows = 120
-
-    num_bytes = num_rows * row_length_in_bytes
-
-    num_bytes.times do |index|
-      x = (index % row_length_in_bytes)
-      y = (index / row_length_in_bytes)
-
-      byte = @mem.fetch(0x10000 + index)
-      # color = (byte != 0x00) ? @white : @black
-      # @screen.fill_rect(x * 4, y * 4, 4, 4, color)
-    end
-
-    # @screen.flip
-  end
-
-  def loop_draw
-    @running = true
-    loop do
-      draw
-      break unless @running
-    end
-  end
-
-  def stop_drawing
-    @running = false
-  end
-end
+require "./video"
 
 # Run
 
-if ARGV.find { |a| a == "--video" }
-  video = Video.new(context.mem)
-  video.init
-  Thread.new do
-    CPU.new(context).run
-    video.stop_drawing
+def get_input
+  while LibSDL2.poll_event(out e) == 1
+    case e.type
+    when EventType::QUIT
+      return :quit
+    end
   end
-  video.loop_draw
+  return :none
+end
+
+if ARGV.find { |a| a == "--video" }
+  cpu = CPU.new(context)
+  video = Video.new(context.mem)
+  video.draw do |g|
+    loop do
+      case get_input
+      when :quit
+        break
+      end
+
+      cpu.run(100)
+      video.update(g)
+      break unless cpu.running
+    end
+  end
 else
   CPU.new(context).run
 end
