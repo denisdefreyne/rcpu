@@ -12,3 +12,11 @@ assemble: src/assemble.cr deps
 
 emulate: src/emulate.cr deps
 	crystal $< -o $@
+
+.PHONY: clean
+clean:
+	rm -rf .crystal
+	rm -rf .deps
+	rm -rf libs
+	rm assemble
+	rm emulate
