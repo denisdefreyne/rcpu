@@ -65,8 +65,6 @@ print-char:
     push r3
     push r4
     push r5
-    push r6
-    push r7
 
     # get args
     addi r0, rbp, 16
@@ -175,8 +173,6 @@ print-char:
     addi r3, r3, 1
     addi r4, r4, 157
 
-    pop r7
-    pop r6
     pop r5
     pop r4
     pop r3
