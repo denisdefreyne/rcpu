@@ -61,7 +61,7 @@ class Graphics
   end
 
   def clear_background
-    LibSDL2.set_render_draw_color(@render, 0x4f_u8, 0x4c_u8, 0x42_u8, 255_u8)
+    LibSDL2.set_render_draw_color(@render, 0x42_u8, 0x4c_u8, 0x4f_u8, 255_u8)
     LibSDL2.render_clear(@render)
   end
 
@@ -94,6 +94,8 @@ PURPLE = 0xFF4B1485_u32
 RED    = 0xFF4B59F2_u32
 
 class Video
+  PADDING = 16
+
   def initialize(mem)
     @mem = mem
   end
@@ -110,13 +112,13 @@ class Video
 
       byte = @mem.fetch(0x10000 + index)
       color = (byte != 0x00) ? TEAL : EMPTY
-      graphics.draw_block(x * 4, y * 4, 4, 4, color)
+      graphics.draw_block(PADDING + x * 4, PADDING + y * 4, 4, 4, color)
     end
   end
 
   def draw
     SDL2.run(SDL2::INIT::EVERYTHING) do
-      graphics = Graphics.new("RCPU 3000", 640, 480)
+      graphics = Graphics.new("RCPU 3000", 2 * PADDING + 640, 2 * PADDING + 480)
 
       yield(graphics)
     end
