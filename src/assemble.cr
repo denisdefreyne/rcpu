@@ -198,10 +198,8 @@ class DataDirective
   end
 
   def bytes(labels)
-    p [arg, @length, arg.bytes(labels), arg.bytes(labels).reverse.take(length).reverse]
     bytes = arg.bytes(labels)
     bytes.reverse.take(length).reverse
-    # bytes[-(1-length)..-1]
   end
 end
 
@@ -323,8 +321,7 @@ class Assembler
       when Instruction
         handle_instruction(line, program, labels)
       when DataDirective
-        p line
-        line.bytes(labels).each { |byte| p byte ; program << byte }
+        line.bytes(labels).each { |byte| program << byte }
       end
     end
     program

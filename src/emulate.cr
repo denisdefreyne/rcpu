@@ -58,7 +58,6 @@ class Mem
   end
 
   def []=(address, value)
-    puts "WRITE 0x#{address.to_s(16)} <- #{value}" unless $quiet
     @wrapped[address] = value
   end
 end
@@ -315,7 +314,6 @@ class CPU
     when 0x27 # li
       a0 = read_byte
       a1 = read_u32
-      puts "li done: #{a1}"
       reg[a0] = a1
     when 0x28 # lw
       a0 = read_byte
@@ -337,7 +335,6 @@ class CPU
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
-      puts "lb #{a0} #{a1} - address #{address} (0x#{address.to_s(16)}) - value #{mem[address + 0].to_u32}"
       reg[a0] =
         (mem[address + 0].to_u32 << 0)
     when 0x2b # sw
@@ -390,7 +387,6 @@ context = Context.new
 
 # Read instructions into memory
 # FIXME: use proper option parser
-$quiet = true
 filename = ARGV.reject { |a| a =~ /\A--/ }.first
 bytes = [] of UInt8
 File.open(filename, "r") do |io|
@@ -414,7 +410,6 @@ end
     context.mem[index.to_u32] = 0_u8
   end
 end
-$quiet = false
 
 require "./video"
 
@@ -440,7 +435,7 @@ if ARGV.find { |a| a == "--video" }
         break
       end
 
-      cpu.run(100)
+      cpu.run(5)
       video.update(g)
       break unless cpu.running
     end
