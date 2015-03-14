@@ -8,10 +8,10 @@ deps: .deps
 	crystal deps
 
 assemble: src/assemble.cr deps
-	crystal $< -o $@
+	crystal build $< -o $@
 
 emulate: src/emulate.cr deps
-	crystal $< -o $@
+	crystal build $< -o $@
 
 .PHONY: clean
 clean:
