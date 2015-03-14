@@ -1,6 +1,6 @@
 # RCPU
 
-_RCPU_ is a virtual machine emulator and assembler written in Ruby.
+_RCPU_ is a virtual machine emulator and assembler written in Crystal.
 
 Very much work in progress.
 
