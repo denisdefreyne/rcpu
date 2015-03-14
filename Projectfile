@@ -1,0 +1,3 @@
+deps do
+  github "weskinner/crystal-sdl2"
+end

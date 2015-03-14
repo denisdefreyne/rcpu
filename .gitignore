@@ -1,3 +1,6 @@
 *.rcb
-.crystal
+.crystal/
+.deps/
 assemble
+emulate
+libs/
