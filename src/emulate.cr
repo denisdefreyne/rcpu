@@ -435,7 +435,7 @@ if ARGV.find { |a| a == "--video" }
         break
       end
 
-      cpu.run(50)
+      cpu.run(100)
       video.update(g)
       break unless cpu.running
     end
