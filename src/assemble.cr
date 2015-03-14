@@ -302,11 +302,12 @@ class Assembler
     labels = {} of String => UInt32
     program = [] of UInt8
     lines.each do |line|
-      if line.is_a?(Instruction)
+      case line
+      when Instruction
         handle_instruction(line, program, nil)
-      elsif line.is_a?(Label)
+      when Label
         labels[line.name] = program.size.to_u32
-      elsif line.is_a?(DataDirective)
+      when DataDirective
         line.length.times { program << 0x00.to_u8 }
       end
     end
@@ -316,9 +317,10 @@ class Assembler
   private def generate_program(lines, labels)
     program = [] of UInt8
     lines.each do |line|
-      if line.is_a?(Instruction)
+      case line
+      when Instruction
         handle_instruction(line, program, labels)
-      elsif line.is_a?(DataDirective)
+      when DataDirective
         line.bytes(labels).each { |byte| program << byte }
       end
     end
