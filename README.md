@@ -4,15 +4,19 @@ _RCPU_ is a virtual machine emulator and assembler written in Crystal.
 
 Very much work in progress.
 
+## Building
+
+You will need [Crystal](http://crystal-lang.org/) to build RCPU. Once you have Crystal, run <kbd>make</kbd>, which will generate the compiled assembler and emulator binaries in the current directory.
+
 ## Usage
 
-To assemble a file, use _rcpu-assemble_, passing the input filename (with the _rcs_ extension). This will generate a corresponding _rcb_ file. For example:
+To assemble a file, use _assemble_, passing the input filename (with the _rcs_ extension). This will generate a corresponding _rcb_ file. For example:
 
-	% ./bin/rcpu-assemble samples/counter.rcs
+	% ./assemble samples/counter.rcs
 
 To run a file, use _rcpu-emulate_, passing the input filename (with the _rcb_ extension). For example:
 
-	% ./bin/rcpu-emulate samples/counter.rcb
+	% ./emulate samples/counter.rcb
 
 The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **RC**PU **b**inary (i.e. compiled) files.
 
