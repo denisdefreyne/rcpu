@@ -607,36 +607,35 @@ class Assembler
     parser = Parser.new(lexer.tokens)
     parser.run
 
-    # TODO: rename lines to statements
-    lines = parser.statements
-    labels = collect_labels(lines)
-    generate_program(lines, labels)
+    statements = parser.statements
+    labels = collect_labels(statements)
+    generate_program(statements, labels)
   end
 
-  private def collect_labels(lines)
+  private def collect_labels(statements)
     labels = {} of String => UInt32
     program = [] of UInt8
-    lines.each do |line|
-      case line
+    statements.each do |statement|
+      case statement
       when Instruction
-        handle_instruction(line, program, nil)
+        handle_instruction(statement, program, nil)
       when Label
-        labels[line.name] = program.size.to_u32
+        labels[statement.name] = program.size.to_u32
       when DataDirective
-        line.length.times { program << 0x00.to_u8 }
+        statement.length.times { program << 0x00.to_u8 }
       end
     end
     labels
   end
 
-  private def generate_program(lines, labels)
+  private def generate_program(statements, labels)
     program = [] of UInt8
-    lines.each do |line|
-      case line
+    statements.each do |statement|
+      case statement
       when Instruction
-        handle_instruction(line, program, labels)
+        handle_instruction(statement, program, labels)
       when DataDirective
-        line.bytes(labels).each { |byte| program << byte }
+        statement.bytes(labels).each { |byte| program << byte }
       end
     end
     program
