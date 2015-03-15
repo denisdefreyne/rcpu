@@ -231,7 +231,7 @@ class Token
   end
 end
 
-class Lexer3
+class Lexer
   getter tokens
 
   def initialize(@input)
@@ -398,7 +398,7 @@ class Lexer3
   end
 end
 
-class Parser2
+class Parser
   getter statements
 
   def initialize(@input)
@@ -559,10 +559,10 @@ class Assembler
   end
 
   def assemble
-    lexer = Lexer3.new(@input)
+    lexer = Lexer.new(@input)
     lexer.run
 
-    parser = Parser2.new(lexer.tokens)
+    parser = Parser.new(lexer.tokens)
     parser.run
 
     # TODO: rename lines to statements
