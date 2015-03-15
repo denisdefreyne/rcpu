@@ -416,14 +416,45 @@ class Parser2
       when :newline # empty line
         advance
       when :dot # data directive
-        advance
-        # TODO: implement
+        @statements << consume_data_directive
       when :eof
         break
       else
-        raise "Parser [1]: unexpected #{current_token.kind.to_s.upcase}"
+        raise "Parser: unexpected #{current_token.kind.to_s.upcase}"
       end
     end
+  end
+
+  def consume_data_directive
+    advance # dot
+
+    directive_kind = consume(:identifier).content
+    length =
+      case directive_kind
+      when "byte"
+        1
+      when "half"
+        2
+      when "word"
+        4
+      else
+        raise "Parser: invalid data directive kind: #{directive_kind}"
+      end
+
+    arg =
+      case current_token.kind
+      when :number
+        number_token = consume
+        ImmArg.new(parse_int(number_token.content))
+      when :at
+        advance
+        label_name = consume(:identifier).content
+        LabelArg.new(label_name)
+      else
+        raise "Parser: unexpected #{current_token.kind.to_s.upcase}"
+      end
+
+    DataDirective.new(length, arg)
   end
 
   def consume_label
@@ -460,20 +491,22 @@ class Parser2
     end
   end
 
+  def parse_int(content)
+    case content
+    when /\A0x/
+      content[2..-1].to_i(16)
+    when /\A0b/
+      content[2..-1].to_i(2)
+    else
+      content.to_i
+    end
+  end
+
   def consume_argument
     case current_token.kind
     when :number # e.g. 0x123
       number_token = consume
-      int =
-        case number_token.content
-        when /\A0x/
-          number_token.content[2..-1].to_i(16)
-        when /\A0b/
-          number_token.content[2..-1].to_i(2)
-        else
-          number_token.content.to_i
-        end
-      ImmArg.new(int)
+      ImmArg.new(parse_int(number_token.content))
     when :at # e.g. @foo
       advance
       name = consume(:identifier)
@@ -530,32 +563,6 @@ class Parser
     parser.statements
   end
 end
-
-  # def parse_directive(raw_type, raw_value)
-  #   value = parse_number(raw_value)
-  #   arg =
-  #     if value
-  #       ImmArg.new(value)
-  #     elsif raw_value =~ /\A@[a-z0-9-]+\z/
-  #       LabelArg.new(raw_value[1..-1])
-  #     else
-  #       raise "Weird"
-  #     end
-
-  #   length =
-  #     case raw_type
-  #     when "byte"
-  #       1
-  #     when "half"
-  #       2
-  #     when "word"
-  #       4
-  #     else
-  #       raise "Unrecognised directive: #{raw_type}"
-  #     end
-
-  #   DataDirective.new(length, arg)
-  # end
 
 class Assembler
   def initialize(@input)
