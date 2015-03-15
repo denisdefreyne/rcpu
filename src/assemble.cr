@@ -552,17 +552,7 @@ class Parser2
   end
 end
 
-class Parser
-  def parse_raw_lines(raw_lines)
-    lexer = Lexer3.new(raw_lines.join)
-    lexer.run
-
-    parser = Parser2.new(lexer.tokens)
-    parser.run
-
-    parser.statements
-  end
-end
+################################################################################
 
 class Assembler
   def initialize(@input)
