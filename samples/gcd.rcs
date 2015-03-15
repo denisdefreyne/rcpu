@@ -2,10 +2,10 @@
     li r1, 254163
 
 start:
-    cmpi r1 0
+    cmpi r1, 0
     je @end
     addi r2, r1, 0
-    mod r1 r0 r1
+    mod r1, r0, r1
     addi r0, r2, 0
     jmpi @start
 
