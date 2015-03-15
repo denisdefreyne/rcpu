@@ -409,14 +409,16 @@ class Parser
   def run
     loop do
       case current_token.kind
+      when :comment
+        advance
       when :identifier # label
-        @statements << consume_label
+        consume_label
       when :space # instruction
-        @statements << consume_instruction
+        consume_instruction
       when :newline # empty line
         advance
       when :dot # data directive
-        @statements << consume_data_directive
+        consume_data_directive
       when :eof
         break
       else
@@ -454,25 +456,57 @@ class Parser
         raise "Parser: unexpected #{current_token.kind.to_s.upcase}"
       end
 
-    DataDirective.new(length, arg)
+    case current_token
+    when :newline
+      advance
+    when :space
+      advance
+      consume(:comment)
+      consume(:newline)
+    end
+
+    @statements << DataDirective.new(length, arg)
   end
 
   def consume_label
     name = consume(:identifier)
     consume(:colon)
-    consume(:newline)
-    Label.new(name.content)
+
+    case current_token
+    when :newline
+      advance
+    when :space
+      advance
+      consume(:comment)
+      consume(:newline)
+    end
+
+    @statements << Label.new(name.content)
   end
 
   def consume_instruction
     advance
+
+    if current_token.kind == :comment
+      advance
+      consume(:newline)
+      return
+    end
+
     opcode_mnemonic = consume(:identifier).content
     case current_token.kind
     when :newline
       advance
-      Instruction.new(opcode_mnemonic, [] of Arg)
+      @statements << Instruction.new(opcode_mnemonic, [] of Arg)
     when :space
       advance
+
+      if current_token == :comment
+        advance
+        consume(:newline)
+        return
+      end
+
       args = [] of ImmArg | LabelArg | RegArg
       loop do
         args << consume_argument
@@ -480,12 +514,17 @@ class Parser
         when :newline
           advance
           break
+        when :space
+          advance
+          maybe_consume(:comment)
+          consume(:newline)
+          break
         when :comma
           advance
           consume(:space)
         end
       end
-      Instruction.new(opcode_mnemonic, args)
+      @statements << Instruction.new(opcode_mnemonic, args)
     else
       raise "Parser: unexpected #{current_token.kind.to_s.upcase}"
     end
@@ -521,6 +560,8 @@ class Parser
 
   def advance
     @index += 1
+
+    puts "*** #{current_token.inspect}"
   end
 
   def unread_token
