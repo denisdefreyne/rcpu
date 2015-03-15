@@ -385,7 +385,8 @@ class Lexer
         end
       when :body
         case char
-        when '0' .. '9'
+          # TODO: be more strict
+        when '0' .. '9', 'a' .. 'f', 'A' .. 'F'
           @current_token.append_char(char)
         else
           unread_char
