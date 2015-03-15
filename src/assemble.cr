@@ -563,8 +563,6 @@ class Parser
 
   def advance
     @index += 1
-
-    puts "*** #{current_token.inspect}"
   end
 
   def unread_token
