@@ -529,91 +529,47 @@ class Parser
 
     parser.statements
   end
-
-  def parse_raw_line(raw_line)
-    raw_line = raw_line.gsub(/#.*/, "")
-
-    if raw_line.strip.empty?
-      nil
-    elsif raw_line =~ /\A\s+/
-      parts = raw_line.strip.split(/ +/)
-
-      opcode_mnemonic = parts[0]
-      args = parts[1..-1].map { |s| parse_arg(s.gsub(/,\z/, "")) }
-
-      Instruction.new(opcode_mnemonic, args)
-    elsif raw_line.strip =~ /\A\.([a-z]+) (.*)/
-      parse_directive($1, $2)
-    else
-      Label.new(raw_line.strip.gsub(/:\z/, ""))
-    end
-  end
-
-  def parse_directive(raw_type, raw_value)
-    value = parse_number(raw_value)
-    arg =
-      if value
-        ImmArg.new(value)
-      elsif raw_value =~ /\A@[a-z0-9-]+\z/
-        LabelArg.new(raw_value[1..-1])
-      else
-        raise "Weird"
-      end
-
-    length =
-      case raw_type
-      when "byte"
-        1
-      when "half"
-        2
-      when "word"
-        4
-      else
-        raise "Unrecognised directive: #{raw_type}"
-      end
-
-    DataDirective.new(length, arg)
-  end
-
-  def parse_number(string)
-    case string
-    when /\A0x[0-9a-fA-F]+\z/
-      string[2..-1].to_i(16)
-    when /\A0b[0-1]+\z/
-      string[2..-1].to_i(2)
-    when /\A\d+\z/
-      string.to_i
-    else
-      nil
-    end
-  end
-
-  def parse_arg(string)
-    # Try as number
-    number = parse_number(string)
-    if number
-      return ImmArg.new(number)
-    end
-
-    case string
-    when /\A@[a-z0-9-]+\z/
-      LabelArg.new(string[1..-1])
-    when /\Ar[a-z0-9]+\z/
-      RegArg.new(string)
-    else
-      raise "Cannot parse argument: #{string.inspect}"
-    end
-  end
 end
 
+  # def parse_directive(raw_type, raw_value)
+  #   value = parse_number(raw_value)
+  #   arg =
+  #     if value
+  #       ImmArg.new(value)
+  #     elsif raw_value =~ /\A@[a-z0-9-]+\z/
+  #       LabelArg.new(raw_value[1..-1])
+  #     else
+  #       raise "Weird"
+  #     end
+
+  #   length =
+  #     case raw_type
+  #     when "byte"
+  #       1
+  #     when "half"
+  #       2
+  #     when "word"
+  #       4
+  #     else
+  #       raise "Unrecognised directive: #{raw_type}"
+  #     end
+
+  #   DataDirective.new(length, arg)
+  # end
+
 class Assembler
-  def initialize(raw_lines)
-    @raw_lines = raw_lines
+  def initialize(@input)
   end
 
   def assemble
-    parser = Parser.new
-    lines = parser.parse_raw_lines(@raw_lines)
+    lexer = Lexer3.new(@input)
+    lexer.run
+
+    parser = Parser2.new(lexer.tokens)
+    parser.run
+
+    # TODO: rename lines to statements
+    lines = parser.statements
     labels = collect_labels(lines)
     generate_program(lines, labels)
   end
@@ -747,10 +703,10 @@ output_filename =
     File.basename(input_filename, ".rcs") + ".rcb")
 
 # Read
-raw_lines = File.read_lines(input_filename)
+data = File.read(input_filename)
 
 # Assemble
-bytes = Assembler.new(raw_lines).assemble
+bytes = Assembler.new(data).assemble
 
 # Write
 File.open(output_filename, "w") do |io|
