@@ -444,6 +444,8 @@ class Parser
         raise "Parser: invalid data directive kind: #{directive_kind}"
       end
 
+    consume(:space)
+
     arg =
       case current_token.kind
       when :number
@@ -574,7 +576,7 @@ class Parser
   end
 
   def consume
-    @input[@index].tap { @index += 1 }
+    @input[@index].tap { advance }
   end
 
   def consume(kind)
