@@ -234,8 +234,7 @@ end
 class Lexer3
   getter tokens
 
-  def initialize(input)
-    @input = input
+  def initialize(@input)
     @index = 0
     @tokens = [] of Token
     @current_token = Token.new
@@ -291,6 +290,13 @@ class Lexer3
         raise "lexer error before #{char} at #{@index}"
       end
     end
+
+    if @current_token.content.size > 0
+      puts "Warning: unfinished token after end of lexing"
+      finish_token
+    end
+    @current_token.kind = :eof
+    finish_token
   end
 
   def unread_char
@@ -392,13 +398,137 @@ class Lexer3
   end
 end
 
+class Parser2
+  def initialize(@input)
+    @index = 0
+    @statements = [] of Instruction | Label | DataDirective
+  end
+
+  def run
+    loop do
+      p current_token
+
+      case current_token.kind
+      when :identifier # label
+        @statements << consume_label
+      when :space # instruction
+        # TODO: add to @statements
+        consume_instruction
+      when :newline # empty line
+        advance
+      when :dot # data directive
+        advance
+      when :eof
+        break
+      else
+        raise "Parser [1]: unexpected #{current_token.kind.to_s.upcase}"
+      end
+    end
+  end
+
+  def consume_label
+    name = consume(:identifier)
+    consume(:colon)
+    consume(:newline)
+    Label.new(name.content)
+  end
+
+  def consume_instruction
+    advance
+    opcode_mnemonic = consume(:identifier).content
+    case current_token.kind
+    when :newline
+      advance
+      Instruction.new(opcode_mnemonic, [] of Arg)
+    when :space
+      advance
+      args = [] of ImmArg | LabelArg | RegArg
+      loop do
+        args << consume_argument
+        case current_token.kind
+        when :newline
+          advance
+          break
+        when :comma
+          advance
+          consume(:space)
+        end
+      end
+      Instruction.new(opcode_mnemonic, args)
+    else
+      raise "Parser: unexpected #{current_token.kind.to_s.upcase}"
+    end
+  end
+
+  def consume_argument
+    case current_token.kind
+    when :number # e.g. 0x123
+      number_token = consume
+      int =
+        case number_token.content
+        when /\A0x/
+          number_token.content[2..-1].to_i(16)
+        when /\A0b/
+          number_token.content[2..-1].to_i(2)
+        else
+          number_token.content.to_i
+        end
+      ImmArg.new(int)
+    when :at # e.g. @foo
+      advance
+      name = consume(:identifier)
+      LabelArg.new(name.content)
+    when :identifier # e.g. r0
+      name = consume(:identifier)
+      RegArg.new(name.content)
+    else
+      raise "Parser: unexpected #{current_token.kind.to_s.upcase}"
+    end
+  end
+
+  def advance
+    @index += 1
+  end
+
+  def unread_token
+    @index -= 1
+  end
+
+  def current_token
+    @input[@index]
+  end
+
+  def consume
+    @input[@index].tap { @index += 1 }
+  end
+
+  def consume(kind)
+    token = @input[@index]
+    if token.kind == kind
+      consume
+    else
+      raise "Parser: unexpected #{token.kind.to_s.upcase}"
+    end
+  end
+
+  def maybe_consume(kind)
+    token = @input[@index]
+    if token.kind == kind
+      @index += 1
+    end
+  end
+end
+
 class Parser
   def parse_raw_lines(raw_lines)
     puts "lexing…"
-    lexer = Lexer3.new(raw_lines.join)
-    lexer.run
-    p lexer.tokens
+    tokens = Lexer3.new(raw_lines.join).tap { |l| l.run }.tokens
+    tokens.each { |t| p t }
     puts "done lexing"
+
+    puts "parsing…"
+    Parser2.new(tokens).run
+    puts "done parsing"
 
     raw_lines.map { |rl| parse_raw_line(rl) }.compact
   end
