@@ -202,8 +202,126 @@ end
 
 ###############################################################################
 
+require "string_scanner"
+
+class Token
+  getter content
+
+  def initialize(content)
+    @content = content
+  end
+end
+
+class IdentifierToken < Token
+  REGEX = /[a-zA-Z]+[a-zA-Z0-9-]+/
+end
+
+class NumberToken < Token
+  REGEX = /(|0|0x|0b)[0-9]+/
+end
+
+class DotToken < Token
+  REGEX = /\./
+end
+
+class ColonToken < Token
+  REGEX = /:/
+end
+
+class CommaToken < Token
+  REGEX = /,/
+end
+
+class CommentToken < Token
+  REGEX = /#.*/
+end
+
+class AtToken < Token
+  REGEX = /@/
+end
+
+class SpaceToken < Token
+  REGEX = /( |\t)+/
+end
+
+class NewlineToken < Token
+  REGEX = /\n/
+end
+
+class Lexer2
+  def initialize(input)
+    @input = input
+  end
+
+  def run
+    scanner = StringScanner.new(@input)
+    tokens = [] of Token
+
+    until scanner.eos?
+      case
+      when t = scanner.scan(IdentifierToken::REGEX)
+        p t ; tokens << IdentifierToken.new(t)
+      when t = scanner.scan(NumberToken::REGEX)
+        p t ; tokens << NumberToken.new(t)
+      when t = scanner.scan(DotToken::REGEX)
+        p t ; tokens << DotToken.new(t)
+      when t = scanner.scan(ColonToken::REGEX)
+        p t ; tokens << ColonToken.new(t)
+      when t = scanner.scan(CommaToken::REGEX)
+        p t ; tokens << CommaToken.new(t)
+      when t = scanner.scan(CommentToken::REGEX)
+        p t ; tokens << CommentToken.new(t)
+      when t = scanner.scan(AtToken::REGEX)
+        p t ; tokens << AtToken.new(t)
+      when t = scanner.scan(SpaceToken::REGEX)
+        p t ; tokens << SpaceToken.new(t)
+      when t = scanner.scan(NewlineToken::REGEX)
+        p t ; tokens << NewlineToken.new(t)
+      when t = scanner.scan(/./m)
+        raise "Lexer error before #{t.inspect}"
+      end
+    end
+
+    tokens
+  end
+end
+
+# class NewParser
+#   getter program
+
+#   def initialize(input)
+#     @input = input
+#     @index = 0
+#     @program = [] of Instruction | DataDirective | Label
+#   end
+
+#   def parse
+#     case c = peek_char
+#     when /\s/
+#     when '.'
+#     when /[a-z-]/
+#     when nil
+#       # done
+#     else
+#       raise "Illegal start of line: #{c}"
+#     end
+#   end
+
+#   private def peek_char
+#     @input[@index]
+#   end
+
+#   private def read_char
+#     peek_char.tap { @index += 1 }
+#   end
+# end
+
 class Parser
   def parse_raw_lines(raw_lines)
+    puts "lexing…"
+    res = Lexer2.new(raw_lines.join("\n")).run
+    puts "done lexing"
+
     raw_lines.map { |rl| parse_raw_line(rl) }.compact
   end
 
