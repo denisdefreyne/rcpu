@@ -399,6 +399,8 @@ class Lexer3
 end
 
 class Parser2
+  getter statements
+
   def initialize(@input)
     @index = 0
     @statements = [] of Instruction | Label | DataDirective
@@ -406,18 +408,16 @@ class Parser2
 
   def run
     loop do
-      p current_token
-
       case current_token.kind
       when :identifier # label
         @statements << consume_label
       when :space # instruction
-        # TODO: add to @statements
-        consume_instruction
+        @statements << consume_instruction
       when :newline # empty line
         advance
       when :dot # data directive
         advance
+        # TODO: implement
       when :eof
         break
       else
@@ -521,16 +521,13 @@ end
 
 class Parser
   def parse_raw_lines(raw_lines)
-    puts "lexing…"
-    tokens = Lexer3.new(raw_lines.join).tap { |l| l.run }.tokens
-    tokens.each { |t| p t }
-    puts "done lexing"
+    lexer = Lexer3.new(raw_lines.join)
+    lexer.run
 
-    puts "parsing…"
-    Parser2.new(tokens).run
-    puts "done parsing"
+    parser = Parser2.new(lexer.tokens)
+    parser.run
 
-    raw_lines.map { |rl| parse_raw_line(rl) }.compact
+    parser.statements
   end
 
   def parse_raw_line(raw_line)
