@@ -1,4 +1,5 @@
 require "sdl2"
+require "option_parser"
 
 require "./video"
 
@@ -65,48 +66,6 @@ class Context
     @mem = Mem.new
     @reg = Registers.new
   end
-
-  def inspect
-    # TODO: re-enable (#format)
-
-    # mem = String.build do |io|
-    #   stride = 10
-    #   i = 0
-    #   prev_key = nil
-    #   @mem.keys.sort.each do |key|
-    #     # Split
-    #     if prev_key && prev_key + 1 != key
-    #       io << "\n" << "----" << "\n"
-    #       i = 0
-    #     end
-    #     prev_key = key
-
-    #     io << format("%04x=%02x ", key, @mem[key])
-
-    #     io << "\n" if i % stride == stride - 1
-    #     i += 1
-    #   end
-    # end
-
-    # reg = String.build do |io|
-    #   io << "┌─────┬───────────┬────────────┐" << "\n"
-    #   io << "│ loc │ val (hex) │ val (dec)  │" << "\n"
-    #   io << "├─────┼───────────┼────────────┤" << "\n"
-    #   @reg.each do |loc, val|
-    #     io << "│ "
-    #     io << format("%3i", loc)
-    #     io << " │ "
-    #     io << format(" %8x", val)
-    #     io << " │ "
-    #     io << format("%10i", val)
-    #     io << " │" << "\n"
-    #   end
-    #   io << "└─────┴───────────┴────────────┘" << "\n"
-    # end
-
-    # mem + "\n" + reg
-    ""
-  end
 end
 
 class CPU
@@ -149,15 +108,6 @@ class CPU
 
   private def step
     opcode = read_byte
-
-    debug_count = ARGV.count { |a| a == "--debug" }
-    if debug_count >= 2
-      puts @context.inspect
-    end
-    if debug_count >= 1
-      # puts "*** #{format("0x%02x", opcode)} @ #{format("0x%08x", reg[PC])}"
-      puts "*** #{opcode} (0x#{opcode.to_s(16)}) @ #{reg[PC]-1}"
-    end
 
     case opcode
     when 0x01 # call
@@ -377,11 +327,28 @@ class CPU
   end
 end
 
+enble_video = false
+
+op = OptionParser.parse! do |opts|
+  opts.banner = "Usage: rcpu-emulate [options] filename"
+  opts.on("-V", "--video", "enable video") do
+    enble_video = true
+  end
+  opts.on("-h", "--help", "print this help menu") do
+    puts opts
+    exit 0
+  end
+end
+
+if ARGV.size != 1
+  puts op
+  exit 1
+end
+
 context = Context.new
 
 # Read instructions into memory
-# FIXME: use proper option parser
-filename = ARGV.reject { |a| a =~ /\A--/ }.first
+filename = ARGV.first
 bytes = [] of UInt8
 File.open(filename, "r") do |io|
   loop do
@@ -417,7 +384,7 @@ def get_input
   return :none
 end
 
-if ARGV.find { |a| a == "--video" }
+if enble_video
   cpu = CPU.new(context)
   video = Video.new(context.mem)
   video.draw do |g|
