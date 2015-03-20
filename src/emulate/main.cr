@@ -1,5 +1,7 @@
 require "sdl2"
 
+require "./video"
+
 class Registers
   def initialize
     @reg = {
@@ -402,8 +404,6 @@ end
     context.mem[index.to_u32] = 0_u8
   end
 end
-
-require "./video"
 
 # Run
 

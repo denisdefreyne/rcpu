@@ -1,5 +1,5 @@
 .PHONY: all
-all: assemble emulate
+all: rcpu-assemble rcpu-emulate
 
 .PHONY: deps
 deps: .deps
@@ -7,10 +7,10 @@ deps: .deps
 .deps: Projectfile
 	crystal deps
 
-assemble: src/assemble.cr deps
+rcpu-assemble: src/assemble/main.cr deps
 	crystal build $< -o $@
 
-emulate: src/emulate.cr deps
+rcpu-emulate: src/emulate/main.cr deps
 	crystal build $< -o $@
 
 .PHONY: clean
@@ -18,5 +18,5 @@ clean:
 	rm -rf .crystal
 	rm -rf .deps
 	rm -rf libs
-	rm assemble
-	rm emulate
+	rm rcpu-assemble
+	rm rcpu-emulate
