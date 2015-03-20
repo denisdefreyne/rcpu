@@ -57,17 +57,6 @@ class Mem
   end
 end
 
-class Context
-  getter reg
-  getter mem
-  setter mem
-
-  def initialize
-    @mem = Mem.new
-    @reg = Registers.new
-  end
-end
-
 class CPU
   # TODO: move these elsewhere
   PC    = 8_u8
@@ -76,9 +65,13 @@ class CPU
   BP    = 11_u8
 
   getter running
+  getter reg
+  getter mem
+  setter mem
 
-  def initialize(context)
-    @context = context
+  def initialize(mem)
+    @reg = Registers.new
+    @mem = mem
     @running = true
   end
 
@@ -96,14 +89,6 @@ class CPU
         break unless @running
       end
     end
-  end
-
-  private def mem
-    @context.mem
-  end
-
-  private def reg
-    @context.reg
   end
 
   private def step
@@ -345,8 +330,6 @@ if ARGV.size != 1
   exit 1
 end
 
-context = Context.new
-
 # Read instructions into memory
 filename = ARGV.first
 bytes = [] of UInt8
@@ -360,22 +343,23 @@ File.open(filename, "r") do |io|
     end
   end
 end
+mem = Mem.new
 bytes.each_with_index do |byte, index|
-  context.mem[index.to_u32] = byte
+  mem[index.to_u32] = byte
 end
 
 # Set video memory
 160.times do |x|
   120.times do |y|
     index = 0x10000 + (x * 120 + y)
-    context.mem[index.to_u32] = 0_u8
+    mem[index.to_u32] = 0_u8
   end
 end
 
 # Run
-cpu = CPU.new(context)
+cpu = CPU.new(mem)
 if enble_video
-  video = Video.new(context.mem)
+  video = Video.new(mem)
   video.run(cpu, 40)
 else
   cpu.run
