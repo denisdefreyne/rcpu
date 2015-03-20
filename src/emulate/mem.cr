@@ -4,7 +4,7 @@ class Mem
   end
 
   def [](address)
-    @wrapped[address]
+    fetch(address)
   end
 
   def fetch(address)
