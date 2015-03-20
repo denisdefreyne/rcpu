@@ -1,4 +1,9 @@
 class Reg
+  PC    = 8_u8
+  FLAGS = 9_u8
+  SP    = 10_u8
+  BP    = 11_u8
+
   def initialize
     @reg = {
       0_u8  => 0_u32,      # r0

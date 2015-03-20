@@ -1,10 +1,4 @@
 class CPU
-  # TODO: move these elsewhere
-  PC    = 8_u8
-  FLAGS = 9_u8
-  SP    = 10_u8
-  BP    = 11_u8
-
   getter running
   getter reg
   getter mem
@@ -37,85 +31,85 @@ class CPU
 
     case opcode
     when 0x01 # call
-      reg[SP] -= 4_u32
-      new_pc = reg[PC] + 4
-      mem[reg[SP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
-      mem[reg[SP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
-      mem[reg[SP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
-      mem[reg[SP] + 3] = ((new_pc & 0x000000ff)).to_u8
+      reg[Reg::SP] -= 4_u32
+      new_pc = reg[Reg::PC] + 4
+      mem[reg[Reg::SP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
+      mem[reg[Reg::SP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
+      mem[reg[Reg::SP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
+      mem[reg[Reg::SP] + 3] = ((new_pc & 0x000000ff)).to_u8
       i = read_u32
-      reg[PC] = i
+      reg[Reg::PC] = i
     when 0x02 # ret
       i = reconstruct_int(
-        mem.fetch(reg[SP] + 0),
-        mem.fetch(reg[SP] + 1),
-        mem.fetch(reg[SP] + 2),
-        mem.fetch(reg[SP] + 3)
+        mem.fetch(reg[Reg::SP] + 0),
+        mem.fetch(reg[Reg::SP] + 1),
+        mem.fetch(reg[Reg::SP] + 2),
+        mem.fetch(reg[Reg::SP] + 3)
       )
-      reg[SP] += 4
-      reg[PC] = i
+      reg[Reg::SP] += 4
+      reg[Reg::PC] = i
     when 0x03 # push
       a0 = read_byte
       raw = reg[a0]
-      reg[SP] -= 4
-      mem[reg[SP] + 0] = ((raw & 0xff000000) >> 24).to_u8
-      mem[reg[SP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
-      mem[reg[SP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
-      mem[reg[SP] + 3] = ((raw & 0x000000ff)).to_u8
+      reg[Reg::SP] -= 4
+      mem[reg[Reg::SP] + 0] = ((raw & 0xff000000) >> 24).to_u8
+      mem[reg[Reg::SP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
+      mem[reg[Reg::SP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
+      mem[reg[Reg::SP] + 3] = ((raw & 0x000000ff)).to_u8
     when 0x04 # pushi
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       a3 = read_byte
-      reg[SP] -= 4_u32
-      mem[reg[SP] + 0] = a0
-      mem[reg[SP] + 1] = a1
-      mem[reg[SP] + 2] = a2
-      mem[reg[SP] + 3] = a3
+      reg[Reg::SP] -= 4_u32
+      mem[reg[Reg::SP] + 0] = a0
+      mem[reg[Reg::SP] + 1] = a1
+      mem[reg[Reg::SP] + 2] = a2
+      mem[reg[Reg::SP] + 3] = a3
     when 0x05 # pop
       a0 = read_byte
       reg[a0] = reconstruct_int(
-        mem.fetch(reg[SP] + 0),
-        mem.fetch(reg[SP] + 1),
-        mem.fetch(reg[SP] + 2),
-        mem.fetch(reg[SP] + 3)
+        mem.fetch(reg[Reg::SP] + 0),
+        mem.fetch(reg[Reg::SP] + 1),
+        mem.fetch(reg[Reg::SP] + 2),
+        mem.fetch(reg[Reg::SP] + 3)
       )
-      reg[SP] += 4
+      reg[Reg::SP] += 4
     when 0x06 # jmpi
       i = read_u32
-      reg[PC] = i
+      reg[Reg::PC] = i
     when 0xa6 # jmp
       a0 = read_byte
-      reg[PC] = reg[a0]
+      reg[Reg::PC] = reg[a0]
     when 0x07 # je
       i = read_u32
-      if reg[FLAGS] & 0x01 == 0x01
-        reg[PC] = i
+      if reg[Reg::FLAGS] & 0x01 == 0x01
+        reg[Reg::PC] = i
       end
     when 0x08 # jne
       i = read_u32
-      if reg[FLAGS] & 0x01 == 0x00
-        reg[PC] = i
+      if reg[Reg::FLAGS] & 0x01 == 0x00
+        reg[Reg::PC] = i
       end
     when 0x09 # jg
       i = read_u32
-      if reg[FLAGS] & 0x02 == 0x02
-        reg[PC] = i
+      if reg[Reg::FLAGS] & 0x02 == 0x02
+        reg[Reg::PC] = i
       end
     when 0x0a # jge
       i = read_u32
-      if reg[FLAGS] & 0x03 != 0x00
-        reg[PC] = i
+      if reg[Reg::FLAGS] & 0x03 != 0x00
+        reg[Reg::PC] = i
       end
     when 0x0b # jl
       i = read_u32
-      if reg[FLAGS] & 0x03 == 0x00
-        reg[PC] = i
+      if reg[Reg::FLAGS] & 0x03 == 0x00
+        reg[Reg::PC] = i
       end
     when 0x0c # jle
       i = read_u32
-      if reg[FLAGS] & 0x02 == 0x00
-        reg[PC] = i
+      if reg[Reg::FLAGS] & 0x02 == 0x00
+        reg[Reg::PC] = i
       end
     when 0x0d # not
     when 0x0e # prn
@@ -124,13 +118,13 @@ class CPU
     when 0x11 # cmp
       a0 = read_byte
       a1 = read_byte
-      reg[FLAGS] =
+      reg[Reg::FLAGS] =
         (reg[a0] == reg[a1] ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > reg[a1]  ? 0x02_u32 : 0x00_u32)
     when 0x12 # cmpi
       a0 = read_byte
       i = read_u32
-      reg[FLAGS] =
+      reg[Reg::FLAGS] =
         (reg[a0] == i ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > i  ? 0x02_u32 : 0x00_u32)
     when 0x13 # mod
@@ -237,11 +231,11 @@ class CPU
   end
 
   def advance(amount)
-    reg[PC] += amount
+    reg[Reg::PC] += amount
   end
 
   def read_byte
-    mem[reg[PC]].tap { advance(1) }
+    mem[reg[Reg::PC]].tap { advance(1) }
   end
 
   def read_u32
