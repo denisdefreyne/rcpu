@@ -129,4 +129,29 @@ class Video
       draw_once(graphics)
     end
   end
+
+  def get_input
+    while LibSDL2.poll_event(out e) == 1
+      case e.type
+      when EventType::QUIT
+        return :quit
+      end
+    end
+    return :none
+  end
+
+  def run(cpu, num_cycles)
+    draw do |g|
+      loop do
+        case get_input
+        when :quit
+          break
+        end
+
+        cpu.run(num_cycles)
+        update(g)
+        break unless cpu.running
+      end
+    end
+  end
 end

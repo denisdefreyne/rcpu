@@ -373,32 +373,10 @@ end
 end
 
 # Run
-
-def get_input
-  while LibSDL2.poll_event(out e) == 1
-    case e.type
-    when EventType::QUIT
-      return :quit
-    end
-  end
-  return :none
-end
-
+cpu = CPU.new(context)
 if enble_video
-  cpu = CPU.new(context)
   video = Video.new(context.mem)
-  video.draw do |g|
-    loop do
-      case get_input
-      when :quit
-        break
-      end
-
-      cpu.run(40)
-      video.update(g)
-      break unless cpu.running
-    end
-  end
+  video.run(cpu, 40)
 else
-  CPU.new(context).run
+  cpu.run
 end
