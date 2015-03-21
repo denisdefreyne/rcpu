@@ -117,8 +117,4 @@ TODO: describe me
 == To do
 
 * Finish implementing all opcodes
-* mov instead of weird add
 * Tests
-* Update instruction set
-* Make non-immediate and immediate instructions more uniform
-* Rearrange opcodes
