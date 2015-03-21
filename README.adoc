@@ -112,7 +112,58 @@ Label arguments are identical to immediate arguments.
 
 === Assembly language syntax
 
-TODO: describe me
+A lines can be an instruction line, a label line, or a data directive line. Blank lines are ignored.
+
+Comments start with the `#` character and can appear anywhere on a line, including a blank line. For example:
+
+----
+# load coords
+li r2, 0                 # x (in px)
+li r3, 0                 # y (in px)
+----
+
+An instruction line starts with a tab character, followed by the instruction mnemonic, and arguments separated by commas. For example:
+
+----
+	li r3, 0                 # y (in px)
+	jei @print-string-done
+	addi rsp, rsp, 12
+----
+
+Register arguments are indicated with an `r` prefix (e.g. `rsp` or `r0`).
+
+Immediate values can be given in decimal (e.g. `123`), in hexadecimal (starting with `0x`, e.g. `0xfe`), or in binary (starting with `0b`, e.g. `0b10010000`).
+
+Label arguments start with the `@` character.
+
+A label line starts with an identifier, followed by a colon. For example:
+
+----
+print-string-loop:
+----
+
+A data directive line starts with a period, followed by the directive name, followed by optional arguments. For example:
+
+----
+.byte 0x73 # s
+.byte 0x6c # l
+.byte 0x65 # e
+.byte 0x65 # e
+.byte 0x70 # p
+
+.word @char-left-parenthesis  # (
+.word @char-right-parenthesis # )
+.word @char-question-mark     # * - TODO
+.word @char-question-mark     # + - TODO
+.word @char-comma             # ,
+.word @char-dash              # -
+.word @char-period            # .
+.word @char-slash             # /
+----
+
+The supported data directives are `.byte`, `.half` and `.word`; they insert a byte, a half word (two bytes) or a word (four bytes), respectively.
+
+See the examples in the _samples_ directory for inspiration.
 
 == To do
 
