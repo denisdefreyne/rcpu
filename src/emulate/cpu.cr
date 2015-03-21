@@ -156,44 +156,32 @@ class CPU
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when O_JEI
       i = read_u32
-      if reg[Reg::RFLAGS] & 0x01 == 0x01
-        reg[Reg::RPC] = i
-      end
+      reg[Reg::RPC] = i if reg[Reg::RFLAGS] & 0x01 == 0x01
     when O_JNE
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when O_JNEI
       i = read_u32
-      if reg[Reg::RFLAGS] & 0x01 == 0x00
-        reg[Reg::RPC] = i
-      end
+      reg[Reg::RPC] = i if reg[Reg::RFLAGS] & 0x01 == 0x00
     when O_JG
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when O_JGI
       i = read_u32
-      if reg[Reg::RFLAGS] & 0x02 == 0x02
-        reg[Reg::RPC] = i
-      end
+      reg[Reg::RPC] = i if reg[Reg::RFLAGS] & 0x02 == 0x02
     when O_JGE
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when O_JGEI
       i = read_u32
-      if reg[Reg::RFLAGS] & 0x03 != 0x00
-        reg[Reg::RPC] = i
-      end
+      reg[Reg::RPC] = i if reg[Reg::RFLAGS] & 0x03 != 0x00
     when O_JL
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when O_JLI
       i = read_u32
-      if reg[Reg::RFLAGS] & 0x03 == 0x00
-        reg[Reg::RPC] = i
-      end
+      reg[Reg::RPC] = i if reg[Reg::RFLAGS] & 0x03 == 0x00
     when O_JLE
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when O_JLEI
       i = read_u32
-      if reg[Reg::RFLAGS] & 0x02 == 0x00
-        reg[Reg::RPC] = i
-      end
+      reg[Reg::RPC] = i if reg[Reg::RFLAGS] & 0x02 == 0x00
     # --- ARITHMETIC ---
     when O_CMP
       a0 = read_byte
