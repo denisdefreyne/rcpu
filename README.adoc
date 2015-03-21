@@ -119,9 +119,9 @@ A lines can be an instruction line, a label line, or a data directive line. Blan
 Comments start with the `#` character and can appear anywhere on a line, including a blank line. For example:
 
 ----
-# load coords
-li r2, 0                 # x (in px)
-li r3, 0                 # y (in px)
+	# load coords
+	li r2, 0                 # x (in px)
+	li r3, 0                 # y (in px)
 ----
 
 An instruction line starts with a tab character, followed by the instruction mnemonic, and arguments separated by commas. For example:
