@@ -4,6 +4,60 @@ class CPU
   getter mem
   setter mem
 
+  O_CALL  = 0x01_u8
+  O_CALLI = 0x02_u8
+  O_RET   = 0x03_u8
+  O_PUSH  = 0x04_u8
+  O_PUSHI = 0x05_u8
+  O_POP   = 0x06_u8
+  O_J     = 0x07_u8
+  O_JI    = 0x08_u8
+  O_JE    = 0x09_u8
+  O_JEI   = 0x0a_u8
+  O_JNE   = 0x0b_u8
+  O_JNEI  = 0x0c_u8
+  O_JG    = 0x0d_u8
+  O_JGI   = 0x0e_u8
+  O_JGE   = 0x0f_u8
+  O_JGEI  = 0x10_u8
+  O_JL    = 0x11_u8
+  O_JLI   = 0x12_u8
+  O_JLE   = 0x13_u8
+  O_JLEI  = 0x14_u8
+  O_CMP   = 0x15_u8
+  O_CMPI  = 0x16_u8
+  O_MOD   = 0x17_u8
+  O_MODI  = 0x18_u8
+  O_ADD   = 0x19_u8
+  O_ADDI  = 0x1a_u8
+  O_SUB   = 0x1b_u8
+  O_SUBI  = 0x1c_u8
+  O_MUL   = 0x1d_u8
+  O_MULI  = 0x1e_u8
+  O_DIV   = 0x1f_u8
+  O_DIVI  = 0x20_u8
+  O_XOR   = 0x21_u8
+  O_XORI  = 0x22_u8
+  O_OR    = 0x23_u8
+  O_ORI   = 0x24_u8
+  O_AND   = 0x25_u8
+  O_ANDI  = 0x26_u8
+  O_SHL   = 0x27_u8
+  O_SHLI  = 0x28_u8
+  O_SHR   = 0x29_u8
+  O_SHRI  = 0x2a_u8
+  O_NOT   = 0x2b_u8
+  O_MOV   = 0x2c_u8
+  O_LI    = 0x2d_u8
+  O_LW    = 0x2e_u8
+  O_LH    = 0x2f_u8
+  O_LB    = 0x30_u8
+  O_SW    = 0x31_u8
+  O_SH    = 0x32_u8
+  O_SB    = 0x33_u8
+  O_PRN   = 0xfe_u8
+  O_HALT  = 0xff_u8
+
   class OpcodeNotSupportedException < Exception
   end
 
@@ -37,9 +91,9 @@ class CPU
 
     case opcode
     # --- FUNCTION HANDLING ---
-    when 0x01 # call
+    when O_CALL
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x02 # calli
+    when O_CALLI
       reg[Reg::RSP] -= 4_u32
       new_pc = reg[Reg::RPC] + 4
       mem[reg[Reg::RSP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
@@ -48,7 +102,7 @@ class CPU
       mem[reg[Reg::RSP] + 3] = ((new_pc & 0x000000ff)).to_u8
       i = read_u32
       reg[Reg::RPC] = i
-    when 0x03 # ret
+    when O_RET
       i = reconstruct_int(
         mem.fetch(reg[Reg::RSP] + 0),
         mem.fetch(reg[Reg::RSP] + 1),
@@ -58,7 +112,7 @@ class CPU
       reg[Reg::RSP] += 4
       reg[Reg::RPC] = i
     # --- STACK MANAGEMENT ---
-    when 0x04 # push
+    when O_PUSH
       a0 = read_byte
       raw = reg[a0]
       reg[Reg::RSP] -= 4
@@ -66,7 +120,7 @@ class CPU
       mem[reg[Reg::RSP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
       mem[reg[Reg::RSP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
       mem[reg[Reg::RSP] + 3] = ((raw & 0x000000ff)).to_u8
-    when 0x05 # pushi
+    when O_PUSHI
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
@@ -76,7 +130,7 @@ class CPU
       mem[reg[Reg::RSP] + 1] = a1
       mem[reg[Reg::RSP] + 2] = a2
       mem[reg[Reg::RSP] + 3] = a3
-    when 0x06 # pop
+    when O_POP
       a0 = read_byte
       reg[a0] = reconstruct_int(
         mem.fetch(reg[Reg::RSP] + 0),
@@ -86,141 +140,141 @@ class CPU
       )
       reg[Reg::RSP] += 4
     # --- BRANCHING ---
-    when 0x07 # j
+    when O_J
       a0 = read_byte
       reg[Reg::RPC] = reg[a0]
-    when 0x08 # ji
+    when O_JI
       i = read_u32
       reg[Reg::RPC] = i
-    when 0x09 # je
+    when O_JE
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x0a # jei
+    when O_JEI
       i = read_u32
       if reg[Reg::RFLAGS] & 0x01 == 0x01
         reg[Reg::RPC] = i
       end
-    when 0x0b # jne
+    when O_JNE
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x0c # jnei
+    when O_JNEI
       i = read_u32
       if reg[Reg::RFLAGS] & 0x01 == 0x00
         reg[Reg::RPC] = i
       end
-    when 0x0d # jg
+    when O_JG
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x0e # jgi
+    when O_JGI
       i = read_u32
       if reg[Reg::RFLAGS] & 0x02 == 0x02
         reg[Reg::RPC] = i
       end
-    when 0x0f # jge
+    when O_JGE
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x10 # jgei
+    when O_JGEI
       i = read_u32
       if reg[Reg::RFLAGS] & 0x03 != 0x00
         reg[Reg::RPC] = i
       end
-    when 0x11 # jl
+    when O_JL
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x12 # jli
+    when O_JLI
       i = read_u32
       if reg[Reg::RFLAGS] & 0x03 == 0x00
         reg[Reg::RPC] = i
       end
-    when 0x13 # jle
+    when O_JLE
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x14 # jlei
+    when O_JLEI
       i = read_u32
       if reg[Reg::RFLAGS] & 0x02 == 0x00
         reg[Reg::RPC] = i
       end
     # --- ARITHMETIC ---
-    when 0x15 # cmp
+    when O_CMP
       a0 = read_byte
       a1 = read_byte
       reg[Reg::RFLAGS] =
         (reg[a0] == reg[a1] ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > reg[a1]  ? 0x02_u32 : 0x00_u32)
-    when 0x16 # cmpi
+    when O_CMPI
       a0 = read_byte
       i = read_u32
       reg[Reg::RFLAGS] =
         (reg[a0] == i ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > i  ? 0x02_u32 : 0x00_u32)
-    when 0x17 # mod
+    when O_MOD
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       reg[a0] = reg[a1] % reg[a2]
-    when 0x18 # modi
+    when O_MODI
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = reg[a1] % i
-    when 0x19 # add
+    when O_ADD
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       reg[a0] = (reg[a1] + reg[a2])
-    when 0x1a # addi
+    when O_ADDI
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] + i)
-    when 0x1b # sub
+    when O_SUB
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x1c # subi
+    when O_SUBI
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] - i)
-    when 0x1d # mul
+    when O_MUL
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x1e # muli
+    when O_MULI
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] * i)
-    when 0x1f # div
+    when O_DIV
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x20 # divi
+    when O_DIVI
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x21 # xor
+    when O_XOR
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x22 # xori
+    when O_XORI
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x23 # or
+    when O_OR
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x24 # ori
+    when O_ORI
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x25 # and
+    when O_AND
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x26 # andi
+    when O_ANDI
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x27 # shl
+    when O_SHL
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x28 # shli
+    when O_SHLI
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x29 # shr
+    when O_SHR
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x2a # shri
+    when O_SHRI
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] >> i)
-    when 0x2b # not
+    when O_NOT
       raise OpcodeNotSupportedException.new(opcode.inspect)
     # --- REGISTER HANDLING ---
-    when 0x2c # mov
+    when O_MOV
       a0 = read_byte
       a1 = read_byte
       reg[a0] = reg[a1]
-    when 0x2d # li
+    when O_LI
       a0 = read_byte
       a1 = read_u32
       reg[a0] = a1
     # --- MEMORY HANDLING ---
-    when 0x2e # lw
+    when O_LW
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
@@ -229,33 +283,33 @@ class CPU
         (mem[address + 1].to_u32 << 16) |
         (mem[address + 2].to_u32 << 8)  |
         (mem[address + 3].to_u32 << 0)
-    when 0x2f # lh
+    when O_LH
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
       reg[a0] =
         (mem[address + 0].to_u32 << 8)  |
         (mem[address + 1].to_u32 << 0)
-    when 0x30 # lb
+    when O_LB
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
       reg[a0] =
         (mem[address + 0].to_u32 << 0)
-    when 0x31 # sw
+    when O_SW
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x32 # sh
+    when O_SH
       raise OpcodeNotSupportedException.new(opcode.inspect)
-    when 0x33 # sb
+    when O_SB
       a0 = read_byte
       a1 = read_byte
       raw = reg[a1]
       mem[reg[a0] + 0] = ((raw & 0x000000ff)).to_u8
     # --- SPECIAL ---
-    when 0xfe # prn
+    when O_PRN
       a0 = read_byte
       puts "#{reg[a0]}"
-    when 0xff # halt
+    when O_HALT
       @running = false
       advance(-1)
     else

@@ -8,7 +8,7 @@ describe CPU do
   describe "j" do
     it "jumps to the right address" do
       mem = Mem.new
-      mem[0_u32] = 0x07_u8
+      mem[0_u32] = CPU::O_J
       mem[1_u32] = Reg::R6
 
       cpu = CPU.new(mem)
@@ -22,7 +22,7 @@ describe CPU do
   describe "ji" do
     it "jumps to the right address" do
       mem = Mem.new
-      mem[0_u32] = 0x08_u8
+      mem[0_u32] = CPU::O_JI
       mem[1_u32] = 1_u8
       mem[2_u32] = 2_u8
       mem[3_u32] = 3_u8
@@ -38,7 +38,7 @@ describe CPU do
   describe "mov" do
     it "copies the register" do
       mem = Mem.new
-      mem[0_u32] = 0x2c_u8
+      mem[0_u32] = CPU::O_MOV
       mem[1_u32] = Reg::R1
       mem[2_u32] = Reg::R2
 
