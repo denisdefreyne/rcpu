@@ -40,111 +40,111 @@ class CPU
     when 0x01 # call
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x02 # calli
-      reg[Reg::SP] -= 4_u32
-      new_pc = reg[Reg::PC] + 4
-      mem[reg[Reg::SP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
-      mem[reg[Reg::SP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
-      mem[reg[Reg::SP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
-      mem[reg[Reg::SP] + 3] = ((new_pc & 0x000000ff)).to_u8
+      reg[Reg::RSP] -= 4_u32
+      new_pc = reg[Reg::RPC] + 4
+      mem[reg[Reg::RSP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
+      mem[reg[Reg::RSP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
+      mem[reg[Reg::RSP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
+      mem[reg[Reg::RSP] + 3] = ((new_pc & 0x000000ff)).to_u8
       i = read_u32
-      reg[Reg::PC] = i
+      reg[Reg::RPC] = i
     when 0x03 # ret
       i = reconstruct_int(
-        mem.fetch(reg[Reg::SP] + 0),
-        mem.fetch(reg[Reg::SP] + 1),
-        mem.fetch(reg[Reg::SP] + 2),
-        mem.fetch(reg[Reg::SP] + 3)
+        mem.fetch(reg[Reg::RSP] + 0),
+        mem.fetch(reg[Reg::RSP] + 1),
+        mem.fetch(reg[Reg::RSP] + 2),
+        mem.fetch(reg[Reg::RSP] + 3)
       )
-      reg[Reg::SP] += 4
-      reg[Reg::PC] = i
+      reg[Reg::RSP] += 4
+      reg[Reg::RPC] = i
     # --- STACK MANAGEMENT ---
     when 0x04 # push
       a0 = read_byte
       raw = reg[a0]
-      reg[Reg::SP] -= 4
-      mem[reg[Reg::SP] + 0] = ((raw & 0xff000000) >> 24).to_u8
-      mem[reg[Reg::SP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
-      mem[reg[Reg::SP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
-      mem[reg[Reg::SP] + 3] = ((raw & 0x000000ff)).to_u8
+      reg[Reg::RSP] -= 4
+      mem[reg[Reg::RSP] + 0] = ((raw & 0xff000000) >> 24).to_u8
+      mem[reg[Reg::RSP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
+      mem[reg[Reg::RSP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
+      mem[reg[Reg::RSP] + 3] = ((raw & 0x000000ff)).to_u8
     when 0x05 # pushi
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       a3 = read_byte
-      reg[Reg::SP] -= 4_u32
-      mem[reg[Reg::SP] + 0] = a0
-      mem[reg[Reg::SP] + 1] = a1
-      mem[reg[Reg::SP] + 2] = a2
-      mem[reg[Reg::SP] + 3] = a3
+      reg[Reg::RSP] -= 4_u32
+      mem[reg[Reg::RSP] + 0] = a0
+      mem[reg[Reg::RSP] + 1] = a1
+      mem[reg[Reg::RSP] + 2] = a2
+      mem[reg[Reg::RSP] + 3] = a3
     when 0x06 # pop
       a0 = read_byte
       reg[a0] = reconstruct_int(
-        mem.fetch(reg[Reg::SP] + 0),
-        mem.fetch(reg[Reg::SP] + 1),
-        mem.fetch(reg[Reg::SP] + 2),
-        mem.fetch(reg[Reg::SP] + 3)
+        mem.fetch(reg[Reg::RSP] + 0),
+        mem.fetch(reg[Reg::RSP] + 1),
+        mem.fetch(reg[Reg::RSP] + 2),
+        mem.fetch(reg[Reg::RSP] + 3)
       )
-      reg[Reg::SP] += 4
+      reg[Reg::RSP] += 4
     # --- BRANCHING ---
     when 0x07 # j
       a0 = read_byte
-      reg[Reg::PC] = reg[a0]
+      reg[Reg::RPC] = reg[a0]
     when 0x08 # ji
       i = read_u32
-      reg[Reg::PC] = i
+      reg[Reg::RPC] = i
     when 0x09 # je
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x0a # jei
       i = read_u32
-      if reg[Reg::FLAGS] & 0x01 == 0x01
-        reg[Reg::PC] = i
+      if reg[Reg::RFLAGS] & 0x01 == 0x01
+        reg[Reg::RPC] = i
       end
     when 0x0b # jne
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x0c # jnei
       i = read_u32
-      if reg[Reg::FLAGS] & 0x01 == 0x00
-        reg[Reg::PC] = i
+      if reg[Reg::RFLAGS] & 0x01 == 0x00
+        reg[Reg::RPC] = i
       end
     when 0x0d # jg
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x0e # jgi
       i = read_u32
-      if reg[Reg::FLAGS] & 0x02 == 0x02
-        reg[Reg::PC] = i
+      if reg[Reg::RFLAGS] & 0x02 == 0x02
+        reg[Reg::RPC] = i
       end
     when 0x0f # jge
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x10 # jgei
       i = read_u32
-      if reg[Reg::FLAGS] & 0x03 != 0x00
-        reg[Reg::PC] = i
+      if reg[Reg::RFLAGS] & 0x03 != 0x00
+        reg[Reg::RPC] = i
       end
     when 0x11 # jl
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x12 # jli
       i = read_u32
-      if reg[Reg::FLAGS] & 0x03 == 0x00
-        reg[Reg::PC] = i
+      if reg[Reg::RFLAGS] & 0x03 == 0x00
+        reg[Reg::RPC] = i
       end
     when 0x13 # jle
       raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x14 # jlei
       i = read_u32
-      if reg[Reg::FLAGS] & 0x02 == 0x00
-        reg[Reg::PC] = i
+      if reg[Reg::RFLAGS] & 0x02 == 0x00
+        reg[Reg::RPC] = i
       end
     # --- ARITHMETIC ---
     when 0x15 # cmp
       a0 = read_byte
       a1 = read_byte
-      reg[Reg::FLAGS] =
+      reg[Reg::RFLAGS] =
         (reg[a0] == reg[a1] ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > reg[a1]  ? 0x02_u32 : 0x00_u32)
     when 0x16 # cmpi
       a0 = read_byte
       i = read_u32
-      reg[Reg::FLAGS] =
+      reg[Reg::RFLAGS] =
         (reg[a0] == i ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > i  ? 0x02_u32 : 0x00_u32)
     when 0x17 # mod
@@ -262,11 +262,11 @@ class CPU
   end
 
   def advance(amount)
-    reg[Reg::PC] += amount
+    reg[Reg::RPC] += amount
   end
 
   def read_byte
-    mem[reg[Reg::PC]].tap { advance(1) }
+    mem[reg[Reg::RPC]].tap { advance(1) }
   end
 
   def read_u32

@@ -15,7 +15,7 @@ describe CPU do
       cpu.reg[6_u8] = 0x01020304_u32
 
       cpu.step
-      cpu.reg[Reg::PC].should eq(0x01020304)
+      cpu.reg[Reg::RPC].should eq(0x01020304)
     end
   end
 
@@ -31,7 +31,7 @@ describe CPU do
       cpu = CPU.new(mem)
 
       cpu.step
-      cpu.reg[Reg::PC].should eq(0x01020304)
+      cpu.reg[Reg::RPC].should eq(0x01020304)
     end
   end
 end
