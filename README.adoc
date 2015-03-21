@@ -171,3 +171,5 @@ See the examples in the _samples_ directory for inspiration.
 
 * Finish implementing all opcodes
 * Tests
+* Line/column numbers in parser error messages
+* RCPU prefix in binaries
