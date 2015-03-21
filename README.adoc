@@ -15,11 +15,11 @@ You will need link:http://crystal-lang.org/[Crystal] to build RCPU. Once you hav
 
 To assemble a file, use _rcpu-assemble_, passing the input filename (with the _rcs_ extension). This will generate a corresponding _rcb_ file. For example:
 
-	% ./rcpu-assemble samples/counter.rcs
+	% ./rcpu-assemble samples/fib.rcs
 
 To run a file, use _rcpu-emulate_, passing the input filename (with the _rcb_ extension). For example:
 
-	% ./rcpu-emulate samples/counter.rcb
+	% ./rcpu-emulate samples/fib.rcb
 
 The _rcs_ extension is used for **RC**PU **s**ource files, while _rcb_ is for **RC**PU **b**inary (i.e. compiled) files.
 
