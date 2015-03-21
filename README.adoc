@@ -1,11 +1,13 @@
+= RCPU
 :experimental: true
 :toc:
-
-= RCPU
+:toc-placement!:
 
 _RCPU_ is a virtual machine emulator and assembler written in Crystal.
 
 CAUTION: This project is very much a work in progress.
+
+toc::[]
 
 == Building
 
