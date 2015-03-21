@@ -26,7 +26,7 @@ class CPU
     end
   end
 
-  private def step
+  def step
     opcode = read_byte
 
     case opcode
