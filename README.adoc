@@ -70,12 +70,12 @@ The first byte is the opcode. Register arguments are one byte long, and label/im
 | `pop`     | 0x06       | reg               | pop into a0
 4+h|Branching
 | `j(i)`    | 0x07, 0x08 | reg/imm           | pc ← a0
-| `je(i)`   | 0x09, 0x0a | reg/imm           | if == then pc ← a0
-| `jne(i)`  | 0x0b, 0x0c | reg/imm           | if != then pc ← a0
-| `jg(i)`   | 0x0d, 0x0e | reg/imm           | if >  then pc ← a0
-| `jge(i)`  | 0x0f, 0x10 | reg/imm           | if >= then pc ← a0
-| `jl(i)`   | 0x11, 0x12 | reg/imm           | if <  then pc ← a0
-| `jle(i)`  | 0x13, 0x14 | reg/imm           | if <= then pc ← a0
+| `je(i)`   | 0x09, 0x0a | reg/imm           | if = then pc ← a0
+| `jne(i)`  | 0x0b, 0x0c | reg/imm           | if ≠ then pc ← a0
+| `jg(i)`   | 0x0d, 0x0e | reg/imm           | if > then pc ← a0
+| `jge(i)`  | 0x0f, 0x10 | reg/imm           | if ≥ then pc ← a0
+| `jl(i)`   | 0x11, 0x12 | reg/imm           | if < then pc ← a0
+| `jle(i)`  | 0x13, 0x14 | reg/imm           | if ≤ then pc ← a0
 4+h|Arithmetic
 | `cmp(i)`  | 0x15, 0x16 | reg, reg/imm      | (see below)
 | `mod(i)`  | 0x17, 0x18 | reg, reg, reg/imm | a0 ← a1 % a2
@@ -101,7 +101,7 @@ The first byte is the opcode. Register arguments are one byte long, and label/im
 | `sb`      | 0x33       | reg, imm          | (see below)
 4+h|Special
 | `prn`     | 0xfe       | reg               | print a0
-| `halt`    | 0xff       | (none)             | stops emulation
+| `halt`    | 0xff       | (none)            | stops emulation
 |===
 
 `cmp(i)` updates the `flags` register and sets the 0x01 bit to true if the arguments are equal, and the 0x02 bit to true if the first argument is greater than the second.
