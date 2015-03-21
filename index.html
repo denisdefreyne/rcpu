@@ -625,13 +625,13 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>call(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x01, 0x02</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ret</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x03</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(none)</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -640,13 +640,13 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>push(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x04, 0x05</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">push a0 onto stack</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>pop</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x06</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">pop into a0</p></td>
 </tr>
 <tr>
@@ -655,43 +655,43 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>j(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x07, 0x08</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">pc ← a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>je(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x09, 0x0a</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">if == then pc ← a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>jne(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x0b, 0x0c</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">if != then pc ← a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>jg(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x0d, 0x0e</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">if &gt;  then pc ← a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>jge(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x0f, 0x10</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">if &gt;= then pc ← a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>jl(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x11, 0x12</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">if &lt;  then pc ← a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>jle(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x13, 0x14</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">if &#8656; then pc ← a0</p></td>
 </tr>
 <tr>
@@ -700,73 +700,73 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cmp(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x15, 0x16</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>mod(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x17, 0x18</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 % a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>add(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x19, 0x1a</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 + a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sub(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x1b, 0x1c</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 - a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>mul(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x1d, 0x1e</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 * a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>div(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x1f, 0x20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 / a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>xor(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x21, 0x22</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 ^ a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>or(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x23, 0x24</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 | a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>and(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x25, 0x26</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 &amp; a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>shl(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x27, 0x28</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 &lt;&lt; a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>shr(i)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x29, 0x2a</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg, reg/imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg, reg/imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1 &gt;&gt; a2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>not</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x2b</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← ~a1</p></td>
 </tr>
 <tr>
@@ -775,13 +775,13 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>mov</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x2c</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, reg)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, reg</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>li</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x2d</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0 ← a1</p></td>
 </tr>
 <tr>
@@ -790,37 +790,37 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lw</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x2e</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lh</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x2f</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lb</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x30</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sw</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x31</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sh</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x32</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sb</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0x33</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2 (reg, imm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg, imm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(see below)</p></td>
 </tr>
 <tr>
@@ -829,13 +829,13 @@ This project is very much a work in progress.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>prn</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0xfe</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 (reg)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reg</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">print a0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>halt</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0xff</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(none)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">stops emulation</p></td>
 </tr>
 </tbody>
@@ -949,7 +949,7 @@ li r3, 0                 # y (in px)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-21 15:18:07 CET
+Last updated 2015-03-21 18:59:22 CET
 </div>
 </div>
 </body>
