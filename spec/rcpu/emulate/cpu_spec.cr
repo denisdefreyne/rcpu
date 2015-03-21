@@ -157,6 +157,154 @@ describe CPU do
     end
   end
 
+  describe "je" do
+  end
+
+  describe "jei" do
+  end
+
+  describe "jne" do
+  end
+
+  describe "jnei" do
+  end
+
+  describe "jg" do
+  end
+
+  describe "jgi" do
+  end
+
+  describe "jge" do
+  end
+
+  describe "jgei" do
+  end
+
+  describe "jl" do
+  end
+
+  describe "jli" do
+  end
+
+  describe "jle" do
+  end
+
+  describe "jlei" do
+  end
+
+  describe "cmp" do
+    it "sets the right flags when equal" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CMP
+      mem[1_u32] = Reg::R1
+      mem[2_u32] = Reg::R2
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R1] = 0x05_u32
+      cpu.reg[Reg::R2] = 0x05_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x03)
+      cpu.reg[Reg::RFLAGS].should eq(0x01)
+    end
+
+    it "sets the right flags when greater than" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CMP
+      mem[1_u32] = Reg::R1
+      mem[2_u32] = Reg::R2
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R1] = 0x07_u32
+      cpu.reg[Reg::R2] = 0x05_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x03)
+      cpu.reg[Reg::RFLAGS].should eq(0x02)
+    end
+
+    it "sets the right flags when less than" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CMP
+      mem[1_u32] = Reg::R1
+      mem[2_u32] = Reg::R2
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R1] = 0x03_u32
+      cpu.reg[Reg::R2] = 0x05_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x03)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+    end
+  end
+
+  describe "cmpi" do
+    it "sets the right flags when equal" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CMPI
+      mem[1_u32] = Reg::R2
+      mem[2_u32] = 0_u8
+      mem[3_u32] = 0_u8
+      mem[4_u32] = 0_u8
+      mem[5_u32] = 5_u8
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R2] = 0x05_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x06)
+      cpu.reg[Reg::RFLAGS].should eq(0x01)
+    end
+
+    it "sets the right flags when greater than" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CMPI
+      mem[1_u32] = Reg::R2
+      mem[2_u32] = 0_u8
+      mem[3_u32] = 0_u8
+      mem[4_u32] = 0_u8
+      mem[5_u32] = 5_u8
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R2] = 0x07_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x06)
+      cpu.reg[Reg::RFLAGS].should eq(0x02)
+    end
+
+    it "sets the right flags when less than" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CMPI
+      mem[1_u32] = Reg::R2
+      mem[2_u32] = 0_u8
+      mem[3_u32] = 0_u8
+      mem[4_u32] = 0_u8
+      mem[5_u32] = 5_u8
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R2] = 0x03_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x06)
+      cpu.reg[Reg::RFLAGS].should eq(0x00)
+    end
+  end
+
   describe "mov" do
     it "copies the register" do
       mem = Mem.new
