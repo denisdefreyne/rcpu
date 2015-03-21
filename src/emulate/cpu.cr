@@ -92,7 +92,14 @@ class CPU
     case opcode
     # --- FUNCTION HANDLING ---
     when O_CALL
-      raise OpcodeNotSupportedException.new(opcode.inspect)
+      reg[Reg::RSP] -= 4_u32
+      new_pc = reg[Reg::RPC] + 1
+      mem[reg[Reg::RSP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
+      mem[reg[Reg::RSP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
+      mem[reg[Reg::RSP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
+      mem[reg[Reg::RSP] + 3] = ((new_pc & 0x000000ff)).to_u8
+      a0 = read_byte
+      reg[Reg::RPC] = reg[a0]
     when O_CALLI
       reg[Reg::RSP] -= 4_u32
       new_pc = reg[Reg::RPC] + 4

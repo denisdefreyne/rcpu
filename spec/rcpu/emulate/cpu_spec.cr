@@ -5,6 +5,23 @@ require "../src/emulate/mem"
 require "../src/emulate/reg"
 
 describe CPU do
+  describe "call" do
+    it "pushes the return address and jumps" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_CALL
+      mem[1_u32] = Reg::R3
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R3] = 0x10204080_u32
+
+      cpu.reg[Reg::RPC].should eq(0x0)
+      cpu.reg[Reg::RSP].should eq(0xffff)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x10204080)
+      cpu.reg[Reg::RSP].should eq(0xfffb)
+    end
+  end
+
   describe "calli" do
     it "pushes the return address and jumps" do
       mem = Mem.new
