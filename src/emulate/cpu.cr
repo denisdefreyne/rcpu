@@ -114,6 +114,12 @@ class CPU
     end
   end
 
+  def cmp(a, b)
+    reg[Reg::RFLAGS] =
+      (a == b ? 0x01_u32 : 0x00_u32) |
+      (a > b  ? 0x02_u32 : 0x00_u32)
+  end
+
   def step
     opcode = read_byte
 
@@ -186,15 +192,11 @@ class CPU
     when O_CMP
       a0 = read_byte
       a1 = read_byte
-      reg[Reg::RFLAGS] =
-        (reg[a0] == reg[a1] ? 0x01_u32 : 0x00_u32) |
-        (reg[a0] > reg[a1]  ? 0x02_u32 : 0x00_u32)
+      cmp(reg[a0], reg[a1])
     when O_CMPI
       a0 = read_byte
       i = read_u32
-      reg[Reg::RFLAGS] =
-        (reg[a0] == i ? 0x01_u32 : 0x00_u32) |
-        (reg[a0] > i  ? 0x02_u32 : 0x00_u32)
+      cmp(reg[a0], i)
     when O_MOD
       a0 = read_byte
       a1 = read_byte
