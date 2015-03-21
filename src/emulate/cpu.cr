@@ -30,7 +30,10 @@ class CPU
     opcode = read_byte
 
     case opcode
+    # --- FUNCTION HANDLING ---
     when 0x01 # call
+      # TODO: implement
+    when 0x02 # calli
       reg[Reg::SP] -= 4_u32
       new_pc = reg[Reg::PC] + 4
       mem[reg[Reg::SP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
@@ -39,7 +42,7 @@ class CPU
       mem[reg[Reg::SP] + 3] = ((new_pc & 0x000000ff)).to_u8
       i = read_u32
       reg[Reg::PC] = i
-    when 0x02 # ret
+    when 0x03 # ret
       i = reconstruct_int(
         mem.fetch(reg[Reg::SP] + 0),
         mem.fetch(reg[Reg::SP] + 1),
@@ -48,7 +51,8 @@ class CPU
       )
       reg[Reg::SP] += 4
       reg[Reg::PC] = i
-    when 0x03 # push
+    # --- STACK MANAGEMENT ---
+    when 0x04 # push
       a0 = read_byte
       raw = reg[a0]
       reg[Reg::SP] -= 4
@@ -56,7 +60,7 @@ class CPU
       mem[reg[Reg::SP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
       mem[reg[Reg::SP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
       mem[reg[Reg::SP] + 3] = ((raw & 0x000000ff)).to_u8
-    when 0x04 # pushi
+    when 0x05 # pushi
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
@@ -66,7 +70,7 @@ class CPU
       mem[reg[Reg::SP] + 1] = a1
       mem[reg[Reg::SP] + 2] = a2
       mem[reg[Reg::SP] + 3] = a3
-    when 0x05 # pop
+    when 0x06 # pop
       a0 = read_byte
       reg[a0] = reconstruct_int(
         mem.fetch(reg[Reg::SP] + 0),
@@ -75,111 +79,127 @@ class CPU
         mem.fetch(reg[Reg::SP] + 3)
       )
       reg[Reg::SP] += 4
-    when 0x06 # jmpi
-      i = read_u32
-      reg[Reg::PC] = i
-    when 0xa6 # jmp
+    # --- BRANCHING ---
+    when 0x07 # j
       a0 = read_byte
       reg[Reg::PC] = reg[a0]
-    when 0x07 # je
+    when 0x08 # ji
+      i = read_u32
+      reg[Reg::PC] = i
+    when 0x09 # je
+      # TODO: implement
+    when 0x0a # jei
       i = read_u32
       if reg[Reg::FLAGS] & 0x01 == 0x01
         reg[Reg::PC] = i
       end
-    when 0x08 # jne
+    when 0x0b # jne
+      # TODO: implement
+    when 0x0c # jnei
       i = read_u32
       if reg[Reg::FLAGS] & 0x01 == 0x00
         reg[Reg::PC] = i
       end
-    when 0x09 # jg
+    when 0x0d # jg
+      # TODO: implement
+    when 0x0e # jgi
       i = read_u32
       if reg[Reg::FLAGS] & 0x02 == 0x02
         reg[Reg::PC] = i
       end
-    when 0x0a # jge
+    when 0x0f # jge
+      # TODO: implement
+    when 0x10 # jgei
       i = read_u32
       if reg[Reg::FLAGS] & 0x03 != 0x00
         reg[Reg::PC] = i
       end
-    when 0x0b # jl
+    when 0x11 # jl
+      # TODO: implement
+    when 0x12 # jli
       i = read_u32
       if reg[Reg::FLAGS] & 0x03 == 0x00
         reg[Reg::PC] = i
       end
-    when 0x0c # jle
+    when 0x13 # jle
+      # TODO: implement
+    when 0x14 # jlei
       i = read_u32
       if reg[Reg::FLAGS] & 0x02 == 0x00
         reg[Reg::PC] = i
       end
-    when 0x0d # not
-    when 0x0e # prn
-      a0 = read_byte
-      puts "#{reg[a0]}"
-    when 0x11 # cmp
+    # --- ARITHMETIC ---
+    when 0x15 # cmp
       a0 = read_byte
       a1 = read_byte
       reg[Reg::FLAGS] =
         (reg[a0] == reg[a1] ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > reg[a1]  ? 0x02_u32 : 0x00_u32)
-    when 0x12 # cmpi
+    when 0x16 # cmpi
       a0 = read_byte
       i = read_u32
       reg[Reg::FLAGS] =
         (reg[a0] == i ? 0x01_u32 : 0x00_u32) |
         (reg[a0] > i  ? 0x02_u32 : 0x00_u32)
-    when 0x13 # mod
+    when 0x17 # mod
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       reg[a0] = reg[a1] % reg[a2]
-    when 0x14 # modi
+    when 0x18 # modi
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = reg[a1] % i
-    when 0x15 # add
+    when 0x19 # add
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       reg[a0] = (reg[a1] + reg[a2])
-    when 0x16 # addi
+    when 0x1a # addi
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] + i)
-    when 0x17 # sub
-    when 0x18 # subi
+    when 0x1b # sub
+    when 0x1c # subi
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] - i)
-    when 0x19 # mul
-    when 0x1a # muli
+    when 0x1d # mul
+    when 0x1e # muli
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] * i)
-    when 0x1b # div
-    when 0x1c # divi
-    when 0x1d # xor
-    when 0x1e # xori
-    when 0x1f # or
-    when 0x20 # ori
-    when 0x21 # and
-    when 0x22 # andi
-    when 0x23 # shl
-    when 0x24 # shli
-    when 0x25 # shr
-    when 0x26 # shri
+    when 0x1f # div
+    when 0x20 # divi
+    when 0x21 # xor
+    when 0x22 # xori
+    when 0x23 # or
+    when 0x24 # ori
+    when 0x25 # and
+    when 0x26 # andi
+    when 0x27 # shl
+    when 0x28 # shli
+    when 0x29 # shr
+    when 0x2a # shri
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] >> i)
-    when 0x27 # li
+    when 0x2b # not
+      # TODO: iplement
+    # --- REGISTER HANDLING ---
+    when 0x2c # mov
+      # TODO: implement
+    when 0x2d # li
       a0 = read_byte
       a1 = read_u32
       reg[a0] = a1
-    when 0x28 # lw
+    # --- MEMORY HANDLING ---
+    when 0x2e # lw
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
@@ -188,40 +208,32 @@ class CPU
         (mem[address + 1].to_u32 << 16) |
         (mem[address + 2].to_u32 << 8)  |
         (mem[address + 3].to_u32 << 0)
-    when 0x29 # lh
+    when 0x2f # lh
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
       reg[a0] =
         (mem[address + 0].to_u32 << 8)  |
         (mem[address + 1].to_u32 << 0)
-    when 0x2a # lb
+    when 0x30 # lb
       a0 = read_byte
       a1 = read_byte
       address = reg[a1]
       reg[a0] =
         (mem[address + 0].to_u32 << 0)
-    when 0x2b # sw
-      raise "broken"
-      # TODO: fixme
-      # raw = reg[a1]
-      # mem[reg[a0] + 0] = ((raw & 0xff000000) >> 24).to_u8
-      # mem[reg[a0] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
-      # mem[reg[a0] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
-      # mem[reg[a0] + 3] = ((raw & 0x000000ff)).to_u8
-      # advance(3)
-    when 0x2c # sh
-      raise "broken"
-      # TODO: fixme
-      # raw = reg[a1]
-      # mem[reg[a0] + 0] = ((raw & 0x0000ff00) >> 8).to_u8
-      # mem[reg[a0] + 1] = ((raw & 0x000000ff)).to_u8
-      # advance(3)
-    when 0x2d # sb
+    when 0x31 # sw
+      # TODO: implement
+    when 0x32 # sh
+      # TODO: implement
+    when 0x33 # sb
       a0 = read_byte
       a1 = read_byte
       raw = reg[a1]
       mem[reg[a0] + 0] = ((raw & 0x000000ff)).to_u8
+    # --- SPECIAL ---
+    when 0xfe # prn
+      a0 = read_byte
+      puts "#{reg[a0]}"
     when 0xff # halt
       @running = false
       advance(-1)

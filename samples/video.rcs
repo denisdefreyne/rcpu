@@ -1,9 +1,9 @@
 ### MAIN
 
-    call @print-string
+    calli @print-string
 
 loop:
-    jmpi @loop
+    ji @loop
 
 ### PRINT-STRING
 
@@ -25,8 +25,8 @@ print-string-loop:
     # load char
     lb r1, r0                # r1 = ascii value
     cmpi r1, 0x00
-    je @print-string-done
-    call @maybe-break-line
+    jei @print-string-done
+    calli @maybe-break-line
     muli r1, r1, 0x04        # address size is 4
     addi r1, r1, @ascii      # r1 = char address
     lw r1, r1
@@ -35,14 +35,14 @@ print-string-loop:
     push r1                  # char address
     push r2                  # x (in px)
     push r3                  # y (in px)
-    call @print-char
+    calli @print-char
     addi rsp, rsp, 12
 
     # next
     addi r2, r2, 5
     addi r0, r0, 1
 
-    jmpi @print-string-loop
+    ji @print-string-loop
 
 print-string-done:
     pop r3
@@ -56,18 +56,18 @@ print-string-done:
 
 maybe-break-line:
     cmpi r1, 0x0a
-    je @break-line
+    jei @break-line
     ret
 
 break-line:
     pushi 50
-    call @sleep
+    calli @sleep
     addi rsp, rsp, 4
     li r2, 0
     addi r3, r3, 6
     addi r0, r0, 1
     addi rsp, rsp, 4 # no return
-    jmpi @print-string-loop
+    ji @print-string-loop
 
 ### SLEEP
 
@@ -94,9 +94,9 @@ sleep:
 
 sleep-loop:
     cmp r0, r1
-    je @sleep-done
+    jei @sleep-done
     addi r1, r1, 1
-    jmpi @sleep-loop
+    ji @sleep-loop
 
 sleep-done:
     pop r1
