@@ -86,40 +86,6 @@ class CPU
     end
   end
 
-  def push(int)
-    push(
-      ((int & 0xff000000) >> 24).to_u8,
-      ((int & 0x00ff0000) >> 16).to_u8,
-      ((int & 0x0000ff00) >> 8).to_u8,
-      ((int & 0x000000ff)).to_u8,
-    )
-  end
-
-  def push(a, b, c, d)
-    reg[Reg::RSP] -= 4_u32
-    mem[reg[Reg::RSP] + 0] = a
-    mem[reg[Reg::RSP] + 1] = b
-    mem[reg[Reg::RSP] + 2] = c
-    mem[reg[Reg::RSP] + 3] = d
-  end
-
-  def pop
-    reconstruct_int(
-      mem.fetch(reg[Reg::RSP] + 0),
-      mem.fetch(reg[Reg::RSP] + 1),
-      mem.fetch(reg[Reg::RSP] + 2),
-      mem.fetch(reg[Reg::RSP] + 3)
-    ).tap do
-      reg[Reg::RSP] += 4
-    end
-  end
-
-  def cmp(a, b)
-    reg[Reg::RFLAGS] =
-      (a == b ? 0x01_u32 : 0x00_u32) |
-      (a > b  ? 0x02_u32 : 0x00_u32)
-  end
-
   def step
     opcode = read_byte
 
@@ -313,19 +279,53 @@ class CPU
     end
   end
 
-  def advance(amount)
+  private def push(int)
+    push(
+      ((int & 0xff000000) >> 24).to_u8,
+      ((int & 0x00ff0000) >> 16).to_u8,
+      ((int & 0x0000ff00) >> 8).to_u8,
+      ((int & 0x000000ff)).to_u8,
+    )
+  end
+
+  private def push(a, b, c, d)
+    reg[Reg::RSP] -= 4_u32
+    mem[reg[Reg::RSP] + 0] = a
+    mem[reg[Reg::RSP] + 1] = b
+    mem[reg[Reg::RSP] + 2] = c
+    mem[reg[Reg::RSP] + 3] = d
+  end
+
+  private def pop
+    reconstruct_int(
+      mem.fetch(reg[Reg::RSP] + 0),
+      mem.fetch(reg[Reg::RSP] + 1),
+      mem.fetch(reg[Reg::RSP] + 2),
+      mem.fetch(reg[Reg::RSP] + 3)
+    ).tap do
+      reg[Reg::RSP] += 4
+    end
+  end
+
+  private def cmp(a, b)
+    reg[Reg::RFLAGS] =
+      (a == b ? 0x01_u32 : 0x00_u32) |
+      (a > b  ? 0x02_u32 : 0x00_u32)
+  end
+
+  private def advance(amount)
     reg[Reg::RPC] += amount
   end
 
-  def read_byte
+  private def read_byte
     mem[reg[Reg::RPC]].tap { advance(1) }
   end
 
-  def read_u32
+  private def read_u32
     reconstruct_int(read_byte, read_byte, read_byte, read_byte)
   end
 
-  def reconstruct_int(x, y, z, t)
+  private def reconstruct_int(x, y, z, t)
     (x.to_u32 << 24) + (y.to_u32 << 16) + (z.to_u32 << 8) + t.to_u32
   end
 end
