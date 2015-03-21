@@ -20,8 +20,8 @@ rcpu-assemble: src/assemble/main.cr $(SOURCES) deps
 rcpu-emulate: src/emulate/main.cr $(SOURCES) deps
 	crystal build $< -o $@
 
-rcpu-spec: $(SPEC_SOURCES) $(SOURCES)
-	crystal build $< -o $@
+rcpu-spec: $(SPEC_SOURCES)
+	crystal build $+ -o $@
 
 .PHONY: clean
 clean:
