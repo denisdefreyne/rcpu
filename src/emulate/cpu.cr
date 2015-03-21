@@ -4,6 +4,12 @@ class CPU
   getter mem
   setter mem
 
+  class OpcodeNotSupportedException < Exception
+  end
+
+  class InvalidOpcodeException < Exception
+  end
+
   def initialize(mem)
     @reg = Reg.new
     @mem = mem
@@ -32,7 +38,7 @@ class CPU
     case opcode
     # --- FUNCTION HANDLING ---
     when 0x01 # call
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x02 # calli
       reg[Reg::SP] -= 4_u32
       new_pc = reg[Reg::PC] + 4
@@ -87,42 +93,42 @@ class CPU
       i = read_u32
       reg[Reg::PC] = i
     when 0x09 # je
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x0a # jei
       i = read_u32
       if reg[Reg::FLAGS] & 0x01 == 0x01
         reg[Reg::PC] = i
       end
     when 0x0b # jne
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x0c # jnei
       i = read_u32
       if reg[Reg::FLAGS] & 0x01 == 0x00
         reg[Reg::PC] = i
       end
     when 0x0d # jg
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x0e # jgi
       i = read_u32
       if reg[Reg::FLAGS] & 0x02 == 0x02
         reg[Reg::PC] = i
       end
     when 0x0f # jge
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x10 # jgei
       i = read_u32
       if reg[Reg::FLAGS] & 0x03 != 0x00
         reg[Reg::PC] = i
       end
     when 0x11 # jl
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x12 # jli
       i = read_u32
       if reg[Reg::FLAGS] & 0x03 == 0x00
         reg[Reg::PC] = i
       end
     when 0x13 # jle
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x14 # jlei
       i = read_u32
       if reg[Reg::FLAGS] & 0x02 == 0x00
@@ -162,38 +168,51 @@ class CPU
       i = read_u32
       reg[a0] = (reg[a1] + i)
     when 0x1b # sub
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x1c # subi
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] - i)
     when 0x1d # mul
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x1e # muli
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] * i)
     when 0x1f # div
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x20 # divi
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x21 # xor
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x22 # xori
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x23 # or
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x24 # ori
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x25 # and
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x26 # andi
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x27 # shl
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x28 # shli
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x29 # shr
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x2a # shri
       a0 = read_byte
       a1 = read_byte
       i = read_u32
       reg[a0] = (reg[a1] >> i)
     when 0x2b # not
-      # TODO: iplement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     # --- REGISTER HANDLING ---
     when 0x2c # mov
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x2d # li
       a0 = read_byte
       a1 = read_u32
@@ -222,9 +241,9 @@ class CPU
       reg[a0] =
         (mem[address + 0].to_u32 << 0)
     when 0x31 # sw
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x32 # sh
-      # TODO: implement
+      raise OpcodeNotSupportedException.new(opcode.inspect)
     when 0x33 # sb
       a0 = read_byte
       a1 = read_byte
@@ -238,7 +257,7 @@ class CPU
       @running = false
       advance(-1)
     else
-      raise "Unknown opcode: #{@opcode.inspect}"
+      raise InvalidOpcodeException.new(opcode.inspect)
     end
   end
 
