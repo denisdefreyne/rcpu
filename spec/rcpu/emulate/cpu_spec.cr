@@ -9,10 +9,10 @@ describe CPU do
     it "jumps to the right address" do
       mem = Mem.new
       mem[0_u32] = 0x07_u8
-      mem[1_u32] = 6_u8 # r6
+      mem[1_u32] = Reg::R6
 
       cpu = CPU.new(mem)
-      cpu.reg[6_u8] = 0x01020304_u32
+      cpu.reg[Reg::R6] = 0x01020304_u32
 
       cpu.step
       cpu.reg[Reg::RPC].should eq(0x01020304)
@@ -32,6 +32,23 @@ describe CPU do
 
       cpu.step
       cpu.reg[Reg::RPC].should eq(0x01020304)
+    end
+  end
+
+  describe "mov" do
+    it "copies the register" do
+      mem = Mem.new
+      mem[0_u32] = 0x2c_u8
+      mem[1_u32] = Reg::R1
+      mem[2_u32] = Reg::R2
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R1] = 0x11111111_u32
+      cpu.reg[Reg::R2] = 0x22222222_u32
+
+      cpu.step
+      cpu.reg[Reg::R1].should eq(0x22222222_u32)
+      cpu.reg[Reg::R2].should eq(0x22222222_u32)
     end
   end
 end

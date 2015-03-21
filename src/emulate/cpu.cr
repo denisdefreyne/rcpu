@@ -212,7 +212,9 @@ class CPU
       raise OpcodeNotSupportedException.new(opcode.inspect)
     # --- REGISTER HANDLING ---
     when 0x2c # mov
-      raise OpcodeNotSupportedException.new(opcode.inspect)
+      a0 = read_byte
+      a1 = read_byte
+      reg[a0] = reg[a1]
     when 0x2d # li
       a0 = read_byte
       a1 = read_u32
