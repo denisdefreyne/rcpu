@@ -158,39 +158,51 @@ describe CPU do
   end
 
   describe "je" do
+    # TODO: implement
   end
 
   describe "jei" do
+    # TODO: implement
   end
 
   describe "jne" do
+    # TODO: implement
   end
 
   describe "jnei" do
+    # TODO: implement
   end
 
   describe "jg" do
+    # TODO: implement
   end
 
   describe "jgi" do
+    # TODO: implement
   end
 
   describe "jge" do
+    # TODO: implement
   end
 
   describe "jgei" do
+    # TODO: implement
   end
 
   describe "jl" do
+    # TODO: implement
   end
 
   describe "jli" do
+    # TODO: implement
   end
 
   describe "jle" do
+    # TODO: implement
   end
 
   describe "jlei" do
+    # TODO: implement
   end
 
   describe "cmp" do
@@ -305,6 +317,90 @@ describe CPU do
     end
   end
 
+  describe "mod" do
+    # TODO: implement
+  end
+
+  describe "modi" do
+    # TODO: implement
+  end
+
+  describe "add" do
+    # TODO: implement
+  end
+
+  describe "addi" do
+    # TODO: implement
+  end
+
+  describe "sub" do
+    # TODO: implement
+  end
+
+  describe "subi" do
+    # TODO: implement
+  end
+
+  describe "mul" do
+    # TODO: implement
+  end
+
+  describe "muli" do
+    # TODO: implement
+  end
+
+  describe "div" do
+    # TODO: implement
+  end
+
+  describe "divi" do
+    # TODO: implement
+  end
+
+  describe "xor" do
+    # TODO: implement
+  end
+
+  describe "xori" do
+    # TODO: implement
+  end
+
+  describe "or" do
+    # TODO: implement
+  end
+
+  describe "ori" do
+    # TODO: implement
+  end
+
+  describe "and" do
+    # TODO: implement
+  end
+
+  describe "andi" do
+    # TODO: implement
+  end
+
+  describe "shl" do
+    # TODO: implement
+  end
+
+  describe "shli" do
+    # TODO: implement
+  end
+
+  describe "shr" do
+    # TODO: implement
+  end
+
+  describe "shri" do
+    # TODO: implement
+  end
+
+  describe "not" do
+    # TODO: implement
+  end
+
   describe "mov" do
     it "copies the register" do
       mem = Mem.new
@@ -320,5 +416,41 @@ describe CPU do
       cpu.reg[Reg::R1].should eq(0x22222222_u32)
       cpu.reg[Reg::R2].should eq(0x22222222_u32)
     end
+  end
+
+  describe "li" do
+    # TODO: implement
+  end
+
+  describe "lw" do
+    # TODO: implement
+  end
+
+  describe "lh" do
+    # TODO: implement
+  end
+
+  describe "lb" do
+    # TODO: implement
+  end
+
+  describe "sw" do
+    # TODO: implement
+  end
+
+  describe "sh" do
+    # TODO: implement
+  end
+
+  describe "sb" do
+    # TODO: implement
+  end
+
+  describe "prn" do
+    # TODO: implement
+  end
+
+  describe "halt" do
+    # TODO: implement
   end
 end
