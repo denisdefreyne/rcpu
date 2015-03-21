@@ -61,7 +61,24 @@ describe CPU do
   end
 
   describe "push" do
-    # TODO: implement
+    it "advances RSP and stores the value at the given register" do
+      mem = Mem.new
+      mem[0x00_u32] = CPU::O_PUSH
+      mem[0x01_u32] = Reg::R6
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::R6] = 0x05060708_u32
+
+      cpu.reg[Reg::RPC].should eq(0x00)
+      cpu.reg[Reg::RSP].should eq(0xffff)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x02)
+      cpu.reg[Reg::RSP].should eq(0xfffb_u32)
+      mem[0xfffb_u32].should eq(5_u8)
+      mem[0xfffc_u32].should eq(6_u8)
+      mem[0xfffd_u32].should eq(7_u8)
+      mem[0xfffe_u32].should eq(8_u8)
+    end
   end
 
   describe "pushi" do

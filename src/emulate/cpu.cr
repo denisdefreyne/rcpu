@@ -86,27 +86,36 @@ class CPU
     end
   end
 
+  def push(int)
+    push(
+      ((int & 0xff000000) >> 24).to_u8,
+      ((int & 0x00ff0000) >> 16).to_u8,
+      ((int & 0x0000ff00) >> 8).to_u8,
+      ((int & 0x000000ff)).to_u8,
+    )
+  end
+
+  def push(a, b, c, d)
+    reg[Reg::RSP] -= 4_u32
+    mem[reg[Reg::RSP] + 0] = a
+    mem[reg[Reg::RSP] + 1] = b
+    mem[reg[Reg::RSP] + 2] = c
+    mem[reg[Reg::RSP] + 3] = d
+  end
+
   def step
     opcode = read_byte
 
     case opcode
     # --- FUNCTION HANDLING ---
     when O_CALL
-      reg[Reg::RSP] -= 4_u32
       new_pc = reg[Reg::RPC] + 1
-      mem[reg[Reg::RSP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
-      mem[reg[Reg::RSP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
-      mem[reg[Reg::RSP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
-      mem[reg[Reg::RSP] + 3] = ((new_pc & 0x000000ff)).to_u8
+      push(new_pc)
       a0 = read_byte
       reg[Reg::RPC] = reg[a0]
     when O_CALLI
-      reg[Reg::RSP] -= 4_u32
       new_pc = reg[Reg::RPC] + 4
-      mem[reg[Reg::RSP] + 0] = ((new_pc & 0xff000000) >> 24).to_u8
-      mem[reg[Reg::RSP] + 1] = ((new_pc & 0x00ff0000) >> 16).to_u8
-      mem[reg[Reg::RSP] + 2] = ((new_pc & 0x0000ff00) >> 8).to_u8
-      mem[reg[Reg::RSP] + 3] = ((new_pc & 0x000000ff)).to_u8
+      push(new_pc)
       i = read_u32
       reg[Reg::RPC] = i
     when O_RET
@@ -122,21 +131,13 @@ class CPU
     when O_PUSH
       a0 = read_byte
       raw = reg[a0]
-      reg[Reg::RSP] -= 4
-      mem[reg[Reg::RSP] + 0] = ((raw & 0xff000000) >> 24).to_u8
-      mem[reg[Reg::RSP] + 1] = ((raw & 0x00ff0000) >> 16).to_u8
-      mem[reg[Reg::RSP] + 2] = ((raw & 0x0000ff00) >> 8).to_u8
-      mem[reg[Reg::RSP] + 3] = ((raw & 0x000000ff)).to_u8
+      push(raw)
     when O_PUSHI
       a0 = read_byte
       a1 = read_byte
       a2 = read_byte
       a3 = read_byte
-      reg[Reg::RSP] -= 4_u32
-      mem[reg[Reg::RSP] + 0] = a0
-      mem[reg[Reg::RSP] + 1] = a1
-      mem[reg[Reg::RSP] + 2] = a2
-      mem[reg[Reg::RSP] + 3] = a3
+      push(a0, a1, a2, a3)
     when O_POP
       a0 = read_byte
       reg[a0] = reconstruct_int(
