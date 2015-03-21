@@ -61,47 +61,47 @@ The first byte is the opcode. Register arguments are one byte long, and label/im
 
 [options="header",cols="1,1,1,2"]
 |===
-| Mnemonic  | Opcode     | Arguments             | Effect
+| Mnemonic  | Opcode     | Arguments         | Effect
 4+h|Function handling
-| `call(i)` | 0x01, 0x02 | 1 (reg/imm)           |
-| `ret`     | 0x03       | 0                     |
+| `call(i)` | 0x01, 0x02 | reg/imm           |
+| `ret`     | 0x03       | (none)            |
 4+h|Stack management
-| `push(i)` | 0x04, 0x05 | 1 (reg/imm)           | push a0 onto stack
-| `pop`     | 0x06       | 1 (reg)               | pop into a0
+| `push(i)` | 0x04, 0x05 | reg/imm           | push a0 onto stack
+| `pop`     | 0x06       | reg               | pop into a0
 4+h|Branching
-| `j(i)`    | 0x07, 0x08 | 1 (reg/imm)           | pc ← a0
-| `je(i)`   | 0x09, 0x0a | 1 (reg/imm)           | if == then pc ← a0
-| `jne(i)`  | 0x0b, 0x0c | 1 (reg/imm)           | if != then pc ← a0
-| `jg(i)`   | 0x0d, 0x0e | 1 (reg/imm)           | if >  then pc ← a0
-| `jge(i)`  | 0x0f, 0x10 | 1 (reg/imm)           | if >= then pc ← a0
-| `jl(i)`   | 0x11, 0x12 | 1 (reg/imm)           | if <  then pc ← a0
-| `jle(i)`  | 0x13, 0x14 | 1 (reg/imm)           | if <= then pc ← a0
+| `j(i)`    | 0x07, 0x08 | reg/imm           | pc ← a0
+| `je(i)`   | 0x09, 0x0a | reg/imm           | if == then pc ← a0
+| `jne(i)`  | 0x0b, 0x0c | reg/imm           | if != then pc ← a0
+| `jg(i)`   | 0x0d, 0x0e | reg/imm           | if >  then pc ← a0
+| `jge(i)`  | 0x0f, 0x10 | reg/imm           | if >= then pc ← a0
+| `jl(i)`   | 0x11, 0x12 | reg/imm           | if <  then pc ← a0
+| `jle(i)`  | 0x13, 0x14 | reg/imm           | if <= then pc ← a0
 4+h|Arithmetic
-| `cmp(i)`  | 0x15, 0x16 | 2 (reg, reg/imm)      | (see below)
-| `mod(i)`  | 0x17, 0x18 | 2 (reg, reg, reg/imm) | a0 ← a1 % a2
-| `add(i)`  | 0x19, 0x1a | 2 (reg, reg, reg/imm) | a0 ← a1 + a2
-| `sub(i)`  | 0x1b, 0x1c | 2 (reg, reg, reg/imm) | a0 ← a1 - a2
-| `mul(i)`  | 0x1d, 0x1e | 2 (reg, reg, reg/imm) | a0 ← a1 * a2
-| `div(i)`  | 0x1f, 0x20 | 2 (reg, reg, reg/imm) | a0 ← a1 / a2
-| `xor(i)`  | 0x21, 0x22 | 2 (reg, reg, reg/imm) | a0 ← a1 ^ a2
-| `or(i)`   | 0x23, 0x24 | 2 (reg, reg, reg/imm) | a0 ← a1 \| a2
-| `and(i)`  | 0x25, 0x26 | 2 (reg, reg, reg/imm) | a0 ← a1 & a2
-| `shl(i)`  | 0x27, 0x28 | 2 (reg, reg, reg/imm) | a0 ← a1 << a2
-| `shr(i)`  | 0x29, 0x2a | 2 (reg, reg, reg/imm) | a0 ← a1 >> a2
-| `not`     | 0x2b       | 2 (reg, reg)          | a0 ← ~a1
+| `cmp(i)`  | 0x15, 0x16 | reg, reg/imm      | (see below)
+| `mod(i)`  | 0x17, 0x18 | reg, reg, reg/imm | a0 ← a1 % a2
+| `add(i)`  | 0x19, 0x1a | reg, reg, reg/imm | a0 ← a1 + a2
+| `sub(i)`  | 0x1b, 0x1c | reg, reg, reg/imm | a0 ← a1 - a2
+| `mul(i)`  | 0x1d, 0x1e | reg, reg, reg/imm | a0 ← a1 * a2
+| `div(i)`  | 0x1f, 0x20 | reg, reg, reg/imm | a0 ← a1 / a2
+| `xor(i)`  | 0x21, 0x22 | reg, reg, reg/imm | a0 ← a1 ^ a2
+| `or(i)`   | 0x23, 0x24 | reg, reg, reg/imm | a0 ← a1 \| a2
+| `and(i)`  | 0x25, 0x26 | reg, reg, reg/imm | a0 ← a1 & a2
+| `shl(i)`  | 0x27, 0x28 | reg, reg, reg/imm | a0 ← a1 << a2
+| `shr(i)`  | 0x29, 0x2a | reg, reg, reg/imm | a0 ← a1 >> a2
+| `not`     | 0x2b       | reg, reg          | a0 ← ~a1
 4+h|Register handling
-| `mov`     | 0x2c       | 2 (reg, reg)          | a0 ← a1
-| `li`      | 0x2d       | 2 (reg, imm)          | a0 ← a1
+| `mov`     | 0x2c       | reg, reg          | a0 ← a1
+| `li`      | 0x2d       | reg, imm          | a0 ← a1
 4+h|Memory handling
-| `lw`      | 0x2e       | 2 (reg, imm)          | (see below)
-| `lh`      | 0x2f       | 2 (reg, imm)          | (see below)
-| `lb`      | 0x30       | 2 (reg, imm)          | (see below)
-| `sw`      | 0x31       | 2 (reg, imm)          | (see below)
-| `sh`      | 0x32       | 2 (reg, imm)          | (see below)
-| `sb`      | 0x33       | 2 (reg, imm)          | (see below)
+| `lw`      | 0x2e       | reg, imm          | (see below)
+| `lh`      | 0x2f       | reg, imm          | (see below)
+| `lb`      | 0x30       | reg, imm          | (see below)
+| `sw`      | 0x31       | reg, imm          | (see below)
+| `sh`      | 0x32       | reg, imm          | (see below)
+| `sb`      | 0x33       | reg, imm          | (see below)
 4+h|Special
-| `prn`     | 0xfe       | 1 (reg)               | print a0
-| `halt`    | 0xff       | 0                     | stops emulation
+| `prn`     | 0xfe       | reg               | print a0
+| `halt`    | 0xff       | (none)             | stops emulation
 |===
 
 `cmp(i)` updates the `flags` register and sets the 0x01 bit to true if the arguments are equal, and the 0x02 bit to true if the first argument is greater than the second.
