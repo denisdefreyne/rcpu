@@ -104,6 +104,27 @@ describe CPU do
     end
   end
 
+  describe "pop" do
+    it "pops four bytes" do
+      mem = Mem.new
+      mem[0_u32] = CPU::O_POP
+      mem[1_u32] = 0x05_u8
+      mem[0xfffc_u32] = 5_u8
+      mem[0xfffd_u32] = 6_u8
+      mem[0xfffe_u32] = 7_u8
+      mem[0xffff_u32] = 8_u8
+
+      cpu = CPU.new(mem)
+      cpu.reg[Reg::RSP] = 0xfffc_u32
+
+      cpu.reg[Reg::RPC].should eq(0x0)
+      cpu.step
+      cpu.reg[Reg::RPC].should eq(0x2)
+      cpu.reg[Reg::R5].should eq(0x05060708)
+      cpu.reg[Reg::RSP].should eq(0xffff_u32 + 0x01_u32)
+    end
+  end
+
   describe "j" do
     it "jumps to the right address" do
       mem = Mem.new

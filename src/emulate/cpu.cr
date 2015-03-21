@@ -103,6 +103,17 @@ class CPU
     mem[reg[Reg::RSP] + 3] = d
   end
 
+  def pop
+    reconstruct_int(
+      mem.fetch(reg[Reg::RSP] + 0),
+      mem.fetch(reg[Reg::RSP] + 1),
+      mem.fetch(reg[Reg::RSP] + 2),
+      mem.fetch(reg[Reg::RSP] + 3)
+    ).tap do
+      reg[Reg::RSP] += 4
+    end
+  end
+
   def step
     opcode = read_byte
 
@@ -119,14 +130,7 @@ class CPU
       i = read_u32
       reg[Reg::RPC] = i
     when O_RET
-      i = reconstruct_int(
-        mem.fetch(reg[Reg::RSP] + 0),
-        mem.fetch(reg[Reg::RSP] + 1),
-        mem.fetch(reg[Reg::RSP] + 2),
-        mem.fetch(reg[Reg::RSP] + 3)
-      )
-      reg[Reg::RSP] += 4
-      reg[Reg::RPC] = i
+      reg[Reg::RPC] = pop
     # --- STACK MANAGEMENT ---
     when O_PUSH
       a0 = read_byte
@@ -140,13 +144,7 @@ class CPU
       push(a0, a1, a2, a3)
     when O_POP
       a0 = read_byte
-      reg[a0] = reconstruct_int(
-        mem.fetch(reg[Reg::RSP] + 0),
-        mem.fetch(reg[Reg::RSP] + 1),
-        mem.fetch(reg[Reg::RSP] + 2),
-        mem.fetch(reg[Reg::RSP] + 3)
-      )
-      reg[Reg::RSP] += 4
+      reg[a0] = pop
     # --- BRANCHING ---
     when O_J
       a0 = read_byte
