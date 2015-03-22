@@ -1,3 +1,5 @@
+require "option_parser"
+
 class Arg
   def kind
     raise "Not implemented"
@@ -744,11 +746,20 @@ class Assembler
   end
 end
 
-# Get filenames
+op = OptionParser.parse! do |opts|
+  opts.banner = "Usage: rcpu-assemble filename"
+  opts.on("-h", "--help", "print this help menu") do
+    puts opts
+    exit 0
+  end
+end
+
 if ARGV.size != 1
-  STDERR.puts "usage: #{File.basename($0)} [filename]"
+  puts op
   exit 1
 end
+
+# Get filenames
 input_filename = ARGV[0]
 output_filename =
   File.join(
