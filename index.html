@@ -442,6 +442,7 @@ This project is very much a work in progress.
 <li><a href="#_registers">Registers</a></li>
 <li><a href="#_instruction_format">Instruction format</a></li>
 <li><a href="#_instruction_set">Instruction set</a></li>
+<li><a href="#_memory_layout">Memory layout</a></li>
 <li><a href="#_assembly_language_syntax">Assembly language syntax</a></li>
 </ul>
 </li>
@@ -854,6 +855,35 @@ This project is very much a work in progress.
 </div>
 </div>
 <div class="sect2">
+<h3 id="_memory_layout">Memory layout</h3>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Range</th>
+<th class="tableblock halign-left valign-top">Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x00 – …</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Program code</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">… – 0xffff</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stack (grows downward, word-aligned)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x00010000 - 0x00014b00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Video memory (160 by 120 pixels, 1 byte per pixel)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
 <h3 id="_assembly_language_syntax">Assembly language syntax</h3>
 <div class="paragraph">
 <p>A lines can be an instruction line, a label line, or a data directive line. Blank lines are ignored.</p>
@@ -949,7 +979,7 @@ This project is very much a work in progress.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-21 22:34:54 CET
+Last updated 2015-03-22 10:33:48 CET
 </div>
 </div>
 </body>
