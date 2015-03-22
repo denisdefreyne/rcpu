@@ -112,6 +112,16 @@ Several opcodes have an `(i)` variant. These variants take a four-byte immediate
 
 Label arguments are identical to immediate arguments.
 
+=== Memory layout
+
+[options="header",cols="1,3"]
+|===
+| Range                   | Use
+| 0x00 – …                | Program code
+| … – 0xffff              | Stack (grows downward, word-aligned)
+| 0x00010000 - 0x00014b00 | Video memory (160 by 120 pixels, 1 byte per pixel)
+|===
+
 === Assembly language syntax
 
 A lines can be an instruction line, a label line, or a data directive line. Blank lines are ignored.
