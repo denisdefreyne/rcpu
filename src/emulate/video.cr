@@ -130,24 +130,30 @@ class Video
     end
   end
 
-  def get_input
+  def handle_input(cpu)
     while LibSDL2.poll_event(out e) == 1
       case e.type
       when EventType::QUIT
-        return :quit
+        cpu.running = false
+      when EventType::KEYDOWN
+        cpu.reg[Reg::RFLAGS] |= 0x04_u8 # interrupt bit
+        # TODO: set interrupt kind
+        cpu.mem[0x08fffe_u32] = (e.key.key_sym.scan_code.value & 0xff00).to_u8
+        cpu.mem[0x08ffff_u32] = (e.key.key_sym.scan_code.value & 0x00ff).to_u8
+      when EventType::KEYUP
+        cpu.reg[Reg::RFLAGS] |= 0x04_u8 # interrupt bit
+        # TODO: set interrupt kind
+        cpu.mem[0x08fffe_u32] = (e.key.key_sym.scan_code.value & 0xff00).to_u8
+        cpu.mem[0x08ffff_u32] = (e.key.key_sym.scan_code.value & 0x00ff).to_u8
       end
     end
-    return :none
   end
 
   def run(cpu, num_cycles)
     draw do |g|
       loop do
-        case get_input
-        when :quit
-          break
-        end
-
+        # FIXME: handle input on every occasion
+        handle_input(cpu)
         cpu.run(num_cycles)
         update(g)
         break unless cpu.running

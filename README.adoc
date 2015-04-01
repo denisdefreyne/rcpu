@@ -122,6 +122,22 @@ Label arguments are identical to immediate arguments.
 | 0x00010000 - 0x00014b00 | Video memory (160 by 120 pixels, 1 byte per pixel)
 |===
 
+=== Interrupts
+
+when triggering:
+
+* rflags will contain interrupt bit
+* specific mem location (or register?) will have interrupt types set (bitmask?)
+
+when handling:
+
+* back up rpc
+
+when done:
+
+* restore rpc
+* unset interrupt bit
+
 === Assembly language syntax
 
 A lines can be an instruction line, a label line, or a data directive line. Blank lines are ignored.

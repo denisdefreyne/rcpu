@@ -1,8 +1,7 @@
 class CPU
-  getter running
+  property running
   getter reg
-  getter mem
-  setter mem
+  property mem
 
   O_CALL  = 0x01_u8
   O_CALLI = 0x02_u8
