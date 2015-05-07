@@ -1,10 +1,27 @@
 require "spec"
 
-require "../src/emulate/cpu"
-require "../src/emulate/mem"
-require "../src/emulate/reg"
+require "../../../src/emulate/cpu"
+require "../../../src/emulate/mem"
+require "../../../src/emulate/reg"
+
+macro stack_pointer
+  cpu.reg[Reg::RSP]
+end
+
+macro program_counter
+  cpu.reg[Reg::RPC]
+end
 
 describe CPU do
+
+  describe "initial CPU state" do
+    mem = Mem.new
+    cpu = CPU.new(mem)
+
+    program_counter.should eq(0x0)
+    stack_pointer.should eq(0xffff)
+  end
+
   describe "call" do
     it "pushes the return address and jumps" do
       mem = Mem.new
@@ -14,11 +31,9 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::R3] = 0x10204080_u32
 
-      cpu.reg[Reg::RPC].should eq(0x0)
-      cpu.reg[Reg::RSP].should eq(0xffff)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x10204080)
-      cpu.reg[Reg::RSP].should eq(0xfffb)
+      program_counter.should eq(0x10204080)
+      stack_pointer.should eq(0xfffb)
     end
   end
 
@@ -33,11 +48,9 @@ describe CPU do
 
       cpu = CPU.new(mem)
 
-      cpu.reg[Reg::RPC].should eq(0x0)
-      cpu.reg[Reg::RSP].should eq(0xffff)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x01020304)
-      cpu.reg[Reg::RSP].should eq(0xfffb)
+      program_counter.should eq(0x01020304)
+      stack_pointer.should eq(0xfffb)
     end
   end
 
@@ -53,10 +66,9 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::RSP] = 0xfffc_u32
 
-      cpu.reg[Reg::RPC].should eq(0x0)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x05060708)
-      cpu.reg[Reg::RSP].should eq(0xffff_u32 + 0x01_u32)
+      program_counter.should eq(0x05060708)
+      stack_pointer.should eq(0xffff_u32 + 0x01_u32)
     end
   end
 
@@ -69,11 +81,9 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::R6] = 0x05060708_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RSP].should eq(0xffff)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x02)
-      cpu.reg[Reg::RSP].should eq(0xfffb_u32)
+      program_counter.should eq(0x02)
+      stack_pointer.should eq(0xfffb_u32)
       mem[0xfffb_u32].should eq(5_u8)
       mem[0xfffc_u32].should eq(6_u8)
       mem[0xfffd_u32].should eq(7_u8)
@@ -92,11 +102,9 @@ describe CPU do
 
       cpu = CPU.new(mem)
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RSP].should eq(0xffff)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x05)
-      cpu.reg[Reg::RSP].should eq(0xfffb_u32)
+      program_counter.should eq(0x05)
+      stack_pointer.should eq(0xfffb_u32)
       mem[0xfffb_u32].should eq(5_u8)
       mem[0xfffc_u32].should eq(6_u8)
       mem[0xfffd_u32].should eq(7_u8)
@@ -117,11 +125,10 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::RSP] = 0xfffc_u32
 
-      cpu.reg[Reg::RPC].should eq(0x0)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x2)
+      program_counter.should eq(0x2)
       cpu.reg[Reg::R5].should eq(0x05060708)
-      cpu.reg[Reg::RSP].should eq(0xffff_u32 + 0x01_u32)
+      stack_pointer.should eq(0xffff_u32 + 0x01_u32)
     end
   end
 
@@ -134,9 +141,8 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::R6] = 0x01020304_u32
 
-      cpu.reg[Reg::RPC].should eq(0x0)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x01020304)
+      program_counter.should eq(0x01020304)
     end
   end
 
@@ -151,9 +157,8 @@ describe CPU do
 
       cpu = CPU.new(mem)
 
-      cpu.reg[Reg::RPC].should eq(0x0)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x01020304)
+      program_counter.should eq(0x01020304)
     end
   end
 
@@ -216,10 +221,8 @@ describe CPU do
       cpu.reg[Reg::R1] = 0x05_u32
       cpu.reg[Reg::R2] = 0x05_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RFLAGS].should eq(0x00)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x03)
+      program_counter.should eq(0x03)
       cpu.reg[Reg::RFLAGS].should eq(0x01)
     end
 
@@ -233,10 +236,8 @@ describe CPU do
       cpu.reg[Reg::R1] = 0x07_u32
       cpu.reg[Reg::R2] = 0x05_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RFLAGS].should eq(0x00)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x03)
+      program_counter.should eq(0x03)
       cpu.reg[Reg::RFLAGS].should eq(0x02)
     end
 
@@ -250,10 +251,8 @@ describe CPU do
       cpu.reg[Reg::R1] = 0x03_u32
       cpu.reg[Reg::R2] = 0x05_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RFLAGS].should eq(0x00)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x03)
+      program_counter.should eq(0x03)
       cpu.reg[Reg::RFLAGS].should eq(0x00)
     end
   end
@@ -271,10 +270,8 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::R2] = 0x05_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RFLAGS].should eq(0x00)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x06)
+      program_counter.should eq(0x06)
       cpu.reg[Reg::RFLAGS].should eq(0x01)
     end
 
@@ -290,10 +287,8 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::R2] = 0x07_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RFLAGS].should eq(0x00)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x06)
+      program_counter.should eq(0x06)
       cpu.reg[Reg::RFLAGS].should eq(0x02)
     end
 
@@ -309,10 +304,8 @@ describe CPU do
       cpu = CPU.new(mem)
       cpu.reg[Reg::R2] = 0x03_u32
 
-      cpu.reg[Reg::RPC].should eq(0x00)
-      cpu.reg[Reg::RFLAGS].should eq(0x00)
       cpu.step
-      cpu.reg[Reg::RPC].should eq(0x06)
+      program_counter.should eq(0x06)
       cpu.reg[Reg::RFLAGS].should eq(0x00)
     end
   end
@@ -453,4 +446,5 @@ describe CPU do
   describe "halt" do
     # TODO: implement
   end
+
 end
