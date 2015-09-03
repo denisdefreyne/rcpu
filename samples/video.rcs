@@ -1,7 +1,10 @@
 # TODO: evening -> day
+# TODO: text first, logo later
+# TODO: slow down text
 
 ### MAIN
 
+    calli @display-logo
     calli @print-string
     calli @clear
     calli @print-string
@@ -19,14 +22,19 @@ clear:
     push r2
     push r3
     push r4
+    push r5
 
     li r2, 0       # clear value
     li r3, 0x10000 # start
-    li r4, 0x14b00 # end
+    li r4, 0x12620 # mid
+    li r5, 0x14b00 # end
 
 clear-loop:
     sb r3, r2
+    sb r5, r2
     addi r3, r3, 1
+    subi r5, r5, 1
+
     cmp r3, r4
     jei @clear-loop-done
 
@@ -40,10 +48,20 @@ clear-loop:
     ji @clear-loop
 
 clear-loop-done:
+    pop r5
     pop r4
     pop r3
     pop r2
     pop r1
+
+    pop rbp
+    ret
+
+### DISPLAY-LOGO
+
+display-logo:
+    push rbp
+    addi rbp, rsp, 0
 
     pop rbp
     ret
