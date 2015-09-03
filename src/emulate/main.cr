@@ -54,7 +54,7 @@ end
 cpu = CPU.new(mem)
 if enble_video
   video = Video.new(mem)
-  video.run(cpu, 40)
+  video.run(cpu, 1000)
 else
   cpu.run
 end
