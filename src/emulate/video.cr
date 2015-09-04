@@ -93,6 +93,9 @@ GREEN  = 0xFF40CC2E_u32
 PURPLE = 0xFF4B1485_u32
 RED    = 0xFF4B59F2_u32
 
+ON  = 0xFF0055FF_u32
+OFF = 0xFF4f4c42_u32
+
 class Video
   PADDING = 16
 
@@ -111,7 +114,7 @@ class Video
       y = (index / row_length_in_bytes)
 
       byte = @mem.fetch(0x10000 + index)
-      color = (byte != 0x00) ? TEAL : EMPTY
+      color = (byte != 0x00) ? ON : OFF
       graphics.draw_block(PADDING + x * 4, PADDING + y * 4, 4, 4, color)
     end
   end

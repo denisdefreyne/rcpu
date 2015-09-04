@@ -103,7 +103,6 @@ display-logo-loop-done:
 print-string:
     push rbp
     addi rbp, rsp, 0
-
     push r0
     push r1
     push r2
@@ -142,9 +141,7 @@ print-string-done:
     pop r2
     pop r1
     pop r0
-
     pop rbp
-
     ret
 
 maybe-break-line:
