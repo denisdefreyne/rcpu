@@ -1,7 +1,3 @@
-# TODO: evening -> day
-# TODO: text first, logo later
-# TODO: slow down text
-
 ### MAIN
 
     calli @print-string
@@ -338,11 +334,10 @@ print-char:
     addi r3, r3, 1
     addi r4, r4, 157
 
-    pushi 180
+    pushi 200
     calli @sleep
-    #calli @sleep
-    #calli @sleep
-    #calli @sleep
+    calli @sleep
+    calli @sleep
     addi rsp, rsp, 4
 
     pop r5
@@ -20028,13 +20023,9 @@ ascii-string:
 .byte 0x63
 .byte 0x65
 .byte 0x20
-.byte 0x65
-.byte 0x76
-.byte 0x65
-.byte 0x6e
-.byte 0x69
-.byte 0x6e
-.byte 0x67
+.byte 0x64
+.byte 0x61
+.byte 0x79
 .byte 0x2c
 .byte 0x20
 .byte 0x61
