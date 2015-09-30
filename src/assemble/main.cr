@@ -17,19 +17,19 @@ end
 
 class RegArg < Arg
   MAPPING = {
-    "r0"     => 0.to_u8,
-    "r1"     => 1.to_u8,
-    "r2"     => 2.to_u8,
-    "r3"     => 3.to_u8,
-    "r4"     => 4.to_u8,
-    "r5"     => 5.to_u8,
-    "r6"     => 6.to_u8,
-    "r7"     => 7.to_u8,
-    "rpc"    => 8.to_u8,
-    "rflags" => 9.to_u8,
-    "rsp"    => 10.to_u8,
-    "rbp"    => 11.to_u8,
-    "rr"     => 12.to_u8,
+    "r0"     => 0_u8,
+    "r1"     => 1_u8,
+    "r2"     => 2_u8,
+    "r3"     => 3_u8,
+    "r4"     => 4_u8,
+    "r5"     => 5_u8,
+    "r6"     => 6_u8,
+    "r7"     => 7_u8,
+    "rpc"    => 8_u8,
+    "rflags" => 9_u8,
+    "rsp"    => 10_u8,
+    "rbp"    => 11_u8,
+    "rr"     => 12_u8,
   }
 
   getter :name
