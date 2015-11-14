@@ -209,11 +209,11 @@ class Token
 
   def initialize
     @kind = :unknown
-    @content_io = StringIO.new
+    @content_io = MemoryIO.new
   end
 
   def empty
-    @content_io = StringIO.new
+    @content_io = MemoryIO.new
   end
 
   def append_char(c)
