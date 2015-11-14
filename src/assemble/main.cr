@@ -712,6 +712,7 @@ class Assembler
     "sh"    => IDef.new(0x32.to_u8, [:register, :register]),
     "sb"    => IDef.new(0x33.to_u8, [:register, :register]),
     # Special
+    "sleep" => IDef.new(0xfd.to_u8, [:immediate]),
     "prn"   => IDef.new(0xfe.to_u8, [:register]),
     "halt"  => IDef.new(0xff.to_u8, [] of Symbol),
   }

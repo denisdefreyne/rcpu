@@ -100,6 +100,7 @@ The first byte is the opcode. Register arguments are one byte long, and label/im
 | `sh`      | 0x32       | reg, imm          | (see below)
 | `sb`      | 0x33       | reg, imm          | (see below)
 4+h|Special
+| `sleep`   | 0xfd       | imm               | sleep for a0 ms
 | `prn`     | 0xfe       | reg               | print a0
 | `halt`    | 0xff       | (none)            | stops emulation
 |===

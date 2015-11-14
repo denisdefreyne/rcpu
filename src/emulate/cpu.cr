@@ -55,6 +55,7 @@ class CPU
   O_SW    = 0x31_u8
   O_SH    = 0x32_u8
   O_SB    = 0x33_u8
+  O_SLEEP = 0xfd_u8
   O_PRN   = 0xfe_u8
   O_HALT  = 0xff_u8
 
@@ -268,6 +269,9 @@ class CPU
       raw = reg[a1]
       mem[reg[a0] + 0] = ((raw & 0x000000ff)).to_u8
     # --- SPECIAL ---
+    when O_SLEEP
+      i = read_u32
+      sleep(i.to_f / 1000.0)
     when O_PRN
       a0 = read_byte
       puts "#{reg[a0]}"
