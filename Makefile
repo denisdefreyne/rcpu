@@ -4,20 +4,20 @@ SPEC_SOURCES := $(shell find spec -name '*.cr')
 .PHONY: all
 all: rcpu-assemble rcpu-emulate
 
-.PHONY: deps
-deps: .deps
+.PHONY: dependencies
+dependencies: .shards
 
 .PHONY: spec
 spec: rcpu-spec
 	./rcpu-spec
 
-.deps: Projectfile
+.shards: shard.yml
 	crystal deps
 
-rcpu-assemble: src/assemble/main.cr $(SOURCES) deps
+rcpu-assemble: src/assemble/main.cr $(SOURCES) dependencies
 	crystal build $< -o $@
 
-rcpu-emulate: src/emulate/main.cr $(SOURCES) deps
+rcpu-emulate: src/emulate/main.cr $(SOURCES) dependencies
 	crystal build $< -o $@
 
 rcpu-spec: $(SPEC_SOURCES) $(SOURCES)
