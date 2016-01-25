@@ -1,0 +1,6 @@
+version: 1.0
+shards:
+  ssl:
+    github: weskinner/crystal-sdl2
+    commit: 2e175a173565f7112114cdc30a4b005abffa3270
+
