@@ -26,7 +26,7 @@ rcpu-spec: $(SPEC_SOURCES) $(SOURCES)
 .PHONY: clean
 clean:
 	rm -rf .crystal
-	rm -rf .deps
+	rm -rf .shards
 	rm -rf libs
 	rm -f rcpu-assemble
 	rm -f rcpu-emulate

@@ -1,6 +1,5 @@
 *.rcb
 .crystal/
-.deps/
 libs/
 rcpu-assemble
 rcpu-emulate
