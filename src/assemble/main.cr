@@ -198,7 +198,7 @@ class DataDirective
 
   def bytes(labels)
     bytes = arg.bytes(labels)
-    bytes.reverse.take(length).reverse
+    bytes[-length..-1]
   end
 end
 
