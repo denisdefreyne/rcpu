@@ -3,7 +3,7 @@ version: 0.1.0
 
 dependencies:
   sdl2:
-    github: weskinner/crystal-sdl2
-    branch: master
+    github: ddfreyne/crystal-sdl2
+    branch: crystal-0-15-compat
 
 license: MIT
