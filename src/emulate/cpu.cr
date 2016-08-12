@@ -65,7 +65,7 @@ class CPU
   class InvalidOpcodeException < Exception
   end
 
-  def initialize(mem)
+  def initialize(mem : Mem)
     @reg = Reg.new
     @mem = mem
     @running = true

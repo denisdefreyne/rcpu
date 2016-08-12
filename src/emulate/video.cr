@@ -10,7 +10,7 @@ end
 class Graphics
   property render
 
-  def initialize(title, width, height)
+  def initialize(title : String, width : Int32, height : Int32)
     @render_changed = false
 
     # Create window
@@ -96,7 +96,7 @@ RED    = 0xFF4B59F2_u32
 class Video
   PADDING = 16
 
-  def initialize(mem)
+  def initialize(mem : Mem)
     @mem = mem
   end
 

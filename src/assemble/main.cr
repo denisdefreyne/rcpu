@@ -34,7 +34,7 @@ class RegArg < Arg
 
   getter :name
 
-  def initialize(name)
+  def initialize(name : String)
     @name = name
   end
 
@@ -58,7 +58,7 @@ end
 class ImmArg < Arg
   getter :value
 
-  def initialize(value)
+  def initialize(value : Int32)
     @value = value
   end
 
@@ -88,7 +88,7 @@ end
 class LabelArg < Arg
   getter :name
 
-  def initialize(name)
+  def initialize(name : String)
     @name = name
   end
 
@@ -125,7 +125,7 @@ class Instruction
   getter :opcode_mnemonic
   getter :args
 
-  def initialize(opcode_mnemonic, args)
+  def initialize(opcode_mnemonic : String, args : Array(Arg))
     @opcode_mnemonic = opcode_mnemonic
     @args = args
   end
@@ -150,7 +150,7 @@ end
 class Label
   getter :name
 
-  def initialize(name)
+  def initialize(name : String)
     @name = name
   end
 
@@ -175,7 +175,7 @@ class DataDirective
   getter :length
   getter :arg
 
-  def initialize(length, arg)
+  def initialize(length : Int32, arg : Arg)
     @length = length
     @arg = arg
   end
@@ -236,7 +236,7 @@ end
 class Lexer
   getter tokens
 
-  def initialize(@input)
+  def initialize(@input : String)
     @index = 0
     @tokens = [] of Token
     @current_token = Token.new
@@ -404,7 +404,7 @@ end
 class Parser
   getter statements
 
-  def initialize(@input)
+  def initialize(@input : Array(Token))
     @index = 0
     @statements = [] of Instruction | Label | DataDirective
   end
@@ -599,7 +599,7 @@ end
 ################################################################################
 
 class Assembler
-  def initialize(@input)
+  def initialize(@input : String)
   end
 
   def assemble
@@ -647,7 +647,7 @@ class Assembler
     getter :opcode
     getter :args
 
-    def initialize(opcode : UInt8, args)
+    def initialize(opcode : UInt8, args : Array(Symbol))
       @opcode = opcode
       @args   = args
     end
