@@ -7,6 +7,10 @@ lib LibSDL2_GFX
   fun box_color = boxColor(dst : Void*, x1 : Int16, y1 : Int16, x2 : Int16, y2 : Int16, color : UInt32) : Int32
 end
 
+# ABGR
+ON  = 0xFF005CFF_u32
+OFF = 0xFF301E0E_u32
+
 class Graphics
   property render
 
@@ -61,7 +65,13 @@ class Graphics
   end
 
   def clear_background
-    LibSDL2.set_render_draw_color(@render, 0x42_u8, 0x4c_u8, 0x4f_u8, 255_u8)
+    LibSDL2.set_render_draw_color(
+      @render,
+      (OFF & 0x000000ff) >> 0,
+      (OFF & 0x0000ff00) >> 8,
+      (OFF & 0x00ff0000) >> 16,
+      (OFF & 0xff000000) >> 24,
+    )
     LibSDL2.render_clear(@render)
   end
 
@@ -92,9 +102,6 @@ YELLOW = 0xFF00DCFF_u32
 GREEN  = 0xFF40CC2E_u32
 PURPLE = 0xFF4B1485_u32
 RED    = 0xFF4B59F2_u32
-
-ON  = 0xFF0055FF_u32
-OFF = 0xFF4f4c42_u32
 
 class Video
   PADDING = 16
