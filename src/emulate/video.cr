@@ -76,7 +76,7 @@ class Graphics
   end
 
   def draw_block(x, y, width, height, color)
-    LibSDL2_GFX.box_color(@render as Void*, x.to_i16, y.to_i16, x.to_i16 + width, y.to_i16 + width, color)
+    LibSDL2_GFX.box_color(@render.as(Void*), x.to_i16, y.to_i16, x.to_i16 + width, y.to_i16 + width, color)
 
     set_render_changed
   end
