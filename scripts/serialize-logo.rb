@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'chunky_png'
 
 if ARGV.size != 1
